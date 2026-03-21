@@ -1,0 +1,366 @@
+     SMARTSTOCK
+INVENTORY
+ “Turning manual stock tracking into intelligent decision-making.”
+
+
+                         Presented By
+                         SOMATECH
+ Problem Statement
+ Cambodia's SMEs are flying blind on
+ inventory — every single day
+
+
+
+     01 THE REALITY                      02 WHO AFFECTED                    03 WHY IT EXISTS                     04     THE COST
+
+                                    Small retailers, market vendors,        No affordable tools built         Stockouts & overstock drain
+          SMEs still track stock
+70%+     with notebooks & Excel    and Facebook commerce sellers       for Cambodia's commerce reality       the businesses that can least
+                                                                                                                       afford it
+
+Facebook is the primary sales      Shops selling through Facebook       Demand spikes every Khmer New       Lost sales at peak season — the
+channel with zero structured       Pages & Groups                       Year, Pchum Ben, 11.11              worst time to run out
+data                               Retailers with no budget for         Sales data trapped in Messenger     Overstock locks up scarce
+Orders come via Messenger          enterprise ERP tools                 threads                             working capital
+untracked                          Owners managing stock alone no       Existing tools are too complex or   Cash flow instability blocks
+No forecasting. Just guesswork.    dedicated staff                      too expensive                       growth & restocking
+                                   Businesses tied to Cambodia's        Owners can't anticipate what they   Operational inefficiency
+                                   seasonal calendar                    can't measure                       compounds every month
+
+
+
+
+                                                                                                                                  SOMATECH
+USER PERSONA
+Lika: Clothing seller via Facebook
+
+
+
+                       "I only realize I'm out of stock when customers start
+                                 asking. By then it's already too late."
+
+
+
+                        TOOLS USED FOR ONLINE BUSINESS
+
+
+
+
+                                                                        SOMATECH
+USER PERSONA
+Niko: Owner of a convenience store with a POS
+
+
+
+                   "I have the machine, I have the data. But at the end of
+                       the day I still just guess when to call my supplier."
+
+
+
+                   TOOLS USED FOR ONLINE BUSINESS
+
+
+
+
+                                                                          SOMATECH
+WHO WE SERVE
+
+
+TARGET CUSTOMER                                           PHYSICAL RETAIL SHOP
+                                                                                                           50 – 300 SKUs
+                                                          Runs out of best-sellers with zero early       Walk-in · Market stall
+                                                          warning — finds out only when the shelf is
+                                                          empty.
+50–1K Stock Keeping Unit Range
+Small enough to feel manageable — large enough to lose
+track
+                                                          FACEBOOK COMMERCE SELLER
+                                                                                                           100 – 500 SKUs
+                                                          Sales happen in Messenger DMs —
+WHAT THEY SHARE                                                                                         FB Page · Marketplace
+                                                          completely untracked. Can't see what's
+                                                          selling or what's low.
+No real inventory system. Decisions run on memory,
+Excel, or gut feel.
+
+
+
+                                                         MULTI-CHANNEL RETAILER
+WHEN IT HURTS MOST
+                                                                                                         100 – 500 SKUs
+                                                         Stock is split across walk-in, online, and
+Seasonal peaks — Khmer New Year, Pchum Ben —                                                           FB Page · Marketplace
+                                                         delivery — no single source of truth.
+when stockouts cost the most.                            Oversells weekly.
+
+
+
+
+                                                                                                                      SOMATECH
+  HOW WE SOLVE IT
+
+
+  THE SOLUTION
+
+                                    An AI-powered SaaS platform that turns sales history into
+                                actionable stock decisions — built for non-technical SME owners.
+
+
+
+
+                                                                       TELEGRAM AUTOMATION               MULTI-CHANNEL SYNC
+   SIMPLE DASHBOARD                DEMAND FORECASTING
+                                                                                                        Stockouts & overstock drain
+                                 Automatically flags items           Sends reorder alerts and stock    the businesses that can least
+Predicts product demand                                              summaries directly to the                   afford it
+                                 running low and
+30 days ahead using                                                  owner's Telegram — no app
+                                 recommends reorder
+historical sales patterns and                                        needed.                          Lost sales at peak season — the
+                                 quantities before it's too                                           worst time to run out
+seasonal trends.
+                                 late.                                                                Overstock locks up scarce
+                                                                                                      working capital
+ Fixes: stockouts during         Fixes: finding out stock is          Fixes: owners who live on       Cash flow instability blocks
+ Khmer New Year & peak           empty only at the shelf              mobile, not desktop             growth & restocking
+ season                                                               dashboards                      Operational inefficiency
+                                                                                                      compounds every month
+
+
+
+
+                                                                                                                            SOMATECH
+MARKET GAP
+
+                                 Excel / Notebook    POS Systems    ERP Systems       ⚡ SmartStock
+
+
+    AI Demand Forecasting                                           Enterprise only
+
+
+    AI Demand Forecasting                               Varies
+
+
+
+  Smart Reorder Automation                            Basic Alert   Complex setup
+
+
+
+     Designed for MSMEs                                             Complex setup
+
+
+ Facebook Commerce Focus
+
+
+  Affordable for Small Sellers     Required Skills     Moderate
+
+
+
+
+                                                                                               SOMATECH
+MARKET ANALYSIS
+
+    753K+                           99.8%                          Market Sizing
+  MSMEs in Cambodia             of all businesses are SMEs
+
+
+
+
+                                                             All Cambodian
+     #1–2                             70%                                           753K
+Retail & wholesale are          Still manage inventory           MSMEs             businesses
+
+   largest sectors                      manually
+
+
+              Technology Adoption Gap
+ Manual operations dominant                         ~85%
+
+
+ No digital forecasting tools                       ~70%
+
+
+ Using structured inventory software                ~30%
+
+
+
+                                                                                         SOMATECH
+COMPARATIVE ANALYSIS
+                                                                                         SmartStock
+         Features              Loyverse    Odoo      SAP         Zoho        Excel
+                                                                                        (our product)
+
+
+ Basic Inventory Tracking                                                   Partially
+
+
+                                                    limited
+  AI Demand Forecasting                           (enterprise   limited
+                                                      only)
+
+
+Smart Reorder Automation
+
+
+   Designed for MSMEs          Partially                        Partially   Partially
+
+
+  Facebook Commerce
+        Focus
+
+
+Affordable for Small Sellers                                    Partially
+
+
+   Simple Onboarding                                            Partially
+
+                                                                                               SOMATECH
+BUSINESS MODEL
+1 month free trail to reduce adoption fricition
+
+   Plans              Starter                      Growth                      Advances                    Enterprise
+
+
+  Pricing            $15/month                    $25/month                   $40/month                 Custom Pricing
+
+
+  Target
+                Micro SMEs (50–100        Growing SMEs (100–300         Mini-marts & established    Multi-branch retailers /
+ Custome
+                       SKUs)                      SKUs)                          SMEs                       marts
+    r
+
+
+                                                                              • Unlimited SKUs
+                                         • Advanced AI forecasting
+                                                                            • AI reorder quantity
+                 • Basic AI demand             (seasonality-aware)                                      • Custom AI models
+                                                                                 optimization
+                forecasting (30-day              • Smart reorder                                    • API integration for POS
+                                                                            • Supplier lead-time
+                        forecast)               recommendations                                               providers
+                                                                                   modeling
+                  • Stockout alerts      • Multi-channel sync (up to                                 • Dedicated onboarding
+  Features                                                                  • Promotion demand
+                • Email notifications              3 platforms)                                            • SLA support
+                                                                                  simulation
+                   • 1 sales channel      • Real-time alerts (Email +                               • Data export & reporting
+                                                                           • Advanced analytics
+                integration • Simple                Telegram)                                                   tools
+                                                                                  dashboard
+                       dashboard             • Sales trend analytics                                   • White-label options
+                                                                              • Priority support
+                                           • Basic supplier tracking
+                                                                         • Multi-location suppor
+
+
+                                                                                                                        SOMATECH
+BUSINESS OBJECTIVES
+                                        HYBRID FORECASTING MODEL                                  Why It Matters
+    30d
+               Combines Facebook Prophet for seasonal trend detection with LSTM neural           Predicts stockouts
+   forecast    networks for short-term demand shifts — tuned for Cambodia's peak-heavy retail    before they happen —
+   window      calendar.                                                                         not after the shelf is
+                                                                                                 empty.
+
+
+
+
+                                          ML RESTOCK AUTOMATION                                   Why It Matters
+    ~80%
+                                                                                                 Removes the
+   decisions   Scores each SKU daily — flagging reorder priority, optimal quantity, and timing
+                                                                                                 guesswork that costs
+               automatically. Owners get a decision, not a spreadsheet.
+  automated                                                                                      SMEs cash flow every
+                                                                                                 month.
+
+
+
+
+                                     MULTI-PLATFORM INTEGRATION                                   Why It Matters
+    30d
+               Ingests real-time data from Facebook Commerce, local delivery apps, and walk-in   One source of truth
+   forecast    POS into one unified stock view — no manual reconciliation.                       across every channel
+   window                                                                                        an SME sells on.
+
+
+
+
+                                                                                                                     SOMATECH
+ PRODUCT DEVELOPMENT PLAN
+
+          M1                           M1                            M1                         M1
+
+
+
+
+       MONTH 1                     MONTH 2                      MONTH 3                     MONTH 4
+Research & Architecture        MVP Development                 AI Optimization              Pilot Launch
+
+SME interviews & user        Inventory module             Improve forecast accuracy   Onboard 5–15 SMEs
+discovery                    User management & auth       Build smart reorder         Collect real usage data
+Define MVP scope &           Forecast model integration   algorithm                   Validate forecast
+features                     Dashboard UI                 Telegram alert automation   performance
+UI wireframes & user flows                                Multi-channel sync layer    Prepare paid conversion
+Cloud infrastructure setup
+
+
+
+
+                                                                                                       SOMATECH
+OPPORTUNITY FOR BUSINESS
+
+         Short-Term                     Mid-Term                         Long-Term
+
+
+    ESTABLISH & CAPTURE             EXPAND & PARTNER           PLATFORM & INTELLIGENCE
+
+  First Mover: No AI-powered    POS Provider Partnerships:     SME Retail Intelligence Platform:
+  inventory tool exists for     Integrate with existing POS    Evolve beyond inventory — offer
+  Cambodia SMEs — we            vendors to embed               purchasing insights, supplier
+  move first and build the      SmartStock as their AI layer   matching, and demand
+                                — channel distribution at      benchmarking across the
+  brand.
+                                scale.                         network.
+
+  Underserved Micro Retail      ASEAN Expansion: Replicate     Data Network Effects:
+  Target Phnom Penh retailers   Cambodia model in Myanmar,     oCross-SME data creates a
+  — high density, high pain,    Laos, and Vietnam — same       proprietary demand signal
+  low digital adoption.         underserved SME profile.       no competitor can replicate.
+
+
+
+
+                                                                                                   SOMATECH
+EXPECTED BENEFIT OUTCOME
+
+For SMEs:
+   20–40% reduction in stockouts
+   30–50% reduction in overstock
+   5–10 hours saved weekly
+   Improved cash flow stability
+
+For Investors:
+   Recurring SaaS revenue
+   High-margin digital product
+   Scalable regional expansion
+
+
+
+
+                                   SOMATECH
+               VISION & CONTACT
+
+                      Vision:
+ To democratize AI-powered inventory intelligence
+               for Cambodian SMEs.
+SmartStock will become the decision engine for retail
+                 SMEs in Cambodia.
+           EMAIL ADDRESS   somatech18@gmail.com
+
+
+
+
+                                                        SOMATECH
+
