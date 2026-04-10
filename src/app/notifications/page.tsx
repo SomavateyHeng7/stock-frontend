@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import {
   NOTIFICATION_CENTER_CHANGED_EVENT,
@@ -12,10 +13,12 @@ import {
   resolveNotification,
   type NotificationItem,
 } from "@/lib/notification-center";
+import { formatDateTime } from "@/lib/user-preferences";
 
 type ViewFilter = "open" | "resolved" | "all";
 
 export default function NotificationsPage() {
+  const preferences = useUserPreferences();
   const [filter, setFilter] = useState<ViewFilter>("open");
   const [items, setItems] = useState<NotificationItem[]>(() => readNotificationCenter());
 
@@ -154,7 +157,7 @@ export default function NotificationsPage() {
                       <p className="font-medium text-foreground">{item.title}</p>
                       {item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleString()} · Source: {item.source}
+                        {formatDateTime(item.createdAt, preferences)} · Source: {item.source}
                       </p>
                     </div>
                     <span className={`inline-flex rounded-full border px-2 py-1 text-xs font-medium ${badgeClass(item.severity)}`}>

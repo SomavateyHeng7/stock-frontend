@@ -2,7 +2,9 @@
 
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { useToast } from "@/components/ui/toast-provider";
+import { formatDateTime } from "@/lib/user-preferences";
 import { products as baseProducts } from "@/lib/smartstock-data";
 
 export type InventoryProduct = (typeof baseProducts)[number] & {
@@ -45,6 +47,7 @@ type AddProductPanelProps = {
 
 export function AddProductPanel({ products, setProducts, setSelectedProductId, onProductsAdded }: AddProductPanelProps) {
   const { showToast } = useToast();
+  const preferences = useUserPreferences();
 
   const [entryMode, setEntryMode] = useState<"choose" | "manual" | "bulk">("choose");
   const [showManualForm, setShowManualForm] = useState(false);
@@ -158,7 +161,7 @@ export function AddProductPanel({ products, setProducts, setSelectedProductId, o
     setLastManualSummary({
       name: productName,
       quantity: safeQuantity,
-      createdAt: new Date().toLocaleString(),
+      createdAt: new Date().toISOString(),
     });
 
     setNewName("");
@@ -350,7 +353,7 @@ export function AddProductPanel({ products, setProducts, setSelectedProductId, o
       importedCount: previewRows.length,
       skippedCount: previewErrors.length,
       duplicateSkippedCount,
-      createdAt: new Date().toLocaleString(),
+      createdAt: new Date().toISOString(),
     });
 
     setBulkFile(null);
@@ -499,7 +502,7 @@ export function AddProductPanel({ products, setProducts, setSelectedProductId, o
             <div className="mt-3 rounded-lg border border-green-500/20 bg-green-500/5 p-3 text-xs text-foreground">
               <p className="font-semibold">Last manual create succeeded</p>
               <p className="mt-1 text-muted-foreground">
-                {lastManualSummary.name} with {lastManualSummary.quantity} units at {lastManualSummary.createdAt}
+                {lastManualSummary.name} with {lastManualSummary.quantity} units at {formatDateTime(lastManualSummary.createdAt, preferences)}
               </p>
             </div>
           )}
@@ -630,7 +633,7 @@ export function AddProductPanel({ products, setProducts, setSelectedProductId, o
               <p className="mt-1 text-muted-foreground">
                 Imported: {lastImportSummary.importedCount} | Skipped: {lastImportSummary.skippedCount} | Duplicate skips: {lastImportSummary.duplicateSkippedCount}
               </p>
-              <p className="mt-0.5 text-muted-foreground">Completed at {lastImportSummary.createdAt}</p>
+              <p className="mt-0.5 text-muted-foreground">Completed at {formatDateTime(lastImportSummary.createdAt, preferences)}</p>
             </div>
           )}
         </div>

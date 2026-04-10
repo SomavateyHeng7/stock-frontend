@@ -36,7 +36,7 @@ export default function Home() {
             {/* CTA Buttons */}
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/dashboard"
+                href="/onboarding"
                 className="group inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
               >
                 Start free trial
@@ -415,7 +415,7 @@ export default function Home() {
 
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="/dashboard"
+                  href="/onboarding"
                   className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-primary shadow-lg transition-transform hover:scale-105"
                 >
                   Start your free trial

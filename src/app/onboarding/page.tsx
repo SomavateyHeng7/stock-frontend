@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
+import { readUserPreferences, updateUserPreferences } from "@/lib/user-preferences";
 
 type StepId = 1 | 2 | 3;
 
@@ -75,29 +76,29 @@ function writeOnboardingState(next: Partial<OnboardingState>) {
 export default function OnboardingPage() {
 	const router = useRouter();
 	const { showToast } = useToast();
-	const [step, setStep] = useState<StepId>(1);
-	const [draft, setDraft] = useState<OnboardingDraft>(defaultDraft);
-
-	useEffect(() => {
+	const [showTutorial, setShowTutorial] = useState(false);
+	const [hasCompletedBefore, setHasCompletedBefore] = useState(() => {
 		const saved = readOnboardingState();
-		if (saved.completedAt) {
-			router.replace("/dashboard");
-			return;
-		}
-
-		setDraft({
+		return Boolean(saved.completedAt);
+	});
+	const [step, setStep] = useState<StepId>(1);
+	const [draft, setDraft] = useState<OnboardingDraft>(() => {
+		const saved = readOnboardingState();
+		const preferences = readUserPreferences();
+		const preferredLanguage = preferences.language === "km" ? "khmer" : "english";
+		return {
 			businessName: saved.businessName,
 			industry: saved.industry,
 			skuRange: saved.skuRange,
-			preferredLanguage: saved.preferredLanguage,
+			preferredLanguage: saved.completedAt ? saved.preferredLanguage : preferredLanguage,
 			channels: saved.channels,
 			alertChannel: saved.alertChannel,
 			phoneOrEmail: saved.phoneOrEmail,
-		});
-	}, [router]);
+		};
+	});
 
 	useEffect(() => {
-		writeOnboardingState({ ...draft, completedAt: null });
+		writeOnboardingState({ ...draft });
 	}, [draft]);
 
 	const progress = useMemo(() => Math.round((step / 3) * 100), [step]);
@@ -162,6 +163,10 @@ export default function OnboardingPage() {
 			phoneOrEmail: contact,
 			completedAt: new Date().toISOString(),
 		});
+		updateUserPreferences({
+			language: draft.preferredLanguage === "khmer" ? "km" : "en",
+		});
+		setHasCompletedBefore(true);
 
 		showToast({
 			title: "Onboarding complete",
@@ -170,6 +175,73 @@ export default function OnboardingPage() {
 
 		router.push("/dashboard");
 	};
+
+	const startTutorial = () => {
+		setStep(1);
+		setShowTutorial(true);
+	};
+
+	const skipTutorialForNow = () => {
+		writeOnboardingState({
+			...draft,
+			completedAt: new Date().toISOString(),
+		});
+		updateUserPreferences({
+			language: draft.preferredLanguage === "khmer" ? "km" : "en",
+		});
+		setHasCompletedBefore(true);
+		showToast({
+			title: "Setup skipped",
+			description: "You can return to onboarding anytime from the Tutorial link.",
+		});
+		router.push("/dashboard");
+	};
+
+	if (!showTutorial) {
+		return (
+			<main className="min-h-screen bg-muted/20 px-4 py-8 sm:px-6 lg:py-10">
+				<section className="mx-auto w-full max-w-3xl rounded-2xl border border-border/70 bg-card p-5 shadow-sm sm:p-6">
+					<p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">SmartStock Setup</p>
+					<h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">Choose how you want to start</h1>
+					<p className="mt-2 text-sm text-muted-foreground">
+						Pick a guided tutorial or jump straight to the app. You can always revisit onboarding later.
+					</p>
+
+					{hasCompletedBefore && (
+						<p className="mt-3 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-medium text-foreground">
+							You already have setup data. Start the tutorial to review or update your preferences.
+						</p>
+					)}
+
+					<div className="mt-6 grid gap-3 sm:grid-cols-2">
+						<button
+							type="button"
+							onClick={startTutorial}
+							className="rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+						>
+							Start guided tutorial
+						</button>
+						<button
+							type="button"
+							onClick={skipTutorialForNow}
+							className="rounded-lg border border-border bg-background px-4 py-3 text-sm font-medium text-foreground"
+						>
+							I am fine on my own
+						</button>
+					</div>
+
+					<div className="mt-4">
+						<Link
+							href="/dashboard"
+							className="text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+						>
+							Back to dashboard
+						</Link>
+					</div>
+				</section>
+			</main>
+		);
+	}
 
 	return (
 		<main className="min-h-screen bg-muted/20 px-4 py-8 sm:px-6 lg:py-10">

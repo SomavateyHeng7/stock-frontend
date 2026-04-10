@@ -1,3 +1,5 @@
+import { formatDateTime, readUserPreferences } from "@/lib/user-preferences";
+
 type ExportRow = {
   name: string;
   status: string;
@@ -57,7 +59,7 @@ export function exportLowStockCsv(rows: ExportRow[]) {
 }
 
 export function exportLowStockPdf(rows: ExportRow[], slaHours: number) {
-  const generatedAt = new Date().toLocaleString();
+  const generatedAt = formatDateTime(new Date().toISOString(), readUserPreferences());
 
   const tableRows = rows
     .map(

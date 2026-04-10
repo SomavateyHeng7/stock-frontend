@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { AddProductPanel, type InventoryProduct } from "../../components/inventory/add-product-panel";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { EmptyState, ErrorState, HelpHint, LoadingState } from "@/components/ui/data-state";
 import { useToast } from "@/components/ui/toast-provider";
+import { formatCurrencyAmount, formatDateTime } from "@/lib/user-preferences";
 import {
   getStatusClass,
   getStockStatus,
@@ -55,6 +57,7 @@ const ARCHIVED_PRODUCTS_KEY = "smartstock.inventory.archived-product-ids.v1";
 
 export default function InventoryPage() {
   const { showToast } = useToast();
+  const preferences = useUserPreferences();
   const [products, setProducts] = useState<InventoryProduct[]>(() =>
     readSmartStockState().products as InventoryProduct[],
   );
@@ -82,6 +85,21 @@ export default function InventoryPage() {
   const [showArchived, setShowArchived] = useState(false);
 
   const [detailProductId, setDetailProductId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!detailProductId) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDetailProductId(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [detailProductId]);
 
   const getUnitPrice = (item: InventoryProduct) => {
     if ("unitPrice" in item && typeof item.unitPrice === "number") {
@@ -567,15 +585,15 @@ export default function InventoryPage() {
         <section className="space-y-6" aria-label="Inventory">
           <div className="grid gap-4 lg:grid-cols-5">
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
+              <div className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
+                <div className="flex items-center gap-2 text-base font-semibold text-foreground">
+                  <MapPin className="h-5 w-5" />
                   <span>Current Location</span>
                 </div>
                 <select
                   value={selectedBranchId}
                   onChange={(event) => setSelectedBranchId(event.target.value)}
-                  className="mt-3 h-12 w-full rounded-lg border border-border bg-background px-3 text-base font-semibold text-foreground"
+                  className="mt-3 h-14 w-full rounded-xl border border-border bg-background px-4 text-xl font-semibold text-foreground"
                 >
                   {ledgerState.branches.map((branch) => (
                     <option key={branch.id} value={branch.id}>
@@ -587,38 +605,38 @@ export default function InventoryPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:col-span-3">
-              <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
+              <div className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Package className="h-5 w-5 text-primary" />
+                  <div className="rounded-lg bg-primary/10 p-3">
+                    <Package className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Total Products</p>
-                    <p className="text-xl font-bold text-foreground">{inventoryStats.totalProducts}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Products</p>
+                    <p className="text-3xl font-bold text-foreground">{inventoryStats.totalProducts}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
+              <div className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-lg bg-green-500/10 p-2">
-                    <BarChart3 className="h-5 w-5 text-green-600" />
+                  <div className="rounded-lg bg-green-500/10 p-3">
+                    <BarChart3 className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Stock Value</p>
-                    <p className="text-xl font-bold text-foreground">${inventoryStats.totalValue.toFixed(0)}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Stock Value</p>
+                    <p className="text-3xl font-bold text-foreground">${inventoryStats.totalValue.toFixed(0)}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-4 shadow-sm">
+              <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 shadow-sm">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-lg bg-yellow-500/10 p-2">
-                    <TrendingDown className="h-5 w-5 text-yellow-600" />
+                  <div className="rounded-lg bg-yellow-500/10 p-3">
+                    <TrendingDown className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Low Stock</p>
-                    <p className="text-xl font-bold text-foreground">{inventoryStats.lowStock}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Low Stock</p>
+                    <p className="text-3xl font-bold text-foreground">{inventoryStats.lowStock}</p>
                   </div>
                 </div>
               </div>
@@ -630,33 +648,33 @@ export default function InventoryPage() {
               <div className="flex gap-6 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("overview")}
-                  className={`relative flex items-center gap-2 px-2 py-4 text-sm font-medium ${
+                  className={`relative flex items-center gap-2 px-2 py-4 text-base font-semibold ${
                     activeTab === "overview" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Package className="h-4 w-4" />
+                  <Package className="h-5 w-5" />
                   <span>Inventory Overview</span>
                   {activeTab === "overview" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
                 </button>
 
                 <button
                   onClick={() => setActiveTab("adjust")}
-                  className={`relative flex items-center gap-2 px-2 py-4 text-sm font-medium ${
+                  className={`relative flex items-center gap-2 px-2 py-4 text-base font-semibold ${
                     activeTab === "adjust" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <ArrowUpDown className="h-4 w-4" />
+                  <ArrowUpDown className="h-5 w-5" />
                   <span>Stock Adjustment</span>
                   {activeTab === "adjust" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
                 </button>
 
                 <button
                   onClick={() => setActiveTab("movements")}
-                  className={`relative flex items-center gap-2 px-2 py-4 text-sm font-medium ${
+                  className={`relative flex items-center gap-2 px-2 py-4 text-base font-semibold ${
                     activeTab === "movements" ? "text-primary" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <History className="h-4 w-4" />
+                  <History className="h-5 w-5" />
                   <span>Movement History</span>
                   {activeTab === "movements" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
                 </button>
@@ -666,83 +684,87 @@ export default function InventoryPage() {
             <div className="p-4">
               {activeTab === "overview" && (
                 <div className="space-y-4">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <input
-                          value={searchQuery}
-                          onChange={(event) => setSearchQuery(event.target.value)}
-                          placeholder="Search products by name or quality..."
-                          className="h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-sm text-foreground"
-                        />
+                  <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
+                    <div className="space-y-3">
+                      <div className="rounded-xl border border-border/70 bg-card/80 p-4">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                          <input
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            placeholder="Search products by name or quality..."
+                            className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-3 text-base text-foreground"
+                          />
+                        </div>
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1.5">
+                            <button
+                              onClick={() => setStockFilter("all")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                stockFilter === "all" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              All
+                            </button>
+                            <button
+                              onClick={() => setStockFilter("low")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                stockFilter === "low" ? "bg-yellow-500 text-white" : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              Low
+                            </button>
+                            <button
+                              onClick={() => setStockFilter("good")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                stockFilter === "good" ? "bg-green-500 text-white" : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              Good
+                            </button>
+                            <button
+                              onClick={() => setStockFilter("out")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                stockFilter === "out" ? "bg-red-500 text-white" : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              Out
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setViewMode("grid")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                              }`}
+                            >
+                              Grid
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setViewMode("table")}
+                              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+                                viewMode === "table" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                              }`}
+                            >
+                              Table
+                            </button>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setShowArchived((current) => !current)}
+                            className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground"
+                          >
+                            {showArchived ? "Hide Archived" : `Show Archived (${archivedProductIds.length})`}
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
-                        <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-1">
-                          <button
-                            onClick={() => setStockFilter("all")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              stockFilter === "all" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            All
-                          </button>
-                          <button
-                            onClick={() => setStockFilter("low")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              stockFilter === "low" ? "bg-yellow-500 text-white" : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Low
-                          </button>
-                          <button
-                            onClick={() => setStockFilter("good")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              stockFilter === "good" ? "bg-green-500 text-white" : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Good
-                          </button>
-                          <button
-                            onClick={() => setStockFilter("out")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              stockFilter === "out" ? "bg-red-500 text-white" : "text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Out
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-1">
-                          <button
-                            type="button"
-                            onClick={() => setViewMode("grid")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                            }`}
-                          >
-                            Grid
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setViewMode("table")}
-                            className={`rounded px-3 py-1.5 text-xs font-medium ${
-                              viewMode === "table" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                            }`}
-                          >
-                            Table
-                          </button>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => setShowArchived((current) => !current)}
-                          className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground"
-                        >
-                          {showArchived ? "Hide Archived" : `Show Archived (${archivedProductIds.length})`}
-                        </button>
-
+                      <div className="rounded-xl border border-border/70 bg-card/80 p-3">
                         <AddProductPanel
                           products={products}
                           setProducts={setProducts}
@@ -1288,12 +1310,7 @@ export default function InventoryPage() {
                               return (
                                 <tr key={movement.id} className="transition-colors hover:bg-muted/20">
                                   <td className="whitespace-nowrap px-4 py-3 text-sm text-foreground">
-                                    {new Date(movement.createdAt).toLocaleString("en-US", {
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                    {formatDateTime(movement.createdAt, preferences)}
                                   </td>
                                   <td className="px-4 py-3 text-sm text-foreground">
                                     <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/30 px-2.5 py-0.5 text-xs font-medium">
@@ -1350,25 +1367,67 @@ export default function InventoryPage() {
       )}
 
       {detailProduct && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/35" role="dialog" aria-modal="true">
-          <div className="h-full w-full max-w-xl overflow-y-auto border-l border-border bg-background p-5 shadow-2xl">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product Details</p>
-                <h2 className="mt-1 text-xl font-semibold text-foreground">{detailProduct.name}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{detailProduct.quality || "No tag"}</p>
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/40 sm:bg-black/35"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Product details for ${detailProduct.name}`}
+          onClick={() => setDetailProductId(null)}
+          onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
+            if (event.key === "Escape") {
+              setDetailProductId(null);
+            }
+          }}
+        >
+          <div
+            className="h-full w-full max-w-full overflow-y-auto border-0 bg-background p-4 shadow-2xl sm:max-w-xl sm:border-l sm:border-border sm:p-5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 -mx-4 -mt-4 border-b border-border/70 bg-background/95 px-4 pb-3 pt-4 backdrop-blur sm:-mx-5 sm:-mt-5 sm:px-5 sm:pb-4 sm:pt-5">
+              <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-border sm:hidden" />
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Product Details</p>
+                  <h2 className="mt-1 text-2xl font-semibold text-foreground">{detailProduct.name}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{detailProduct.quality || "No tag"}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDetailProductId(null)}
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-muted/40"
+                  aria-label="Close product details"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setDetailProductId(null)}
-                className="rounded-lg border border-border bg-background p-2 text-muted-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedProductId(detailProduct.id);
+                    setActiveTab("adjust");
+                    setDetailProductId(null);
+                  }}
+                  className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+                >
+                  Adjust Stock
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedProductId(detailProduct.id);
+                    setActiveTab("movements");
+                    setDetailProductId(null);
+                  }}
+                  className="min-h-11 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted/30"
+                >
+                  View Full History
+                </button>
+              </div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-border/70 bg-card p-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="mt-4 rounded-xl border border-border/70 bg-card p-3 sm:mt-5 sm:p-4">
+              <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <p className="text-muted-foreground">On hand ({branchById[selectedBranchId] ?? selectedBranchId})</p>
                   <p className="text-xl font-bold text-foreground">{getOnHandQty(ledgerState, selectedBranchId, detailProduct.id)}</p>
@@ -1381,7 +1440,9 @@ export default function InventoryPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Estimated Value</p>
-                  <p className="text-lg font-semibold text-foreground">${(getOnHandQty(ledgerState, selectedBranchId, detailProduct.id) * getUnitPrice(detailProduct)).toFixed(2)}</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {formatCurrencyAmount(getOnHandQty(ledgerState, selectedBranchId, detailProduct.id) * getUnitPrice(detailProduct), preferences)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Recent Daily Sales</p>
@@ -1390,7 +1451,7 @@ export default function InventoryPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-border/70 bg-card p-4">
+            <div className="mt-3 rounded-xl border border-border/70 bg-card p-3 sm:mt-4 sm:p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Supplier</p>
               {(() => {
                 const supplier = supplierDirectory.find((item) => item.id === detailProduct.supplierId);
@@ -1399,7 +1460,7 @@ export default function InventoryPage() {
                 }
 
                 return (
-                  <div className="mt-2 space-y-1 text-sm">
+                  <div className="mt-2 space-y-1.5 text-sm">
                     <p className="font-medium text-foreground">{supplier.name}</p>
                     <p className="text-muted-foreground">Phone: {supplier.phone}</p>
                     <p className="text-muted-foreground">Lead Time: {supplier.leadTimeDays} days</p>
@@ -1411,12 +1472,12 @@ export default function InventoryPage() {
               })()}
             </div>
 
-            <div className="mt-4 rounded-xl border border-border/70 bg-card p-4">
+            <div className="mt-3 rounded-xl border border-border/70 bg-card p-3 sm:mt-4 sm:p-4">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Forecast Snippet (7 days)</p>
                 <a href="/forecast" className="text-xs font-medium text-foreground underline-offset-4 hover:underline">Open forecast</a>
               </div>
-              <div className="mt-3 flex items-end gap-1 rounded-lg border border-border/70 bg-muted/20 p-2">
+              <div className="mt-3 flex min-w-max items-end gap-1 overflow-x-auto rounded-lg border border-border/70 bg-muted/20 p-2">
                 {detailForecast.map((value, index) => {
                   const max = Math.max(...detailForecast, 1);
                   const height = Math.max(16, Math.round((value / max) * 72));
@@ -1430,7 +1491,7 @@ export default function InventoryPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-border/70 bg-card p-4">
+            <div className="mt-3 rounded-xl border border-border/70 bg-card p-3 sm:mt-4 sm:p-4">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recent Movements</p>
                 <button
@@ -1440,7 +1501,7 @@ export default function InventoryPage() {
                     setActiveTab("movements");
                     setDetailProductId(null);
                   }}
-                  className="rounded-lg border border-border bg-background px-2 py-1 text-xs font-medium text-foreground"
+                  className="min-h-9 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted/30"
                 >
                   Full history
                 </button>
@@ -1449,39 +1510,41 @@ export default function InventoryPage() {
               {detailMovementRows.length === 0 ? (
                 <p className="mt-2 text-sm text-muted-foreground">No movements yet for this product.</p>
               ) : (
-                <ul className="mt-2 space-y-2">
+                <ul className="mt-2 space-y-2.5">
                   {detailMovementRows.map((entry) => (
-                    <li key={entry.id} className="rounded-lg border border-border/70 bg-muted/20 p-2">
+                    <li key={entry.id} className="rounded-lg border border-border/70 bg-muted/20 p-2.5">
                       <p className="text-xs font-medium text-foreground">{entry.type.replaceAll("_", " ")}</p>
                       <p className="text-xs text-muted-foreground">
                         Qty {entry.quantity} · Δ {entry.stockDelta > 0 ? `+${entry.stockDelta}` : entry.stockDelta} · {branchById[entry.branchId] ?? entry.branchId}
                       </p>
-                      <p className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">{formatDateTime(entry.createdAt, preferences)}</p>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            <div className="mt-4 flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedProductId(detailProduct.id);
-                  setActiveTab("adjust");
-                  setDetailProductId(null);
-                }}
-                className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-              >
-                Adjust Product
-              </button>
-              <button
-                type="button"
-                onClick={() => setDetailProductId(null)}
-                className="flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground"
-              >
-                Close
-              </button>
+            <div className="sticky bottom-0 -mx-4 mt-4 border-t border-border/70 bg-background/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:-mx-5 sm:px-5 sm:pb-5">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedProductId(detailProduct.id);
+                    setActiveTab("adjust");
+                    setDetailProductId(null);
+                  }}
+                  className="min-h-11 flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                >
+                  Adjust Product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDetailProductId(null)}
+                  className="min-h-11 flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/30"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

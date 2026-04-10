@@ -23,8 +23,11 @@ import {
 
 export default function DashboardPage() {
   const [expanded, setExpanded] = useState(false);
-  const [orderedIds, setOrderedIds] = useState<number[]>([]);
+  const [orderedQuantities, setOrderedQuantities] = useState<Record<number, number>>({});
   const [enrichedProducts, setEnrichedProducts] = useState<ReturnType<typeof getEnrichedProducts>>([]);
+  const [reorderDialogItem, setReorderDialogItem] = useState<ReturnType<typeof getEnrichedProducts>[number] | null>(null);
+  const [reorderDialogStep, setReorderDialogStep] = useState<1 | 2>(1);
+  const [reorderAmount, setReorderAmount] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const { showToast } = useToast();
@@ -83,13 +86,34 @@ export default function DashboardPage() {
   );
   const visibleItems = expanded ? urgentItems : urgentItems.slice(0, 5);
 
-  const markOrdered = (productId: number, productName: string, reorderQty: number) => {
-    if (orderedIds.includes(productId)) return;
-    setOrderedIds((current) => [...current, productId]);
+  const openReorderDialog = (item: ReturnType<typeof getEnrichedProducts>[number]) => {
+    if (orderedQuantities[item.id]) return;
+    setReorderDialogItem(item);
+    setReorderAmount(Math.max(1, item.reorderQty));
+    setReorderDialogStep(1);
+  };
+
+  const closeReorderDialog = () => {
+    setReorderDialogItem(null);
+    setReorderDialogStep(1);
+    setReorderAmount(1);
+  };
+
+  const confirmReorder = () => {
+    if (!reorderDialogItem) return;
+    const finalAmount = Math.max(1, Math.floor(reorderAmount));
+
+    setOrderedQuantities((current) => ({
+      ...current,
+      [reorderDialogItem.id]: finalAmount,
+    }));
+
     showToast({
       title: "Reorder confirmed",
-      description: `${productName}: ${reorderQty} units marked as ordered.`,
+      description: `${reorderDialogItem.name}: ${finalAmount} units marked as ordered.`,
     });
+
+    closeReorderDialog();
   };
 
   // Top selling products this week (mock - would come from sales data)
@@ -351,23 +375,23 @@ export default function DashboardPage() {
                         {item.reorderQty > 0 && (
                           <button
                             type="button"
-                            disabled={orderedIds.includes(item.id)}
+                            disabled={Boolean(orderedQuantities[item.id])}
                             className={`mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-                              orderedIds.includes(item.id)
+                              orderedQuantities[item.id]
                                 ? "border border-green-500/20 bg-green-500/10 text-green-700"
                                 : "bg-primary text-primary-foreground hover:opacity-90"
                             }`}
-                            onClick={() => markOrdered(item.id, item.name, item.reorderQty)}
+                            onClick={() => openReorderDialog(item)}
                           >
-                            {orderedIds.includes(item.id) ? (
+                            {orderedQuantities[item.id] ? (
                               <>
                                 <CheckCircle2 className="h-4 w-4" />
-                                Marked as Ordered
+                                Ordered {orderedQuantities[item.id]} units
                               </>
                             ) : (
                               <>
                                 <ShoppingCart className="h-4 w-4" />
-                                Reorder {item.reorderQty} units
+                                Reorder
                               </>
                             )}
                           </button>
@@ -521,6 +545,106 @@ export default function DashboardPage() {
 
         <HelpHint description="Prioritize 'Out of Stock' items first, then clear low-stock items with highest reorder value to protect weekly sales." />
       </section>
+
+      {reorderDialogItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Reorder steps">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">Reorder {reorderDialogItem.name}</h2>
+              <button
+                type="button"
+                onClick={closeReorderDialog}
+                className="rounded-lg border border-border bg-background px-2 py-1 text-xs font-medium text-foreground"
+              >
+                Close
+              </button>
+            </div>
+
+            {reorderDialogStep === 1 ? (
+              <div className="mt-4 space-y-4">
+                <p className="text-sm text-muted-foreground">Step 1 of 2: choose how many units you want to reorder.</p>
+                <div className="rounded-lg border border-border/70 bg-background/60 p-3">
+                  <p className="text-xs text-muted-foreground">Suggested reorder amount</p>
+                  <p className="text-sm font-semibold text-foreground">{reorderDialogItem.reorderQty} units</p>
+                </div>
+
+                <label htmlFor="dashboard-reorder-amount" className="grid gap-2 text-sm text-foreground">
+                  Reorder quantity
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setReorderAmount((current) => Math.max(1, current - 1))}
+                      className="h-10 w-10 rounded-lg border border-border bg-background text-sm font-semibold text-foreground"
+                    >
+                      -
+                    </button>
+                    <input
+                      id="dashboard-reorder-amount"
+                      type="number"
+                      min={1}
+                      value={reorderAmount}
+                      onChange={(event) => setReorderAmount(Math.max(1, Number(event.target.value) || 1))}
+                      className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setReorderAmount((current) => current + 1)}
+                      className="h-10 w-10 rounded-lg border border-border bg-background text-sm font-semibold text-foreground"
+                    >
+                      +
+                    </button>
+                  </div>
+                </label>
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeReorderDialog}
+                    className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setReorderDialogStep(2)}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-4">
+                <p className="text-sm text-muted-foreground">Step 2 of 2: confirm reorder details.</p>
+                <div className="rounded-lg border border-border/70 bg-background/60 p-3 text-sm">
+                  <p className="text-muted-foreground">Product: <span className="font-semibold text-foreground">{reorderDialogItem.name}</span></p>
+                  <p className="text-muted-foreground">Quantity: <span className="font-semibold text-foreground">{reorderAmount} units</span></p>
+                  <p className="text-muted-foreground">
+                    Estimated cost: <span className="font-semibold text-foreground">${(reorderAmount * getUnitPrice(reorderDialogItem)).toFixed(2)}</span>
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setReorderDialogStep(1)}
+                    className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground"
+                  >
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmReorder}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                  >
+                    Confirm reorder
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </SmartStockShell>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { ErrorState, HelpHint, LoadingState } from "@/components/ui/data-state";
 import { useToast } from "@/components/ui/toast-provider";
 import {
-  formatPlanPrice,
   getPlanById,
   getPlanPrice,
   getPlanSavingsPercent,
@@ -13,12 +13,14 @@ import {
   plans,
   readBillingStateRemote,
   readPaymentMethodRemote,
+  type BillingState,
   type BillingCycle,
   type PaymentMethodType,
   writeBillingStateRemote,
   writePaymentMethodRemote,
   type PlanId,
 } from "@/lib/billing";
+import { formatCurrencyAmount, formatDateTime } from "@/lib/user-preferences";
 import {
   AlertCircle,
   ArrowRight,
@@ -40,7 +42,8 @@ type ProrationPreview = {
 
 export default function BillingPage() {
   const { showToast } = useToast();
-  const [billingState, setBillingState] = useState(() => ({
+  const preferences = useUserPreferences();
+  const [billingState, setBillingState] = useState<BillingState>(() => ({
     planId: "starter" as PlanId,
     trialStartedAt: new Date().toISOString(),
     billingCycle: "monthly" as BillingCycle,
@@ -144,16 +147,22 @@ export default function BillingPage() {
       return {
         type: "charge",
         amount: Math.abs(delta),
-        message: `Estimated immediate charge: $${Math.abs(delta).toFixed(2)} (remaining period).`,
+        message: `Estimated immediate charge: ${formatCurrencyAmount(Math.abs(delta), preferences)} (remaining period).`,
       };
     }
 
     return {
       type: "credit",
       amount: Math.abs(delta),
-      message: `Estimated credit: $${Math.abs(delta).toFixed(2)} applied to next invoice.`,
+      message: `Estimated credit: ${formatCurrencyAmount(Math.abs(delta), preferences)} applied to next invoice.`,
     };
-  }, [billingState.billingCycle, currentPlan, planModalTarget, trialActive]);
+  }, [billingState.billingCycle, currentPlan, planModalTarget, preferences, trialActive]);
+
+  const formatPlanDisplay = (amount: number | null, cycle: BillingCycle) => {
+    if (amount === null) return "Custom";
+    const priceText = formatCurrencyAmount(amount, preferences);
+    return cycle === "monthly" ? `${priceText}/month` : `${priceText}/year`;
+  };
 
   const switchCycle = async (nextCycle: BillingCycle) => {
     if (nextCycle === billingState.billingCycle) return;
@@ -407,7 +416,7 @@ export default function BillingPage() {
               <div className="mt-2 flex items-center gap-2">
                 <h3 className="text-2xl font-bold text-foreground">{currentPlan.name}</h3>
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                  {formatPlanPrice(getPlanPrice(currentPlan, billingState.billingCycle), billingState.billingCycle)}
+                  {formatPlanDisplay(getPlanPrice(currentPlan, billingState.billingCycle), billingState.billingCycle)}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{currentPlan.targetCustomer}</p>
@@ -431,9 +440,9 @@ export default function BillingPage() {
           </div>
         </article>
 
-        <article className="rounded-2xl border border-border/70 bg-card shadow-sm">
-          <div className="border-b border-border/70 p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+        <article className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+          <div className="border-b border-border/70 bg-muted/10 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-foreground">Plan comparison</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -441,11 +450,11 @@ export default function BillingPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 rounded-lg border border-border bg-background p-1">
+              <div className="inline-flex w-full items-center gap-1 rounded-xl border border-border bg-background p-1 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => void switchCycle("monthly")}
-                  className={`rounded px-3 py-1.5 text-xs font-medium ${
+                  className={`h-10 flex-1 rounded-lg px-4 text-sm font-medium transition-colors sm:h-9 sm:flex-none sm:px-3 sm:text-xs ${
                     billingState.billingCycle === "monthly"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -456,7 +465,7 @@ export default function BillingPage() {
                 <button
                   type="button"
                   onClick={() => void switchCycle("yearly")}
-                  className={`rounded px-3 py-1.5 text-xs font-medium ${
+                  className={`h-10 flex-1 rounded-lg px-4 text-sm font-medium transition-colors sm:h-9 sm:flex-none sm:px-3 sm:text-xs ${
                     billingState.billingCycle === "yearly"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -468,7 +477,7 @@ export default function BillingPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 p-6 lg:grid-cols-4">
+          <div className="grid gap-4 p-5 sm:p-6 md:grid-cols-2 xl:grid-cols-4">
             {plans.map((plan, index) => {
               const selected = plan.id === billingState.planId;
               const isPopular = index === 1;
@@ -480,12 +489,12 @@ export default function BillingPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`relative rounded-xl border-2 p-5 transition-all ${
+                  className={`relative flex h-full flex-col rounded-2xl border-2 p-5 transition-all ${
                     selected
                       ? "border-primary bg-primary/5 shadow-lg"
                       : isPopular
                       ? "border-primary/30 bg-background shadow-md"
-                      : "border-border/70 bg-background hover:border-primary/30"
+                      : "border-border/70 bg-background hover:border-primary/30 hover:shadow-sm"
                   }`}
                 >
                   {isPopular && (
@@ -504,19 +513,21 @@ export default function BillingPage() {
                     <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
                     <div className="mt-2">
                       <span className="text-3xl font-bold text-foreground">
-                        {formatPlanPrice(getPlanPrice(plan, billingState.billingCycle), billingState.billingCycle).split("/")[0]}
+                        {getPlanPrice(plan, billingState.billingCycle) === null
+                          ? "Custom"
+                          : formatCurrencyAmount(getPlanPrice(plan, billingState.billingCycle) ?? 0, preferences)}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         /{billingState.billingCycle === "monthly" ? "month" : "year"}
                       </span>
                     </div>
                     {billingState.billingCycle === "yearly" && savings > 0 && (
-                      <p className="mt-1 text-xs font-medium text-green-700">Save {savings}% vs monthly</p>
+                      <p className="mt-1 inline-flex rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-700">Save {savings}% vs monthly</p>
                     )}
                     <p className="mt-2 text-xs text-muted-foreground">{plan.targetCustomer}</p>
                   </div>
 
-                  <ul className="mb-6 space-y-2">
+                  <ul className="mb-6 flex-1 space-y-2">
                     {plan.features.slice(0, 5).map((feature) => (
                       <li key={`${plan.id}-${feature}`} className="flex items-start gap-2 text-sm">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -529,7 +540,7 @@ export default function BillingPage() {
                     type="button"
                     onClick={() => beginPlanChange(plan.id)}
                     disabled={selected}
-                    className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
+                    className={`mt-auto flex h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all ${
                       selected
                         ? "cursor-default border border-primary/20 bg-primary/10 text-primary"
                         : "bg-primary text-primary-foreground hover:opacity-90"
@@ -552,17 +563,17 @@ export default function BillingPage() {
             })}
           </div>
 
-          <div className="border-t border-border/70 bg-muted/30 p-4">
-            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
+          <div className="border-t border-border/70 bg-muted/30 p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
                 <Shield className="h-4 w-4" />
                 <span>Secure payments</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4" />
                 <span>Proration preview before confirmation</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <Check className="h-4 w-4" />
                 <span>Cancel or reactivate anytime</span>
               </div>
@@ -595,7 +606,7 @@ export default function BillingPage() {
                 Subscription status: <span className="font-semibold text-foreground">Cancellation scheduled</span>
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Requested at {billingState.cancellationRequestedAt ? new Date(billingState.cancellationRequestedAt).toLocaleString() : "-"}
+                Requested at {billingState.cancellationRequestedAt ? formatDateTime(billingState.cancellationRequestedAt, preferences) : "-"}
               </p>
               <button
                 type="button"
@@ -813,8 +824,8 @@ export default function BillingPage() {
             </div>
 
             <div className="mt-4 rounded-lg border border-border/70 bg-muted/20 p-3 text-sm">
-              <p className="text-muted-foreground">Current: <span className="font-medium text-foreground">{formatPlanPrice(getPlanPrice(currentPlan, billingState.billingCycle), billingState.billingCycle)}</span></p>
-              <p className="text-muted-foreground">Next: <span className="font-medium text-foreground">{formatPlanPrice(getPlanPrice(planModalNext, billingState.billingCycle), billingState.billingCycle)}</span></p>
+              <p className="text-muted-foreground">Current: <span className="font-medium text-foreground">{formatPlanDisplay(getPlanPrice(currentPlan, billingState.billingCycle), billingState.billingCycle)}</span></p>
+              <p className="text-muted-foreground">Next: <span className="font-medium text-foreground">{formatPlanDisplay(getPlanPrice(planModalNext, billingState.billingCycle), billingState.billingCycle)}</span></p>
             </div>
 
             <div className="mt-3 rounded-lg border border-border/70 bg-background p-3">
