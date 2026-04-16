@@ -22,12 +22,10 @@ const navItems = [
 ];
 
 const secondaryNavItems = [
-	{ href: "/suppliers", label: "Suppliers" },
-	{ href: "/delivery", label: "Delivery" },
-	{ href: "/integrations", label: "Integrations" },
+	{ href: "/suppliers", label: "Suppliers & Delivery", activePaths: ["/suppliers", "/delivery"] },
+	{ href: "/integrations", label: "Integrations & Sync", activePaths: ["/integrations", "/sync"] },
 	{ href: "/forecast", label: "Forecast" },
 	{ href: "/sales", label: "Sales" },
-	{ href: "/sync", label: "Sync" },
 	{ href: "/onboarding", label: "Tutorial" },
 	{ href: "/setting", label: "Settings" },
 ];
@@ -41,14 +39,10 @@ export function Navbar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 	const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-	const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+	const [authUser, setAuthUser] = useState<AuthUser | null>(() => readAuthUser());
 	const [openNotificationCount, setOpenNotificationCount] = useState(() =>
 		getOpenNotificationCount(readNotificationCenter()),
 	);
-
-	useEffect(() => {
-		setAuthUser(readAuthUser());
-	}, []);
 
 	useEffect(() => {
 		const refreshCount = () => {
@@ -92,7 +86,9 @@ export function Navbar() {
 		router.push("/login");
 	};
 
-	const moreMenuActive = secondaryNavItems.some((item) => pathname === item.href);
+	const moreMenuActive = secondaryNavItems.some((item) =>
+		item.activePaths ? item.activePaths.includes(pathname) : pathname === item.href,
+	);
 
 	return (
 		<nav className="relative bg-[#3b2d1f] text-white" aria-label="Primary">
@@ -144,7 +140,7 @@ export function Navbar() {
 								{isMoreMenuOpen && (
 									<div className="absolute left-0 top-10 z-40 w-52 rounded-xl border border-[#6a533c] bg-[#322517] p-2 shadow-lg">
 										{secondaryNavItems.map((item) => {
-											const isActive = pathname === item.href;
+											const isActive = item.activePaths ? item.activePaths.includes(pathname) : pathname === item.href;
 											return (
 												<Link
 													key={`more-${item.href}`}
@@ -287,7 +283,7 @@ export function Navbar() {
 						})}
 
 						{secondaryNavItems.map((item) => {
-							const isActive = pathname === item.href;
+							const isActive = item.activePaths ? item.activePaths.includes(pathname) : pathname === item.href;
 
 							return (
 								<li key={`mobile-secondary-${item.href}`}>

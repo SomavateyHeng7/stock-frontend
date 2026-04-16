@@ -64,7 +64,7 @@ function Sparkline({
 /*  Status helpers                                                     */
 /* ------------------------------------------------------------------ */
 const statusBadge = (status: string) => {
-	const base = "inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase ring-1 ring-inset";
+	const base = "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold tracking-wide uppercase ring-1 ring-inset";
 	switch (status) {
 		case "Out of Stock":
 			return <span className={`${base} bg-red-500/10 text-red-600 dark:text-red-400 ring-red-500/20`}>{status}</span>;
@@ -86,7 +86,7 @@ const riskBar = (score: number) => {
 			<div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted/40">
 				<div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
 			</div>
-			<span className="text-xs tabular-nums text-muted-foreground">{score}</span>
+			<span className="text-sm tabular-nums text-muted-foreground">{score}</span>
 		</div>
 	);
 };
@@ -153,9 +153,9 @@ export default function ForecastPage() {
 							{kpi.value}
 						</p>
 						{"sub" in kpi && kpi.sub && (
-							<p className="text-xs text-muted-foreground">{kpi.sub}</p>
+							<p className="text-sm text-muted-foreground">{kpi.sub}</p>
 						)}
-						<p className="mt-0.5 text-xs font-medium text-muted-foreground">{kpi.label}</p>
+						<p className="mt-0.5 text-sm font-medium text-muted-foreground">{kpi.label}</p>
 					</div>
 				))}
 			</div>
@@ -171,14 +171,14 @@ export default function ForecastPage() {
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 						placeholder="Search products…"
-						className="h-10 w-full rounded-lg border border-border/70 bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+						className="h-10 w-full rounded-lg border border-border/70 bg-card pl-9 pr-3 text-base text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
 					/>
 				</div>
 				<div className="relative">
 					<select
 						value={sortBy}
 						onChange={(e) => setSortBy(e.target.value as "risk" | "demand" | "name")}
-						className="h-10 appearance-none rounded-lg border border-border/70 bg-card pl-3 pr-8 text-sm font-medium text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+						className="h-10 appearance-none rounded-lg border border-border/70 bg-card pl-3 pr-8 text-base font-medium text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
 					>
 						<option value="risk">Sort: Risk priority</option>
 						<option value="demand">Sort: 30-day demand</option>
@@ -192,13 +192,13 @@ export default function ForecastPage() {
 
 			{/* ── Forecast table ───────────────────────────────────── */}
 			<section className="mt-4">
-				<h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+				<h2 className="mb-3 flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
 					<IconBarChart /> Demand forecast
 				</h2>
 
 				<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 					{/* Header – desktop */}
-					<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_120px_90px_100px_100px_140px]">
+					<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_120px_90px_100px_100px_140px]">
 						<span>Product</span>
 						<span>14-day trend</span>
 						<span className="text-center">30-day</span>
@@ -208,7 +208,7 @@ export default function ForecastPage() {
 					</div>
 
 					{visibleRows.length === 0 ? (
-						<p className="px-4 py-10 text-center text-sm text-muted-foreground">
+						<p className="px-4 py-10 text-center text-base text-muted-foreground">
 							No products match your search.
 						</p>
 					) : (
@@ -242,8 +242,8 @@ export default function ForecastPage() {
 													}`}
 												/>
 												<div className="min-w-0">
-													<p className="truncate text-sm font-medium text-foreground">{item.name}</p>
-													<p className="truncate text-xs text-muted-foreground sm:hidden">
+													<p className="truncate text-base font-medium text-foreground">{item.name}</p>
+													<p className="truncate text-sm text-muted-foreground sm:hidden">
 														30d: {item.total30} · {item.avgDailyForecast}/day
 													</p>
 												</div>
@@ -255,12 +255,12 @@ export default function ForecastPage() {
 											</div>
 
 											{/* 30-day total */}
-											<p className="hidden text-center text-sm font-semibold tabular-nums text-foreground sm:block">
+											<p className="hidden text-center text-base font-semibold tabular-nums text-foreground sm:block">
 												{item.total30}
 											</p>
 
 											{/* Avg/day */}
-											<p className="hidden text-center text-sm tabular-nums text-muted-foreground sm:block">
+											<p className="hidden text-center text-base tabular-nums text-muted-foreground sm:block">
 												{item.avgDailyForecast}
 											</p>
 
@@ -281,7 +281,7 @@ export default function ForecastPage() {
 												<div className="grid gap-4 sm:grid-cols-2">
 													{/* Larger chart */}
 													<div>
-														<p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														<p className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
 															14-day demand curve
 														</p>
 														<div className="rounded-lg border border-border/40 bg-background p-3">
@@ -296,14 +296,14 @@ export default function ForecastPage() {
 																				className={`w-full rounded-sm ${barColor} transition-all hover:opacity-80`}
 																				style={{ height: `${pct}%` }}
 																			/>
-																			<span className="absolute -top-5 left-1/2 -translate-x-1/2 rounded bg-foreground/90 px-1.5 py-0.5 text-[10px] font-medium text-background opacity-0 transition-opacity group-hover/bar:opacity-100">
+																			<span className="absolute -top-5 left-1/2 -translate-x-1/2 rounded bg-foreground/90 px-1.5 py-0.5 text-xs font-medium text-background opacity-0 transition-opacity group-hover/bar:opacity-100">
 																				{v}
 																			</span>
 																		</div>
 																	);
 																})}
 															</div>
-															<div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground/60">
+															<div className="mt-1.5 flex justify-between text-xs text-muted-foreground/60">
 																<span>Day 1</span>
 																<span>Day 7</span>
 																<span>Day 14</span>
@@ -313,7 +313,7 @@ export default function ForecastPage() {
 
 													{/* Detail cards */}
 													<div className="space-y-2">
-														<p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+														<p className="mb-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
 															Details
 														</p>
 														<div className="divide-y divide-border/40 rounded-lg border border-border/40 bg-background">
@@ -324,12 +324,12 @@ export default function ForecastPage() {
 																{ label: "Risk score", value: `${item.riskScore} / 130` },
 															].map((row) => (
 																<div key={row.label} className="flex items-center justify-between px-3 py-2">
-																	<span className="text-xs text-muted-foreground">{row.label}</span>
-																	<span className="text-sm font-semibold tabular-nums text-foreground">{row.value}</span>
+																	<span className="text-sm text-muted-foreground">{row.label}</span>
+																	<span className="text-base font-semibold tabular-nums text-foreground">{row.value}</span>
 																</div>
 															))}
 														</div>
-														<p className="rounded-lg bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+														<p className="rounded-lg bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
 															{item.reason}
 														</p>
 													</div>

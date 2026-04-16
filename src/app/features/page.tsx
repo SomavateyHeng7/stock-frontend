@@ -1,4 +1,5 @@
 import { PublicPageShell } from "@/components/marketing/public-page-shell";
+import { FeatureGroupGrid } from "@/components/marketing/feature-group-grid";
 
 const featureGroups = [
   {
@@ -45,18 +46,7 @@ export default function FeaturesPage() {
       title="Features"
       subtitle="SmartStock combines forecasting, inventory control, supplier workflows, and alerts in one workspace."
     >
-      <section className="grid gap-4 lg:grid-cols-2">
-        {featureGroups.map((group) => (
-          <article key={group.title} className="rounded-2xl border border-border/70 bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-foreground">{group.title}</h2>
-            <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-              {group.items.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </section>
+      <FeatureGroupGrid groups={featureGroups} />
     </PublicPageShell>
   );
 }

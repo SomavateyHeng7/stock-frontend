@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { useToast } from "@/components/ui/toast-provider";
@@ -12,11 +12,7 @@ export default function AccountPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const preferences = useUserPreferences();
-  const [user, setUser] = useState<AuthUser | null>(null);
-
-  useEffect(() => {
-    setUser(readAuthUser());
-  }, []);
+  const [user] = useState<AuthUser | null>(() => readAuthUser());
 
   const handleSignOut = () => {
     signOut();

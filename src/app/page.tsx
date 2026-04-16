@@ -14,7 +14,7 @@ export default function Home() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
               <Zap className="h-3 w-3" />
-              <span>Built for Cambodia's SME retailers</span>
+              <span>Built for Cambodia&apos;s SME retailers</span>
             </div>
 
             {/* Main Headline */}
@@ -101,11 +101,11 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Running out of stock costs you money.
               <br />
-              <span className="text-muted-foreground">Especially when you can't afford it.</span>
+              <span className="text-muted-foreground">Especially when you can&apos;t afford it.</span>
             </h2>
             <p className="mt-6 text-base text-muted-foreground sm:text-lg">
               70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New Year hits, they either
-              run out of best-sellers or lock up cash in overstock. There's a better way.
+              run out of best-sellers or lock up cash in overstock. There&apos;s a better way.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ export default function Home() {
               </div>
               <h3 className="mt-4 font-semibold text-foreground">Guesswork reordering</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                "Should I call my supplier? I think we're low..." Then customers start asking and it's too late.
+                &quot;Should I call my supplier? I think we&apos;re low...&quot; Then customers start asking and it&apos;s too late.
               </p>
             </div>
 
@@ -127,7 +127,7 @@ export default function Home() {
               </div>
               <h3 className="mt-4 font-semibold text-foreground">Peak season disasters</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you'll never get back.
+                Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you&apos;ll never get back.
               </p>
             </div>
 
@@ -182,7 +182,7 @@ export default function Home() {
               </div>
               <h3 className="mt-4 text-xl font-semibold text-foreground">AI predicts demand</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Get 30-day forecasts for every product. Our model knows Cambodia's calendar — Khmer New Year, Pchum Ben,
+                Get 30-day forecasts for every product. Our model knows Cambodia&apos;s calendar — Khmer New Year, Pchum Ben,
                 11.11 shopping events.
               </p>
               <div className="mt-4 flex items-center gap-2 text-sm text-primary">
@@ -198,7 +198,7 @@ export default function Home() {
               </div>
               <h3 className="mt-4 text-xl font-semibold text-foreground">Get alerts on Telegram</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Every morning at 8 AM: "Blue T-Shirt (M) — Order 25 units by Tuesday." No desktop needed. Just tap, call
+                Every morning at 8 AM: &quot;Blue T-Shirt (M) — Order 25 units by Tuesday.&quot; No desktop needed. Just tap, call
                 your supplier, done.
               </p>
               <div className="mt-4 flex items-center gap-2 text-sm text-primary">
@@ -226,7 +226,7 @@ export default function Home() {
               </div>
               <h3 className="mt-4 font-semibold text-foreground">AI Demand Forecasting</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                30-day predictions with seasonal awareness for Cambodia's peak shopping periods.
+                30-day predictions with seasonal awareness for Cambodia&apos;s peak shopping periods.
               </p>
             </div>
 
@@ -383,8 +383,8 @@ export default function Home() {
               ))}
             </div>
             <blockquote className="mt-6 text-lg text-foreground sm:text-xl">
-              "I only realize I'm out of stock when customers start asking. By then it's already too late. SmartStock
-              tells me <strong>before</strong> I run out — saved me during last Khmer New Year."
+              &quot;I only realize I&apos;m out of stock when customers start asking. By then it&apos;s already too late. SmartStock
+              tells me <strong>before</strong> I run out — saved me during last Khmer New Year.&quot;
             </blockquote>
             <div className="mt-6 flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
@@ -446,7 +446,7 @@ export default function Home() {
               <span className="text-sm font-semibold text-foreground">SmartStock</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2026 SomaTech. Built for Cambodia's SME retailers.
+              © 2026 SomaTech. Built for Cambodia&apos;s SME retailers.
             </p>
             <div className="flex gap-6 text-sm text-muted-foreground">
               <Link href="/features" className="hover:text-foreground">

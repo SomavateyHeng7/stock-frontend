@@ -219,12 +219,6 @@ export default function SuppliersPage() {
     saveInventoryLedgerState(ledgerState);
   }, [ledgerState]);
 
-  useEffect(() => {
-    if (!selectedBranchId && ledgerState.branches[0]) {
-      setSelectedBranchId(ledgerState.branches[0].id);
-    }
-  }, [ledgerState.branches, selectedBranchId]);
-
   const getVerificationClass = (verified: boolean) => {
     if (verified) {
       return "border-emerald-400/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
@@ -395,7 +389,7 @@ export default function SuppliersPage() {
     <SmartStockShell title="Supplier tracking" subtitle="Lead time, reliability, and contact details.">
       <section className="space-y-4 pb-24 sm:pb-0" aria-label="Suppliers">
         <article className="rounded-2xl border border-border/70 bg-card p-3 shadow-sm sm:p-4">
-          <p className="text-sm font-medium text-foreground">Operations view</p>
+          <p className="text-base font-medium text-foreground">Operations view</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Keep supplier records and receive deliveries in one place.
           </p>
@@ -403,7 +397,7 @@ export default function SuppliersPage() {
             <button
               type="button"
               onClick={() => changeView("directory")}
-              className={`h-10 rounded-lg px-3 text-sm font-medium transition-colors ${
+              className={`h-10 rounded-lg px-3 text-base font-medium transition-colors ${
                 activeView === "directory" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -412,7 +406,7 @@ export default function SuppliersPage() {
             <button
               type="button"
               onClick={() => changeView("receiving")}
-              className={`h-10 rounded-lg px-3 text-sm font-medium transition-colors ${
+              className={`h-10 rounded-lg px-3 text-base font-medium transition-colors ${
                 activeView === "receiving" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -427,7 +421,7 @@ export default function SuppliersPage() {
 
             <article className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
               <div className="mb-3 grid gap-1">
-                <label htmlFor="supplier-search" className="text-sm font-medium text-foreground">
+                <label htmlFor="supplier-search" className="text-base font-medium text-foreground">
                   Search suppliers
                 </label>
                 <input
@@ -435,7 +429,7 @@ export default function SuppliersPage() {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search name or phone"
-                  className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                  className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                 />
                 <p className="text-xs text-muted-foreground">
                   {filteredSuppliers.length} of {suppliers.length} suppliers shown
@@ -448,7 +442,7 @@ export default function SuppliersPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="font-medium text-foreground">{supplier.name}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-base text-muted-foreground">
                           {supplier.phone} · Lead time {supplier.leadTimeDays} days · Next delivery {supplier.nextDelivery}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -471,13 +465,13 @@ export default function SuppliersPage() {
                           value={editName}
                           onChange={(event) => setEditName(event.target.value)}
                           placeholder="Supplier name"
-                          className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                          className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                         />
                         <input
                           value={editPhone}
                           onChange={(event) => setEditPhone(event.target.value)}
                           placeholder="Phone"
-                          className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                          className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                         />
                         <input
                           type="number"
@@ -487,12 +481,12 @@ export default function SuppliersPage() {
                           value={editLeadTime}
                           onChange={(event) => setEditLeadTime(Number(event.target.value))}
                           placeholder="Lead time"
-                          className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                          className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                         />
                         <select
                           value={editReliability}
                           onChange={(event) => setEditReliability(event.target.value as SupplierReliability)}
-                          className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                          className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                         >
                           <option value="High">High</option>
                           <option value="Medium">Medium</option>
@@ -504,14 +498,14 @@ export default function SuppliersPage() {
                             type="button"
                             disabled={!canSaveEdit}
                             onClick={() => saveEdit(supplier.id)}
-                            className="h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                            className="h-11 rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             Save changes
                           </button>
                           <button
                             type="button"
                             onClick={cancelEdit}
-                            className="h-11 rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground"
+                            className="h-11 rounded-lg border border-border bg-background px-4 text-base font-medium text-foreground"
                           >
                             Cancel
                           </button>
@@ -522,21 +516,21 @@ export default function SuppliersPage() {
                         <button
                           type="button"
                           onClick={() => startEdit(supplier)}
-                          className="h-11 rounded-lg border border-blue-400/50 bg-blue-500/10 px-4 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-500/15 dark:text-blue-300"
+                          className="h-11 rounded-lg border border-blue-400/50 bg-blue-500/10 px-4 text-base font-medium text-blue-700 transition-colors hover:bg-blue-500/15 dark:text-blue-300"
                         >
                           Edit
                         </button>
                         <button
                           type="button"
                           onClick={() => deleteSupplier(supplier.id)}
-                          className="h-11 rounded-lg border border-red-400/50 bg-red-500/10 px-4 text-sm font-medium text-red-700 transition-colors hover:bg-red-500/15 dark:text-red-300"
+                          className="h-11 rounded-lg border border-red-400/50 bg-red-500/10 px-4 text-base font-medium text-red-700 transition-colors hover:bg-red-500/15 dark:text-red-300"
                         >
                           Delete
                         </button>
                         <button
                           type="button"
                           onClick={() => toggleContactVerification(supplier.id)}
-                          className="h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+                          className="h-11 rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground"
                         >
                           {supplier.contactVerified ? "Mark unverified" : "Verify contact"}
                         </button>
@@ -561,7 +555,7 @@ export default function SuppliersPage() {
                 ))}
 
                 {filteredSuppliers.length === 0 && (
-                  <li className="rounded-lg border border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground">
+                  <li className="rounded-lg border border-border/70 bg-muted/20 p-4 text-base text-muted-foreground">
                     No suppliers match your search.
                   </li>
                 )}
@@ -571,7 +565,7 @@ export default function SuppliersPage() {
             <article className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
               <h2 className="text-lg font-semibold text-foreground">Purchase orders by supplier</h2>
               {purchaseOrdersBySupplier.length === 0 ? (
-                <p className="mt-3 rounded-lg border border-border/70 bg-muted/20 p-3 text-sm text-muted-foreground">
+                <p className="mt-3 rounded-lg border border-border/70 bg-muted/20 p-3 text-base text-muted-foreground">
                   No purchase orders yet. Create reorders to start procurement tracking.
                 </p>
               ) : (
@@ -597,7 +591,7 @@ export default function SuppliersPage() {
                             return (
                               <li key={order.id} className="rounded-md border border-border/70 bg-background px-3 py-2">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <p className="text-sm font-medium text-foreground">{order.id}</p>
+                                  <p className="text-base font-medium text-foreground">{order.id}</p>
                                   <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getOrderStatusClass(order.status)}`}>
                                     {formatOrderStatus(order.status)}
                                   </span>
@@ -625,7 +619,7 @@ export default function SuppliersPage() {
                   <button
                     type="button"
                     onClick={cancelEdit}
-                    className="flex h-12 flex-1 items-center justify-center rounded-lg border border-border bg-background text-sm font-medium text-foreground"
+                    className="flex h-12 flex-1 items-center justify-center rounded-lg border border-border bg-background text-base font-medium text-foreground"
                   >
                     Cancel Edit
                   </button>
@@ -633,7 +627,7 @@ export default function SuppliersPage() {
                     type="button"
                     onClick={() => editingId !== null && saveEdit(editingId)}
                     disabled={!canSaveEdit}
-                    className="flex h-12 flex-1 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground disabled:opacity-50"
+                    className="flex h-12 flex-1 items-center justify-center rounded-lg bg-primary text-base font-semibold text-primary-foreground disabled:opacity-50"
                   >
                     Save Supplier
                   </button>
@@ -647,17 +641,17 @@ export default function SuppliersPage() {
           <>
             <article className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
               <h2 className="text-lg font-semibold text-foreground">Delivery receiving</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="mt-1 text-base text-muted-foreground">
                 Post received, damaged, or missing quantities directly from open purchase orders.
               </p>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <label className="grid gap-1 text-sm font-medium text-foreground">
+                <label className="grid gap-1 text-base font-medium text-foreground">
                   Branch
                   <select
                     value={selectedBranchId}
                     onChange={(event) => setSelectedBranchId(event.target.value)}
-                    className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                    className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                   >
                     {ledgerState.branches.map((branch) => (
                       <option key={branch.id} value={branch.id}>
@@ -667,13 +661,13 @@ export default function SuppliersPage() {
                   </select>
                 </label>
 
-                <label className="grid gap-1 text-sm font-medium text-foreground">
+                <label className="grid gap-1 text-base font-medium text-foreground">
                   Receiver
                   <input
                     value={actor}
                     onChange={(event) => setActor(event.target.value)}
                     placeholder="Receiving clerk"
-                    className="h-11 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                    className="h-11 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                   />
                 </label>
               </div>
@@ -684,7 +678,7 @@ export default function SuppliersPage() {
               <p className="mt-1 text-xs text-muted-foreground">{openPurchaseOrders.length} order(s) pending receiving</p>
 
               {openPurchaseOrders.length === 0 ? (
-                <p className="mt-3 rounded-lg border border-border/70 bg-muted/20 p-3 text-sm text-muted-foreground">
+                <p className="mt-3 rounded-lg border border-border/70 bg-muted/20 p-3 text-base text-muted-foreground">
                   No open orders to receive. New reorders will appear here automatically.
                 </p>
               ) : (
@@ -713,7 +707,7 @@ export default function SuppliersPage() {
                               inputMode="numeric"
                               value={input.received}
                               onChange={(event) => updateInput(order.id, "received", Number(event.target.value))}
-                              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                              className="h-10 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                             />
                           </label>
                           <label className="grid gap-1 text-xs font-medium text-foreground">
@@ -724,7 +718,7 @@ export default function SuppliersPage() {
                               inputMode="numeric"
                               value={input.damaged}
                               onChange={(event) => updateInput(order.id, "damaged", Number(event.target.value))}
-                              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                              className="h-10 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                             />
                           </label>
                           <label className="grid gap-1 text-xs font-medium text-foreground">
@@ -735,7 +729,7 @@ export default function SuppliersPage() {
                               inputMode="numeric"
                               value={input.missing}
                               onChange={(event) => updateInput(order.id, "missing", Number(event.target.value))}
-                              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                              className="h-10 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                             />
                           </label>
                         </div>
@@ -746,14 +740,14 @@ export default function SuppliersPage() {
                             value={receiptReasons[order.id] ?? ""}
                             onChange={(event) => updateReason(order.id, event.target.value)}
                             placeholder="Delivery receiving posted"
-                            className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
+                            className="h-10 rounded-lg border border-border bg-background px-3 text-base text-foreground"
                           />
                         </label>
 
                         <button
                           type="button"
                           onClick={() => postReceipt(order)}
-                          className="mt-3 h-11 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
+                          className="mt-3 h-11 rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground"
                         >
                           Post receipt
                         </button>

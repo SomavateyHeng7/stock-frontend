@@ -197,10 +197,6 @@ export function GlobalCommandPalette() {
     }, 0);
   }, [isOpen, showShortcuts]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
   const themeBadge = resolvedTheme === "dark" ? "Dark" : resolvedTheme === "light" ? "Light" : "System";
 
   return (
@@ -246,7 +242,10 @@ export function GlobalCommandPalette() {
                     id="global-command-input"
                     ref={inputRef}
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => {
+                      setQuery(event.target.value);
+                      setSelectedIndex(0);
+                    }}
                     placeholder="Search commands, pages, and actions..."
                     className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground"
                   />
