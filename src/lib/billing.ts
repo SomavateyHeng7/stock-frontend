@@ -32,6 +32,21 @@ export type PaymentMethod = {
 const BILLING_STATE_API = "/api/billing/state";
 const BILLING_PAYMENT_METHOD_API = "/api/billing/payment-method";
 
+// Module-level cache — avoids repeated JSON.parse on every call within the same tab.
+// Cross-tab writes invalidate via the native "storage" event.
+let _billingCache: BillingState | null = null;
+let _paymentCache: PaymentMethod | null | undefined = undefined; // undefined = not yet loaded
+
+let _billingListenerAttached = false;
+function ensureBillingListener() {
+  if (_billingListenerAttached || typeof window === "undefined") return;
+  _billingListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === BILLING_STATE_KEY) _billingCache = null;
+    if (e.key === PAYMENT_METHOD_KEY) _paymentCache = undefined;
+  });
+}
+
 export const BILLING_STATE_KEY = "smartstock.billing.state.v1";
 export const PAYMENT_METHOD_KEY = "smartstock.billing.payment-method.v1";
 export const BILLING_CHANGED_EVENT = "smartstock:billing-changed";
@@ -136,13 +151,17 @@ export function getDefaultBillingState(): BillingState {
 }
 
 export function readBillingState(): BillingState {
-  if (typeof window === "undefined") {
-    return getDefaultBillingState();
-  }
+  if (typeof window === "undefined") return getDefaultBillingState();
+
+  ensureBillingListener();
+  if (_billingCache !== null) return _billingCache;
 
   try {
     const raw = window.localStorage.getItem(BILLING_STATE_KEY);
-    if (!raw) return getDefaultBillingState();
+    if (!raw) {
+      _billingCache = getDefaultBillingState();
+      return _billingCache;
+    }
 
     const parsed = JSON.parse(raw) as Partial<BillingState>;
     const planId = parsed.planId && PLAN_ORDER[parsed.planId] ? parsed.planId : "starter";
@@ -152,13 +171,8 @@ export function readBillingState(): BillingState {
     const cancellationRequestedAt =
       typeof parsed.cancellationRequestedAt === "string" ? parsed.cancellationRequestedAt : null;
 
-    return {
-      planId,
-      trialStartedAt,
-      billingCycle,
-      cancelAtPeriodEnd,
-      cancellationRequestedAt,
-    };
+    _billingCache = { planId, trialStartedAt, billingCycle, cancelAtPeriodEnd, cancellationRequestedAt };
+    return _billingCache;
   } catch {
     return getDefaultBillingState();
   }
@@ -179,6 +193,7 @@ export function writeBillingState(next: Partial<BillingState>) {
         : next.cancellationRequestedAt,
   };
 
+  _billingCache = merged;
   window.localStorage.setItem(BILLING_STATE_KEY, JSON.stringify(merged));
   window.dispatchEvent(new CustomEvent(BILLING_CHANGED_EVENT));
 }
@@ -222,20 +237,24 @@ export function getPlanSavingsPercent(plan: PlanDefinition) {
 export function readPaymentMethod(): PaymentMethod | null {
   if (typeof window === "undefined") return null;
 
+  ensureBillingListener();
+  if (_paymentCache !== undefined) return _paymentCache;
+
   try {
     const raw = window.localStorage.getItem(PAYMENT_METHOD_KEY);
-    if (!raw) return null;
+    if (!raw) { _paymentCache = null; return null; }
 
     const parsed = JSON.parse(raw) as Partial<PaymentMethod>;
-    if (!parsed.type || !parsed.label || !parsed.updatedAt) return null;
-    if (!["card", "bank_transfer", "mobile_wallet"].includes(parsed.type)) return null;
+    if (!parsed.type || !parsed.label || !parsed.updatedAt) { _paymentCache = null; return null; }
+    if (!["card", "bank_transfer", "mobile_wallet"].includes(parsed.type)) { _paymentCache = null; return null; }
 
-    return {
+    _paymentCache = {
       type: parsed.type as PaymentMethodType,
       label: parsed.label,
       last4: parsed.last4,
       updatedAt: parsed.updatedAt,
     };
+    return _paymentCache;
   } catch {
     return null;
   }
@@ -243,6 +262,7 @@ export function readPaymentMethod(): PaymentMethod | null {
 
 export function writePaymentMethod(method: PaymentMethod) {
   if (typeof window === "undefined") return;
+  _paymentCache = method;
   window.localStorage.setItem(PAYMENT_METHOD_KEY, JSON.stringify(method));
 }
 

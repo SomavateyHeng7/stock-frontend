@@ -14,6 +14,16 @@ export type NotificationItem = {
 export const NOTIFICATION_CENTER_KEY = "smartstock.notification-center.v1";
 export const NOTIFICATION_CENTER_CHANGED_EVENT = "smartstock:notification-center-changed";
 
+let _ncCache: NotificationItem[] | null = null;
+let _ncListenerAttached = false;
+function ensureNCListener() {
+  if (_ncListenerAttached || typeof window === "undefined") return;
+  _ncListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === NOTIFICATION_CENTER_KEY) _ncCache = null;
+  });
+}
+
 function generateNotificationId() {
   const rand = Math.random().toString(36).slice(2, 10).toUpperCase();
   return `NTF-${Date.now()}-${rand}`;
@@ -22,14 +32,17 @@ function generateNotificationId() {
 export function readNotificationCenter(): NotificationItem[] {
   if (typeof window === "undefined") return [];
 
+  ensureNCListener();
+  if (_ncCache !== null) return _ncCache;
+
   try {
     const raw = window.localStorage.getItem(NOTIFICATION_CENTER_KEY);
-    if (!raw) return [];
+    if (!raw) { _ncCache = []; return _ncCache; }
 
     const parsed = JSON.parse(raw) as Array<Partial<NotificationItem>>;
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) { _ncCache = []; return _ncCache; }
 
-    return parsed
+    _ncCache = parsed
       .filter((item) => {
         return (
           typeof item.id === "string" &&
@@ -50,6 +63,7 @@ export function readNotificationCenter(): NotificationItem[] {
         resolvedAt: typeof item.resolvedAt === "string" ? item.resolvedAt : null,
       }))
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+    return _ncCache;
   } catch {
     return [];
   }
@@ -58,6 +72,7 @@ export function readNotificationCenter(): NotificationItem[] {
 export function writeNotificationCenter(items: NotificationItem[]) {
   if (typeof window === "undefined") return;
 
+  _ncCache = items;
   window.localStorage.setItem(NOTIFICATION_CENTER_KEY, JSON.stringify(items));
   window.dispatchEvent(new CustomEvent(NOTIFICATION_CENTER_CHANGED_EVENT));
 }

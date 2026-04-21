@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/toast-provider";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { AUTH_CHANGED_EVENT, getUserInitials, readAuthUser, signOut, type AuthUser } from "@/lib/auth";
 import {
 	NOTIFICATION_CENTER_CHANGED_EVENT,
@@ -39,12 +40,13 @@ export function Navbar() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 	const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-	const [authUser, setAuthUser] = useState<AuthUser | null>(() => readAuthUser());
-	const [openNotificationCount, setOpenNotificationCount] = useState(() =>
-		getOpenNotificationCount(readNotificationCenter()),
-	);
+	const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+	const [openNotificationCount, setOpenNotificationCount] = useState(0);
 
 	useEffect(() => {
+		setAuthUser(readAuthUser());
+		setOpenNotificationCount(getOpenNotificationCount(readNotificationCenter()));
+
 		const refreshCount = () => {
 			setOpenNotificationCount(getOpenNotificationCount(readNotificationCenter()));
 		};
@@ -174,6 +176,7 @@ export function Navbar() {
 							<path d="M4 7h16M4 12h16M4 17h16" />
 						</svg>
 					</button>
+					<ModeToggle />
 					<Link
 						href="/dashboard"
 						className="rounded-full bg-[#f5e9d8] px-3 py-2 text-sm font-medium text-[#2f2418] transition-colors hover:bg-[#f9efdf] xl:px-5 xl:text-base"
@@ -299,6 +302,10 @@ export function Navbar() {
 								</li>
 							);
 						})}
+						<li className="flex items-center justify-between rounded-lg px-3 py-2">
+							<span className="text-sm text-[#eadfce]">Theme</span>
+							<ModeToggle />
+						</li>
 					</ul>
 				</div>
 			)}

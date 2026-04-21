@@ -101,7 +101,7 @@ export default function OnboardingPage() {
 		writeOnboardingState({ ...draft });
 	}, [draft]);
 
-	const progress = useMemo(() => Math.round((step / 3) * 100), [step]);
+	const progress = useMemo(() => Math.round(((step - 1) / 3) * 100), [step]);
 
 	const toggleChannel = (channel: string) => {
 		setDraft((current) => {
@@ -252,12 +252,13 @@ export default function OnboardingPage() {
 						<h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">Complete your onboarding</h1>
 						<p className="mt-1 text-sm text-muted-foreground">Step {step} of 3 to personalize your inventory workspace.</p>
 					</div>
-					<Link
-						href="/dashboard"
+					<button
+						type="button"
+						onClick={skipTutorialForNow}
 						className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground"
 					>
 						Skip for now
-					</Link>
+					</button>
 				</div>
 
 				<div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">

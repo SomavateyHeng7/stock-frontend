@@ -10,6 +10,16 @@ export type UserPreferences = {
 export const USER_PREFERENCES_KEY = "smartstock.user.preferences.v1";
 export const USER_PREFERENCES_CHANGED_EVENT = "smartstock:user-preferences-changed";
 
+let _prefsCache: UserPreferences | null = null;
+let _prefsListenerAttached = false;
+function ensurePrefsListener() {
+  if (_prefsListenerAttached || typeof window === "undefined") return;
+  _prefsListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === USER_PREFERENCES_KEY) _prefsCache = null;
+  });
+}
+
 export const defaultUserPreferences: UserPreferences = {
   language: "en",
   currency: "USD",
@@ -23,18 +33,22 @@ export function toLocaleTag(language: AppLanguage) {
 export function readUserPreferences(): UserPreferences {
   if (typeof window === "undefined") return defaultUserPreferences;
 
+  ensurePrefsListener();
+  if (_prefsCache !== null) return _prefsCache;
+
   try {
     const raw = window.localStorage.getItem(USER_PREFERENCES_KEY);
     if (!raw) return defaultUserPreferences;
 
     const parsed = JSON.parse(raw) as Partial<UserPreferences>;
-    return {
+    _prefsCache = {
       language: parsed.language === "km" ? "km" : "en",
       currency: parsed.currency === "KHR" ? "KHR" : "USD",
       timezone: typeof parsed.timezone === "string" && parsed.timezone.trim().length > 0
         ? parsed.timezone
         : defaultUserPreferences.timezone,
     };
+    return _prefsCache;
   } catch {
     return defaultUserPreferences;
   }
@@ -42,6 +56,7 @@ export function readUserPreferences(): UserPreferences {
 
 export function writeUserPreferences(next: UserPreferences) {
   if (typeof window === "undefined") return;
+  _prefsCache = next;
   window.localStorage.setItem(USER_PREFERENCES_KEY, JSON.stringify(next));
   window.dispatchEvent(new CustomEvent(USER_PREFERENCES_CHANGED_EVENT));
 }

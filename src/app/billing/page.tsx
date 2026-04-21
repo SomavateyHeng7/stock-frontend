@@ -29,6 +29,8 @@ import {
   CheckCircle2,
   Clock,
   CreditCard,
+  Plus,
+  Pencil,
   Shield,
   Smartphone,
   X,
@@ -57,6 +59,7 @@ export default function BillingPage() {
   const [planModalTarget, setPlanModalTarget] = useState<PlanId | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showReactivateModal, setShowReactivateModal] = useState(false);
+  const [showPaymentDrawer, setShowPaymentDrawer] = useState(false);
 
   const [paymentType, setPaymentType] = useState<PaymentMethodType>("card");
   const [cardholderName, setCardholderName] = useState("");
@@ -106,11 +109,7 @@ export default function BillingPage() {
 
   const prorationPreview = useMemo<ProrationPreview>(() => {
     if (!planModalTarget) {
-      return {
-        type: "none",
-        amount: 0,
-        message: "No pending plan change.",
-      };
+      return { type: "none", amount: 0, message: "No pending plan change." };
     }
 
     if (trialActive) {
@@ -136,11 +135,7 @@ export default function BillingPage() {
     const delta = (targetAmount - currentAmount) * remainingRatio;
 
     if (Math.abs(delta) < 0.01) {
-      return {
-        type: "none",
-        amount: 0,
-        message: "No proration adjustment expected for this change.",
-      };
+      return { type: "none", amount: 0, message: "No proration adjustment expected for this change." };
     }
 
     if (delta > 0) {
@@ -225,8 +220,22 @@ export default function BillingPage() {
     });
   };
 
-  const scrollToPaymentMethod = () => {
-    document.getElementById("payment-method")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const openPaymentDrawer = () => {
+    if (paymentMethod) {
+      setPaymentType(paymentMethod.type);
+    }
+    setShowPaymentDrawer(true);
+  };
+
+  const closePaymentDrawer = () => {
+    setShowPaymentDrawer(false);
+    setCardholderName("");
+    setCardNumber("");
+    setCardExpiry("");
+    setBankName("");
+    setBankAccount("");
+    setWalletProvider("");
+    setWalletNumber("");
   };
 
   const savePaymentMethod = async () => {
@@ -251,10 +260,7 @@ export default function BillingPage() {
 
       const next = await writePaymentMethodRemote(method);
       setPaymentMethod(next);
-      setCardholderName("");
-      setCardNumber("");
-      setCardExpiry("");
-
+      closePaymentDrawer();
       showToast({
         title: "Payment method saved",
         description: `Card ending in ${method.last4} has been added successfully.`,
@@ -281,9 +287,7 @@ export default function BillingPage() {
 
       const next = await writePaymentMethodRemote(method);
       setPaymentMethod(next);
-      setBankName("");
-      setBankAccount("");
-
+      closePaymentDrawer();
       showToast({
         title: "Payment method saved",
         description: `Bank account ending in ${method.last4} has been added.`,
@@ -309,23 +313,21 @@ export default function BillingPage() {
 
     const next = await writePaymentMethodRemote(method);
     setPaymentMethod(next);
-    setWalletProvider("");
-    setWalletNumber("");
-
+    closePaymentDrawer();
     showToast({
       title: "Payment method saved",
       description: `Wallet ending in ${method.last4} has been added.`,
     });
   };
 
-  const getPaymentIcon = () => {
-    switch (paymentType) {
+  const paymentTypeIcon = (type: PaymentMethodType, className = "h-5 w-5") => {
+    switch (type) {
       case "card":
-        return <CreditCard className="h-5 w-5" />;
+        return <CreditCard className={className} />;
       case "bank_transfer":
-        return <Building className="h-5 w-5" />;
+        return <Building className={className} />;
       case "mobile_wallet":
-        return <Smartphone className="h-5 w-5" />;
+        return <Smartphone className={className} />;
     }
   };
 
@@ -345,9 +347,7 @@ export default function BillingPage() {
         <section className="space-y-4" aria-label="Billing error">
           <ErrorState
             description={loadError}
-            onRetry={() => {
-              void hydrateBilling();
-            }}
+            onRetry={() => { void hydrateBilling(); }}
             retryLabel="Retry loading"
             hint="If this keeps happening, refresh the page and check browser storage permissions."
           />
@@ -359,6 +359,8 @@ export default function BillingPage() {
   return (
     <SmartStockShell title="Billing & Plans" subtitle="Manage your subscription lifecycle, payment methods, and pricing.">
       <section className="space-y-6" aria-label="Billing">
+
+        {/* Trial status banner */}
         {trialActive ? (
           <article className="overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-r from-primary/5 to-primary/10 p-6 shadow-sm">
             <div className="flex items-start gap-4">
@@ -393,6 +395,7 @@ export default function BillingPage() {
           </article>
         )}
 
+        {/* Trial expiry warning */}
         {trialActive && trialDaysLeft <= 7 && !paymentMethod && (
           <article className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 shadow-sm">
             <h2 className="text-base font-semibold text-foreground">Trial ending soon: action required</h2>
@@ -401,7 +404,7 @@ export default function BillingPage() {
             </p>
             <button
               type="button"
-              onClick={scrollToPaymentMethod}
+              onClick={openPaymentDrawer}
               className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
             >
               Add payment method now
@@ -409,8 +412,9 @@ export default function BillingPage() {
           </article>
         )}
 
+        {/* Current plan + payment method summary */}
         <article className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
               <div className="mt-2 flex items-center gap-2">
@@ -426,20 +430,38 @@ export default function BillingPage() {
               </p>
             </div>
 
-            {paymentMethod && (
-              <div className="text-right">
-                <p className="text-sm font-medium text-muted-foreground">Payment Method</p>
-                <div className="mt-2 flex items-center gap-2 text-foreground">
-                  {paymentMethod.type === "card" && <CreditCard className="h-4 w-4" />}
-                  {paymentMethod.type === "bank_transfer" && <Building className="h-4 w-4" />}
-                  {paymentMethod.type === "mobile_wallet" && <Smartphone className="h-4 w-4" />}
-                  <span className="text-sm font-semibold">•••• {paymentMethod.last4}</span>
+            {/* Payment method summary pill */}
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <p className="text-sm font-medium text-muted-foreground">Payment Method</p>
+              {paymentMethod ? (
+                <div className="flex items-center gap-2 rounded-xl border border-green-500/20 bg-green-500/5 px-4 py-2.5">
+                  <div className="text-green-600">{paymentTypeIcon(paymentMethod.type, "h-4 w-4")}</div>
+                  <span className="text-sm font-semibold text-foreground">•••• {paymentMethod.last4}</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <button
+                    type="button"
+                    onClick={openPaymentDrawer}
+                    className="ml-1 rounded-md p-1 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                    aria-label="Update payment method"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-              </div>
-            )}
+              ) : (
+                <button
+                  type="button"
+                  onClick={openPaymentDrawer}
+                  className="flex items-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add payment method
+                </button>
+              )}
+            </div>
           </div>
         </article>
 
+        {/* Plan comparison */}
         <article className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
           <div className="border-b border-border/70 bg-muted/10 p-5 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -522,7 +544,9 @@ export default function BillingPage() {
                       </span>
                     </div>
                     {billingState.billingCycle === "yearly" && savings > 0 && (
-                      <p className="mt-1 inline-flex rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-700">Save {savings}% vs monthly</p>
+                      <p className="mt-1 inline-flex rounded-full bg-green-500/10 px-2 py-1 text-xs font-semibold text-green-700">
+                        Save {savings}% vs monthly
+                      </p>
                     )}
                     <p className="mt-2 text-xs text-muted-foreground">{plan.targetCustomer}</p>
                   </div>
@@ -581,6 +605,7 @@ export default function BillingPage() {
           </div>
         </article>
 
+        {/* Subscription lifecycle */}
         <article className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-foreground">Subscription lifecycle</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -619,195 +644,206 @@ export default function BillingPage() {
           )}
         </article>
 
-        <article id="payment-method" className="rounded-2xl border border-border/70 bg-card shadow-sm">
-          <div className="border-b border-border/70 p-6">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-primary/10 p-2">
-                <CreditCard className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">Payment Method</h2>
-                <p className="text-sm text-muted-foreground">
-                  {paymentMethod ? "Update your payment information below" : "Add a payment method to continue after trial"}
-                </p>
-              </div>
-            </div>
-          </div>
+        <HelpHint description="Upgrade and downgrade changes show proration estimates before confirmation. Scheduled cancellations can be reactivated anytime before period end." />
+      </section>
 
-          <div className="p-6">
-            {paymentMethod && (
-              <div className="mb-6 rounded-lg border border-green-500/20 bg-green-500/5 p-4">
-                <div className="flex items-center justify-between">
+      {/* ── Payment method drawer ─────────────────────────────────── */}
+      {showPaymentDrawer && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            className="flex-1 bg-black/50"
+            onClick={closePaymentDrawer}
+            aria-hidden="true"
+          />
+
+          {/* Slide-over panel */}
+          <div className="flex h-full w-full max-w-md flex-col bg-card shadow-2xl">
+            {/* Drawer header */}
+            <div className="flex items-center justify-between border-b border-border px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <CreditCard className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {paymentMethod ? "Update Payment Method" : "Add Payment Method"}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Choose how you'd like to pay
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={closePaymentDrawer}
+                className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                aria-label="Close panel"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Drawer scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+              {/* Existing method notice */}
+              {paymentMethod && (
+                <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Current method</p>
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-green-500/10 p-2">
-                      {paymentMethod.type === "card" && <CreditCard className="h-5 w-5 text-green-600" />}
-                      {paymentMethod.type === "bank_transfer" && <Building className="h-5 w-5 text-green-600" />}
-                      {paymentMethod.type === "mobile_wallet" && <Smartphone className="h-5 w-5 text-green-600" />}
+                    <div className="rounded-lg bg-green-500/10 p-2 text-green-600">
+                      {paymentTypeIcon(paymentMethod.type)}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground">{paymentMethod.label}</p>
                       <p className="text-xs text-muted-foreground">Ending in {paymentMethod.last4}</p>
                     </div>
+                    <CheckCircle2 className="ml-auto h-5 w-5 text-green-600" />
                   </div>
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                </div>
+              )}
+
+              {/* Payment type selector */}
+              <div>
+                <p className="mb-3 text-sm font-medium text-foreground">Select payment type</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {(["card", "bank_transfer", "mobile_wallet"] as PaymentMethodType[]).map((type) => {
+                    const labels: Record<PaymentMethodType, { title: string; sub: string }> = {
+                      card: { title: "Card", sub: "Credit/Debit" },
+                      bank_transfer: { title: "Bank", sub: "Transfer" },
+                      mobile_wallet: { title: "Wallet", sub: "ABA/Wing" },
+                    };
+                    const active = paymentType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setPaymentType(type)}
+                        className={`flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all ${
+                          active
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-background hover:border-primary/30"
+                        }`}
+                      >
+                        <div className={active ? "text-primary" : "text-muted-foreground"}>
+                          {paymentTypeIcon(type, "h-5 w-5")}
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs font-semibold text-foreground">{labels[type].title}</p>
+                          <p className="text-xs text-muted-foreground">{labels[type].sub}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            )}
 
-            <div className="mb-6">
-              <label className="mb-3 block text-sm font-medium text-foreground">Select Payment Type</label>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <button
-                  type="button"
-                  onClick={() => setPaymentType("card")}
-                  className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                    paymentType === "card" ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/30"
-                  }`}
-                >
-                  <CreditCard className={`h-5 w-5 ${paymentType === "card" ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-foreground">Card</p>
-                    <p className="text-xs text-muted-foreground">Credit/Debit</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentType("bank_transfer")}
-                  className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                    paymentType === "bank_transfer"
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-background hover:border-primary/30"
-                  }`}
-                >
-                  <Building className={`h-5 w-5 ${paymentType === "bank_transfer" ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-foreground">Bank</p>
-                    <p className="text-xs text-muted-foreground">Transfer</p>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentType("mobile_wallet")}
-                  className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
-                    paymentType === "mobile_wallet"
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-background hover:border-primary/30"
-                  }`}
-                >
-                  <Smartphone className={`h-5 w-5 ${paymentType === "mobile_wallet" ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-foreground">Wallet</p>
-                    <p className="text-xs text-muted-foreground">ABA/Wing</p>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-border/70 bg-muted/20 p-5">
-              {paymentType === "card" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Cardholder Name</label>
-                    <input
-                      value={cardholderName}
-                      onChange={(event) => setCardholderName(event.target.value)}
-                      placeholder="John Doe"
-                      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
+              {/* Dynamic form */}
+              <div className="space-y-4">
+                {paymentType === "card" && (
+                  <>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-foreground">Cardholder Name</label>
+                      <input
+                        value={cardholderName}
+                        onChange={(e) => setCardholderName(e.target.value)}
+                        placeholder="John Doe"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-foreground">Card Number</label>
                       <input
                         value={cardNumber}
-                        onChange={(event) => setCardNumber(event.target.value)}
+                        onChange={(e) => setCardNumber(e.target.value)}
                         placeholder="4242 4242 4242 4242"
-                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                       />
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-foreground">Expiry Date</label>
                       <input
                         value={cardExpiry}
-                        onChange={(event) => setCardExpiry(event.target.value)}
+                        onChange={(e) => setCardExpiry(e.target.value)}
                         placeholder="MM/YY"
-                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                       />
                     </div>
-                  </div>
-                </div>
-              )}
+                  </>
+                )}
 
-              {paymentType === "bank_transfer" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Bank Name</label>
-                    <input
-                      value={bankName}
-                      onChange={(event) => setBankName(event.target.value)}
-                      placeholder="e.g., ABA Bank, ACLEDA Bank"
-                      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Account Number</label>
-                    <input
-                      value={bankAccount}
-                      onChange={(event) => setBankAccount(event.target.value)}
-                      placeholder="Enter your account number"
-                      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
-                    />
-                  </div>
-                </div>
-              )}
+                {paymentType === "bank_transfer" && (
+                  <>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-foreground">Bank Name</label>
+                      <input
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="e.g., ABA Bank, ACLEDA Bank"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-foreground">Account Number</label>
+                      <input
+                        value={bankAccount}
+                        onChange={(e) => setBankAccount(e.target.value)}
+                        placeholder="Enter your account number"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                  </>
+                )}
 
-              {paymentType === "mobile_wallet" && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Wallet Provider</label>
-                    <input
-                      value={walletProvider}
-                      onChange={(event) => setWalletProvider(event.target.value)}
-                      placeholder="ABA Pay, Wing, Pi Pay"
-                      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">Phone / Wallet Number</label>
-                    <input
-                      value={walletNumber}
-                      onChange={(event) => setWalletNumber(event.target.value)}
-                      placeholder="Enter your wallet number"
-                      className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground"
-                    />
-                  </div>
-                </div>
-              )}
+                {paymentType === "mobile_wallet" && (
+                  <>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-foreground">Wallet Provider</label>
+                      <input
+                        value={walletProvider}
+                        onChange={(e) => setWalletProvider(e.target.value)}
+                        placeholder="ABA Pay, Wing, Pi Pay"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-foreground">Phone / Wallet Number</label>
+                      <input
+                        value={walletNumber}
+                        onChange={(e) => setWalletNumber(e.target.value)}
+                        placeholder="Enter your wallet number"
+                        className="h-11 w-full rounded-lg border border-border bg-background px-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Security notice */}
+              <div className="flex items-start gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+                <p className="text-xs text-muted-foreground">
+                  Your payment information is encrypted and secure. We never store your full card details.
+                </p>
+              </div>
             </div>
 
-            <div className="mt-4 flex items-start gap-2 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
-              <Shield className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
-              <p className="text-xs text-muted-foreground">
-                Your payment information is encrypted and secure. We never store your full card details.
-              </p>
+            {/* Drawer footer — sticky save button */}
+            <div className="border-t border-border px-6 py-4">
+              <button
+                type="button"
+                onClick={() => void savePaymentMethod()}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                {paymentTypeIcon(paymentType)}
+                Save Payment Method
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => void savePaymentMethod()}
-              className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              {getPaymentIcon()}
-              Save Payment Method
-            </button>
           </div>
-        </article>
+        </div>
+      )}
 
-        <HelpHint description="Upgrade and downgrade changes show proration estimates before confirmation. Scheduled cancellations can be reactivated anytime before period end." />
-      </section>
-
+      {/* ── Plan change confirmation modal ───────────────────────── */}
       {planModalTarget && planModalNext && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-xl">
@@ -853,6 +889,7 @@ export default function BillingPage() {
         </div>
       )}
 
+      {/* ── Cancel subscription modal ─────────────────────────────── */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-xl">
@@ -880,6 +917,7 @@ export default function BillingPage() {
         </div>
       )}
 
+      {/* ── Reactivate subscription modal ────────────────────────── */}
       {showReactivateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-xl">

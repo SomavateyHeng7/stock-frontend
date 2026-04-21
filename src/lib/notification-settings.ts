@@ -14,6 +14,16 @@ export const defaultNotificationSettings: NotificationSettings = {
   lastRunAt: null,
 };
 
+let _nsCache: NotificationSettings | null = null;
+let _nsListenerAttached = false;
+function ensureNSListener() {
+  if (_nsListenerAttached || typeof window === "undefined") return;
+  _nsListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === NOTIFICATION_SETTINGS_KEY) _nsCache = null;
+  });
+}
+
 export function normalizeNotificationSettings(value?: Partial<NotificationSettings>): NotificationSettings {
   return {
     enabled: value?.enabled ?? defaultNotificationSettings.enabled,
@@ -24,28 +34,29 @@ export function normalizeNotificationSettings(value?: Partial<NotificationSettin
 }
 
 export function readNotificationSettings(): NotificationSettings {
-  if (typeof window === "undefined") {
-    return defaultNotificationSettings;
-  }
+  if (typeof window === "undefined") return defaultNotificationSettings;
+
+  ensureNSListener();
+  if (_nsCache !== null) return _nsCache;
 
   try {
     const raw = window.localStorage.getItem(NOTIFICATION_SETTINGS_KEY);
     if (!raw) return defaultNotificationSettings;
-    return normalizeNotificationSettings(JSON.parse(raw));
+    _nsCache = normalizeNotificationSettings(JSON.parse(raw));
+    return _nsCache;
   } catch {
     return defaultNotificationSettings;
   }
 }
 
 export function writeNotificationSettings(settings: Partial<NotificationSettings>) {
-  if (typeof window === "undefined") {
-    return;
-  }
+  if (typeof window === "undefined") return;
 
   const next = normalizeNotificationSettings({
     ...readNotificationSettings(),
     ...settings,
   });
 
+  _nsCache = next;
   window.localStorage.setItem(NOTIFICATION_SETTINGS_KEY, JSON.stringify(next));
 }

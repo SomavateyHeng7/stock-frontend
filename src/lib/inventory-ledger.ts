@@ -36,6 +36,16 @@ export type MovementInput = {
 
 const STORAGE_KEY = "smartstock.inventory-ledger.v1";
 
+let _ledgerCache: InventoryLedgerState | null = null;
+let _ledgerListenerAttached = false;
+function ensureLedgerListener() {
+  if (_ledgerListenerAttached || typeof window === "undefined") return;
+  _ledgerListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === STORAGE_KEY) _ledgerCache = null;
+  });
+}
+
 export const defaultBranches: BranchLocation[] = [
   { id: "pp-main", name: "Phnom Penh Main" },
   { id: "siem-reap", name: "Siem Reap" },
@@ -65,15 +75,17 @@ function buildInitialState(): InventoryLedgerState {
 }
 
 export function getInventoryLedgerState(): InventoryLedgerState {
-  if (typeof window === "undefined") {
-    return buildInitialState();
-  }
+  if (typeof window === "undefined") return buildInitialState();
+
+  ensureLedgerListener();
+  if (_ledgerCache !== null) return _ledgerCache;
 
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (!raw) {
     const initial = buildInitialState();
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
-    return initial;
+    _ledgerCache = initial;
+    return _ledgerCache;
   }
 
   try {
@@ -81,7 +93,8 @@ export function getInventoryLedgerState(): InventoryLedgerState {
     if (!Array.isArray(parsed.branches) || !parsed.stockByBranch || !Array.isArray(parsed.movements)) {
       return buildInitialState();
     }
-    return parsed;
+    _ledgerCache = parsed;
+    return _ledgerCache;
   } catch {
     return buildInitialState();
   }
@@ -89,6 +102,7 @@ export function getInventoryLedgerState(): InventoryLedgerState {
 
 export function saveInventoryLedgerState(state: InventoryLedgerState) {
   if (typeof window === "undefined") return;
+  _ledgerCache = state;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 

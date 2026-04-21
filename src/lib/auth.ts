@@ -9,23 +9,38 @@ export type AuthUser = {
 const AUTH_STORAGE_KEY = "smartstock.auth.user.v1";
 export const AUTH_CHANGED_EVENT = "smartstock:auth-changed";
 
+// undefined = not yet read from storage; null = loaded, no user
+let _authCache: AuthUser | null | undefined = undefined;
+let _authListenerAttached = false;
+function ensureAuthListener() {
+  if (_authListenerAttached || typeof window === "undefined") return;
+  _authListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === AUTH_STORAGE_KEY) _authCache = undefined;
+  });
+}
+
 export function readAuthUser(): AuthUser | null {
   if (typeof window === "undefined") return null;
 
+  ensureAuthListener();
+  if (_authCache !== undefined) return _authCache;
+
   try {
     const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return null;
+    if (!raw) { _authCache = null; return null; }
 
     const parsed = JSON.parse(raw) as Partial<AuthUser>;
-    if (!parsed.id || !parsed.fullName || !parsed.email || !parsed.createdAt) return null;
+    if (!parsed.id || !parsed.fullName || !parsed.email || !parsed.createdAt) { _authCache = null; return null; }
 
-    return {
+    _authCache = {
       id: parsed.id,
       fullName: parsed.fullName,
       email: parsed.email,
       role: parsed.role === "staff" || parsed.role === "manager" ? parsed.role : "owner",
       createdAt: parsed.createdAt,
     };
+    return _authCache;
   } catch {
     return null;
   }
@@ -34,6 +49,7 @@ export function readAuthUser(): AuthUser | null {
 export function writeAuthUser(user: AuthUser | null) {
   if (typeof window === "undefined") return;
 
+  _authCache = user;
   if (!user) {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
   } else {

@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/navbar";
 import {
   BILLING_CHANGED_EVENT,
   canAccessPlan,
+  getDefaultBillingState,
   getPlanById,
   getTrialDaysLeft,
   readBillingState,
@@ -21,10 +22,11 @@ type SmartStockShellProps = {
 
 export function SmartStockShell({ title, subtitle, children }: SmartStockShellProps) {
   const pathname = usePathname();
-  const [billingState, setBillingState] = useState(() => readBillingState());
+  const [billingState, setBillingState] = useState(() => getDefaultBillingState());
 
   useEffect(() => {
     const refresh = () => setBillingState(readBillingState());
+    refresh();
     window.addEventListener(BILLING_CHANGED_EVENT, refresh);
     window.addEventListener("storage", refresh);
     return () => {

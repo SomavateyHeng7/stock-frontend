@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { SmartStockShell } from "@/components/smartstock-shell";
+import { useToast } from "@/components/ui/toast-provider";
 import {
   NOTIFICATION_CENTER_CHANGED_EVENT,
   acknowledgeNotification,
@@ -19,6 +20,7 @@ type ViewFilter = "open" | "resolved" | "all";
 
 export default function NotificationsPage() {
   const preferences = useUserPreferences();
+  const { showToast } = useToast();
   const [filter, setFilter] = useState<ViewFilter>("open");
   const [items, setItems] = useState<NotificationItem[]>(() => readNotificationCenter());
 
@@ -34,19 +36,30 @@ export default function NotificationsPage() {
 
   const markAcknowledged = (id: string) => {
     setItems(acknowledgeNotification(id));
+    showToast({ title: "Acknowledged", severity: "success", persistToCenter: false });
   };
 
   const markResolved = (id: string) => {
     setItems(resolveNotification(id));
+    showToast({ title: "Notification resolved", severity: "success", persistToCenter: false });
   };
 
   const markReopened = (id: string) => {
     setItems(reopenNotification(id));
+    showToast({ title: "Notification reopened", severity: "info", persistToCenter: false });
   };
 
   const clearResolved = () => {
+    const count = items.filter((item) => item.resolvedAt).length;
     clearResolvedNotifications();
     setItems(readNotificationCenter());
+    if (count > 0) {
+      showToast({
+        title: `Cleared ${count} resolved notification${count !== 1 ? "s" : ""}`,
+        severity: "success",
+        persistToCenter: false,
+      });
+    }
   };
 
   const refresh = () => {

@@ -41,6 +41,16 @@ export type SmartStockState = {
 
 export const SMARTSTOCK_STATE_KEY = "smartstock.data.v1";
 
+let _ssCache: SmartStockState | null = null;
+let _ssListenerAttached = false;
+function ensureSSListener() {
+  if (_ssListenerAttached || typeof window === "undefined") return;
+  _ssListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === SMARTSTOCK_STATE_KEY) _ssCache = null;
+  });
+}
+
 export const suppliers: Supplier[] = [
   {
     id: 1,
@@ -202,19 +212,22 @@ function normalizeState(input: Partial<SmartStockState> | null | undefined): Sma
 }
 
 export function readSmartStockState(): SmartStockState {
-  if (typeof window === "undefined") {
-    return cloneDefaultState();
-  }
+  if (typeof window === "undefined") return cloneDefaultState();
+
+  ensureSSListener();
+  if (_ssCache !== null) return _ssCache;
 
   try {
     const raw = window.localStorage.getItem(SMARTSTOCK_STATE_KEY);
     if (!raw) {
       const seeded = cloneDefaultState();
       window.localStorage.setItem(SMARTSTOCK_STATE_KEY, JSON.stringify(seeded));
-      return seeded;
+      _ssCache = seeded;
+      return _ssCache;
     }
 
-    return normalizeState(JSON.parse(raw) as Partial<SmartStockState>);
+    _ssCache = normalizeState(JSON.parse(raw) as Partial<SmartStockState>);
+    return _ssCache;
   } catch {
     return cloneDefaultState();
   }
@@ -230,6 +243,7 @@ export function writeSmartStockState(next: Partial<SmartStockState>) {
     updatedAt: new Date().toISOString(),
   });
 
+  _ssCache = merged;
   window.localStorage.setItem(SMARTSTOCK_STATE_KEY, JSON.stringify(merged));
 }
 

@@ -670,11 +670,13 @@ export default function SettingPage() {
               </div>
 
               <div className="grid grid-cols-3 gap-3">
-                {[
-                  { value: "light", label: "Light", icon: <IconSun />, preview: "bg-white border-gray-200" },
-                  { value: "dark", label: "Dark", icon: <IconMoon />, preview: "bg-zinc-900 border-zinc-700" },
-                  { value: "system", label: "System", icon: <IconMonitor />, preview: "bg-gradient-to-br from-white to-zinc-900 border-gray-300" },
-                ].map((option) => {
+                {(
+                  [
+                    { value: "light", label: "Light", icon: <IconSun />, preview: "bg-white border-gray-200" },
+                    { value: "dark", label: "Dark", icon: <IconMoon />, preview: "bg-zinc-900 border-zinc-700" },
+                    { value: "system", label: "System", icon: <IconMonitor />, preview: "bg-gradient-to-br from-white to-zinc-900 border-gray-300" },
+                  ] as const
+                ).map((option) => {
                   const active = selectedTheme === option.value;
                   return (
                     <button

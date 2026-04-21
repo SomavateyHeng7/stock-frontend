@@ -18,6 +18,16 @@ export type PurchaseOrder = {
 export const PROCUREMENT_ORDERS_KEY = "smartstock.procurement.orders.v1";
 export const PROCUREMENT_ORDERS_CHANGED_EVENT = "smartstock:procurement-orders-changed";
 
+let _ordersCache: PurchaseOrder[] | null = null;
+let _ordersListenerAttached = false;
+function ensureOrdersListener() {
+  if (_ordersListenerAttached || typeof window === "undefined") return;
+  _ordersListenerAttached = true;
+  window.addEventListener("storage", (e) => {
+    if (e.key === PROCUREMENT_ORDERS_KEY) _ordersCache = null;
+  });
+}
+
 function fallbackOrders(): PurchaseOrder[] {
   return [];
 }
@@ -25,14 +35,17 @@ function fallbackOrders(): PurchaseOrder[] {
 export function readPurchaseOrders(): PurchaseOrder[] {
   if (typeof window === "undefined") return fallbackOrders();
 
+  ensureOrdersListener();
+  if (_ordersCache !== null) return _ordersCache;
+
   try {
     const raw = window.localStorage.getItem(PROCUREMENT_ORDERS_KEY);
-    if (!raw) return fallbackOrders();
+    if (!raw) { _ordersCache = []; return _ordersCache; }
 
     const parsed = JSON.parse(raw) as Array<Partial<PurchaseOrder>>;
-    if (!Array.isArray(parsed)) return fallbackOrders();
+    if (!Array.isArray(parsed)) { _ordersCache = []; return _ordersCache; }
 
-    return parsed
+    _ordersCache = parsed
       .filter((item) => {
         return (
           typeof item.id === "string" &&
@@ -61,6 +74,7 @@ export function readPurchaseOrders(): PurchaseOrder[] {
         createdAt: item.createdAt as string,
         updatedAt: item.updatedAt as string,
       }));
+    return _ordersCache;
   } catch {
     return fallbackOrders();
   }
@@ -68,6 +82,7 @@ export function readPurchaseOrders(): PurchaseOrder[] {
 
 export function writePurchaseOrders(orders: PurchaseOrder[]) {
   if (typeof window === "undefined") return;
+  _ordersCache = orders;
   window.localStorage.setItem(PROCUREMENT_ORDERS_KEY, JSON.stringify(orders));
   window.dispatchEvent(new CustomEvent(PROCUREMENT_ORDERS_CHANGED_EVENT));
 }
