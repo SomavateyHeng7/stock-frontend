@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { IntegrationTestsSection } from "@/components/integrations-sync/integration-tests-section";
 import { SyncSection } from "@/components/integrations-sync/sync-section";
@@ -15,6 +15,8 @@ import {
     writeNotificationSettings,
 } from "@/lib/notification-settings";
 
+type StatusResponse = { status: "waiting" } | { status: "connected"; chatId: string };
+
 type IntegrationsSyncHubProps = {
     title?: string;
     subtitle?: string;
@@ -26,19 +28,63 @@ export function IntegrationsSyncHub({
                                     }: IntegrationsSyncHubProps) {
     const { showToast } = useToast();
 
-    // ── Telegram ────────────────────────────────────────────────────────
-    // Seed chatId from persisted notification settings so it survives page reloads.
+    // ── Telegram state ───────────────────────────────────────────────────
     const [telegramChatId, setTelegramChatId] = useState(() => {
         if (typeof window === "undefined") return "";
         return readNotificationSettings().telegramChatId;
     });
     const [telegramMessage, setTelegramMessage] = useState("SmartStock test alert from Integrations page");
-    const [telegramStatus, setTelegramStatus] = useState<string>("Not tested");
+    const [telegramStatus, setTelegramStatus] = useState<string>(
+      () => (typeof window !== "undefined" && readNotificationSettings().telegramChatId ? "Connected" : "Not linked")
+    );
+    const [telegramPolling, setTelegramPolling] = useState(false);
+    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Persist chatId to notification-settings whenever it changes.
+    // Persist chat ID to notification settings whenever it changes.
     useEffect(() => {
         writeNotificationSettings({ telegramChatId });
     }, [telegramChatId]);
+
+    // ── Polling logic ────────────────────────────────────────────────────
+    const stopPolling = useCallback(() => {
+        if (pollingRef.current) {
+            clearInterval(pollingRef.current);
+            pollingRef.current = null;
+        }
+        setTelegramPolling(false);
+    }, []);
+
+    const startPolling = useCallback(() => {
+        // Don't double-start.
+        if (pollingRef.current) return;
+
+        setTelegramPolling(true);
+        setTelegramStatus("Waiting...");
+
+        pollingRef.current = setInterval(async () => {
+            try {
+                const response = await fetch("/api/integrations/telegram/status");
+                const data = (await response.json()) as StatusResponse;
+
+                if (data.status === "connected") {
+                    stopPolling();
+                    setTelegramChatId(data.chatId);
+                    setTelegramStatus("Connected");
+                    showToast({
+                        title: "Telegram linked!",
+                        description: `Chat ID ${data.chatId} captured. Alerts are now active.`,
+                        source: "Telegram",
+                        severity: "info",
+                    });
+                }
+            } catch {
+                // Network error — keep polling silently.
+            }
+        }, 2_000);
+    }, [stopPolling, showToast]);
+
+    // Clean up on unmount.
+    useEffect(() => () => { stopPolling(); }, [stopPolling]);
 
     // ── Facebook parser ─────────────────────────────────────────────────
     const [facebookInput, setFacebookInput] = useState("2 Rice 25kg\nFish Sauce 750ml x 3");
@@ -46,21 +92,21 @@ export function IntegrationsSyncHub({
 
     // ── POS sync ────────────────────────────────────────────────────────
     const [posPayload, setPosPayload] = useState(
-        JSON.stringify(
-            {
-                source: "demo-pos",
-                items: [
-                    { sku: "RICE25", sold: 6, onHand: 14 },
-                    { sku: "FISH750", sold: 3, onHand: 7 },
-                ],
-            },
-            null,
-            2,
-        ),
+      JSON.stringify(
+        {
+            source: "demo-pos",
+            items: [
+                { sku: "RICE25", sold: 6, onHand: 14 },
+                { sku: "FISH750", sold: 3, onHand: 7 },
+            ],
+        },
+        null,
+        2,
+      ),
     );
     const [posStatus, setPosStatus] = useState<string>("Not tested");
 
-    // ── Channel sync rows ───────────────────────────────────────────────
+    // ── Channel sync rows ────────────────────────────────────────────────
     const [rows, setRows] = useState(getChannelSyncRows());
     const mismatchCount = rows.filter((row) => row.mismatch !== 0).length;
     const syncedCount = rows.length - mismatchCount;
@@ -74,13 +120,13 @@ export function IntegrationsSyncHub({
 
     const persistRows = (nextRows: typeof rows) => {
         writeSmartStockChannelInventory(
-            nextRows.map((row) => ({
-                productId: row.productId,
-                walkIn: row.walkIn,
-                facebook: row.facebook,
-                delivery: row.delivery,
-                lastSyncMinutesAgo: row.lastSyncMinutesAgo,
-            })),
+          nextRows.map((row) => ({
+              productId: row.productId,
+              walkIn: row.walkIn,
+              facebook: row.facebook,
+              delivery: row.delivery,
+              lastSyncMinutesAgo: row.lastSyncMinutesAgo,
+          })),
         );
         setRows(nextRows);
     };
@@ -102,7 +148,7 @@ export function IntegrationsSyncHub({
         persistRows(rows.map((row) => rebalanceToSourceTotal(row)));
     };
 
-    // ── Handlers ────────────────────────────────────────────────────────
+    // ── Handlers ─────────────────────────────────────────────────────────
     const testTelegram = async (event: FormEvent) => {
         event.preventDefault();
         setTelegramStatus("Testing...");
@@ -220,35 +266,37 @@ export function IntegrationsSyncHub({
     };
 
     return (
-        <SmartStockShell title={title} subtitle={subtitle}>
-            <section className="space-y-4" aria-label="Integrations and sync">
-                <SyncSection
-                    rows={rows}
-                    hasMismatches={hasMismatches}
-                    mismatchCount={mismatchCount}
-                    syncedCount={syncedCount}
-                    lastSyncLabel={lastSyncLabel}
-                    onSyncNow={syncNow}
-                    onResolveOne={resolveOne}
-                />
+      <SmartStockShell title={title} subtitle={subtitle}>
+          <section className="space-y-4" aria-label="Integrations and sync">
+              <SyncSection
+                rows={rows}
+                hasMismatches={hasMismatches}
+                mismatchCount={mismatchCount}
+                syncedCount={syncedCount}
+                lastSyncLabel={lastSyncLabel}
+                onSyncNow={syncNow}
+                onResolveOne={resolveOne}
+              />
 
-                <IntegrationTestsSection
-                    telegramChatId={telegramChatId}
-                    telegramMessage={telegramMessage}
-                    telegramStatus={telegramStatus}
-                    facebookInput={facebookInput}
-                    parsedLines={parsedLines}
-                    posPayload={posPayload}
-                    posStatus={posStatus}
-                    onTelegramChatIdChange={setTelegramChatId}
-                    onTelegramMessageChange={setTelegramMessage}
-                    onFacebookInputChange={setFacebookInput}
-                    onPosPayloadChange={setPosPayload}
-                    onTestTelegram={testTelegram}
-                    onTestFacebookParse={testFacebookParse}
-                    onTestPosSync={testPosSync}
-                />
-            </section>
-        </SmartStockShell>
+              <IntegrationTestsSection
+                telegramChatId={telegramChatId}
+                telegramMessage={telegramMessage}
+                telegramStatus={telegramStatus}
+                telegramPolling={telegramPolling}
+                facebookInput={facebookInput}
+                parsedLines={parsedLines}
+                posPayload={posPayload}
+                posStatus={posStatus}
+                onTelegramMessageChange={setTelegramMessage}
+                onFacebookInputChange={setFacebookInput}
+                onPosPayloadChange={setPosPayload}
+                onStartPolling={startPolling}
+                onStopPolling={stopPolling}
+                onTestTelegram={testTelegram}
+                onTestFacebookParse={testFacebookParse}
+                onTestPosSync={testPosSync}
+              />
+          </section>
+      </SmartStockShell>
     );
 }
