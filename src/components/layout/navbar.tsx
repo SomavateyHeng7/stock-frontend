@@ -13,7 +13,7 @@ import {
 } from "@/lib/notification-center";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
+  // { href: "/dashboard", label: "Dashboard" },
   { href: "/inventory", label: "Inventory" },
   { href: "/reorder-queue", label: "Reorder" },
   { href: "/alerts", label: "Alerts" },
