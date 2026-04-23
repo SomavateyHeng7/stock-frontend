@@ -213,6 +213,24 @@ export function Navbar() {
 										>
 											Settings
 										</Link>
+										{authUser.role === "owner" && (
+											<>
+												<Link
+													href="/admin/users"
+													onClick={() => setIsAccountMenuOpen(false)}
+													className="block rounded-lg px-2 py-2 text-sm text-[#fff8ef] hover:bg-[#443321]"
+												>
+													Manage team
+												</Link>
+												<Link
+													href="/admin/branches"
+													onClick={() => setIsAccountMenuOpen(false)}
+													className="block rounded-lg px-2 py-2 text-sm text-[#fff8ef] hover:bg-[#443321]"
+												>
+													Manage branches
+												</Link>
+											</>
+										)}
 										<button
 											type="button"
 											onClick={handleSignOut}
@@ -302,6 +320,32 @@ export function Navbar() {
 								</li>
 							);
 						})}
+						{authUser?.role === "owner" && (
+							<>
+								<li>
+									<Link
+										href="/admin/users"
+										onClick={() => setIsMobileMenuOpen(false)}
+										className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
+											pathname === "/admin/users" ? "bg-[#f5e9d8] text-[#2f2418]" : "text-[#eadfce] hover:bg-[#443321]"
+										}`}
+									>
+										<span>Manage team</span>
+									</Link>
+								</li>
+								<li>
+									<Link
+										href="/admin/branches"
+										onClick={() => setIsMobileMenuOpen(false)}
+										className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
+											pathname === "/admin/branches" ? "bg-[#f5e9d8] text-[#2f2418]" : "text-[#eadfce] hover:bg-[#443321]"
+										}`}
+									>
+										<span>Manage branches</span>
+									</Link>
+								</li>
+							</>
+						)}
 						<li className="flex items-center justify-between rounded-lg px-3 py-2">
 							<span className="text-sm text-[#eadfce]">Theme</span>
 							<ModeToggle />

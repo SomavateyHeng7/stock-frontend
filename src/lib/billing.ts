@@ -138,6 +138,8 @@ export const routeMinimumPlan: Record<string, PlanId> = {
   "/delivery": "advanced",
   "/reports": "enterprise",
   "/billing": "starter",
+  "/admin/users": "starter",
+  "/admin/branches": "starter",
 };
 
 export function getDefaultBillingState(): BillingState {
