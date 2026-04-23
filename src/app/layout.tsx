@@ -25,22 +25,22 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html
-            lang="en"
-            suppressHydrationWarning
-            className={`${jakartaSans.variable} h-full antialiased`}
-        >
-        <body className="min-h-full flex flex-col">
-        <ThemeProvider defaultTheme="system" enableSystem>
-            <PreferencesProvider>
-                <ToastProvider>
-                    <NotificationEngine />
-                    <GlobalCommandPalette />
-                    {children}
-                </ToastProvider>
-            </PreferencesProvider>
-        </ThemeProvider>
-        </body>
-        </html>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={`${jakartaSans.variable} h-full antialiased`}
+      >
+      <body className="min-h-full flex flex-col">
+      <ThemeProvider defaultTheme="system" enableSystem>
+          <PreferencesProvider>
+              <ToastProvider>
+                  <NotificationEngine />
+                  <GlobalCommandPalette />
+                  {children}
+              </ToastProvider>
+          </PreferencesProvider>
+      </ThemeProvider>
+      </body>
+      </html>
     );
 }
