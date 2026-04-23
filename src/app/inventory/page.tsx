@@ -34,6 +34,7 @@ import {
   Plus,
   Search,
   Tag,
+  Trash2,
   TrendingDown,
   TrendingUp,
   X,
@@ -85,6 +86,7 @@ export default function InventoryPage() {
   const [showArchived, setShowArchived] = useState(false);
 
   const [detailProductId, setDetailProductId] = useState<number | null>(null);
+  const [confirmDeleteProductId, setConfirmDeleteProductId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!detailProductId) {
@@ -509,6 +511,51 @@ export default function InventoryPage() {
     });
   };
 
+  const deleteProductPermanently = (productId: number) => {
+    const target = products.find((item) => item.id === productId);
+    setProducts((current) => current.filter((item) => item.id !== productId));
+    setArchivedProductIds((current) => current.filter((id) => id !== productId));
+    setSelectedProductIds((current) => current.filter((id) => id !== productId));
+    if (selectedProductId === productId) {
+      const remaining = products.filter((item) => item.id !== productId);
+      setSelectedProductId(remaining[0]?.id ?? 0);
+    }
+    setDetailProductId(null);
+    setConfirmDeleteProductId(null);
+    showToast({
+      title: "Product deleted",
+      description: `${target?.name ?? "Product"} permanently removed from inventory.`,
+    });
+  };
+
+  const deleteSelectedProducts = () => {
+    if (bulkSelectedCount === 0) {
+      showToast({
+        title: "No products selected",
+        description: "Select products to delete.",
+      });
+      return;
+    }
+
+    const names = products
+      .filter((item) => selectedProductIds.includes(item.id))
+      .map((item) => item.name)
+      .join(", ");
+
+    setProducts((current) => current.filter((item) => !selectedProductIds.includes(item.id)));
+    setArchivedProductIds((current) => current.filter((id) => !selectedProductIds.includes(id)));
+    if (selectedProductIds.includes(selectedProductId)) {
+      const remaining = products.filter((item) => !selectedProductIds.includes(item.id));
+      setSelectedProductId(remaining[0]?.id ?? 0);
+    }
+    const count = bulkSelectedCount;
+    setSelectedProductIds([]);
+    showToast({
+      title: "Products deleted",
+      description: `${count} product${count !== 1 ? "s" : ""} permanently deleted (${names}).`,
+    });
+  };
+
   const saveCurrentView = () => {
     if (newViewName.trim().length === 0) {
       showToast({
@@ -897,6 +944,15 @@ export default function InventoryPage() {
                       >
                         <Archive className="h-3.5 w-3.5" />
                         Archive Selected
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={deleteSelectedProducts}
+                        className="flex h-10 items-center justify-center gap-2 rounded-lg border border-red-400/50 bg-red-500/10 px-3 text-sm font-medium text-red-700 dark:text-red-400"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete Selected
                       </button>
                     </div>
                   </div>
@@ -1539,11 +1595,41 @@ export default function InventoryPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setDetailProductId(null)}
+                  onClick={() => { setDetailProductId(null); setConfirmDeleteProductId(null); }}
                   className="min-h-11 flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted/30"
                 >
                   Close
                 </button>
+              </div>
+              <div className="mt-2">
+                {confirmDeleteProductId === detailProduct.id ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-3 py-2">
+                    <p className="flex-1 text-xs font-medium text-red-600 dark:text-red-400">Delete permanently? This cannot be undone.</p>
+                    <button
+                      type="button"
+                      onClick={() => deleteProductPermanently(detailProduct.id)}
+                      className="rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600"
+                    >
+                      Yes, delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteProductId(null)}
+                      className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteProductId(detailProduct.id)}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-400/40 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-500/10 dark:text-red-400"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete Product
+                  </button>
+                )}
               </div>
             </div>
           </div>

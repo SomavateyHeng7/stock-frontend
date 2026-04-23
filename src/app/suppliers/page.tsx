@@ -18,6 +18,7 @@ import {
   getOpenPurchaseOrders,
   PROCUREMENT_ORDERS_CHANGED_EVENT,
   readPurchaseOrders,
+  updatePurchaseOrderStatus,
   type PurchaseOrder,
   type PurchaseOrderStatus,
 } from "@/lib/procurement-orders";
@@ -372,6 +373,15 @@ export default function SuppliersPage() {
     });
   };
 
+  const cancelOrder = (orderId: string) => {
+    const orders = updatePurchaseOrderStatus(orderId, "cancelled");
+    setPurchaseOrders(orders);
+    showToast({
+      title: "Order cancelled",
+      description: `Purchase order ${orderId} has been cancelled.`,
+    });
+  };
+
   const changeView = (nextView: SuppliersView) => {
     setActiveView(nextView);
 
@@ -588,13 +598,25 @@ export default function SuppliersPage() {
                         <ul className="mt-2 space-y-2">
                           {group.orders.slice(0, 6).map((order) => {
                             const remaining = getRemainingQty(order);
+                            const isCancellable = order.status !== "received" && order.status !== "cancelled";
                             return (
                               <li key={order.id} className="rounded-md border border-border/70 bg-background px-3 py-2">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <p className="text-base font-medium text-foreground">{order.id}</p>
-                                  <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getOrderStatusClass(order.status)}`}>
-                                    {formatOrderStatus(order.status)}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getOrderStatusClass(order.status)}`}>
+                                      {formatOrderStatus(order.status)}
+                                    </span>
+                                    {isCancellable && (
+                                      <button
+                                        type="button"
+                                        onClick={() => cancelOrder(order.id)}
+                                        className="rounded-full border border-red-400/40 bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-700 hover:bg-red-500/20 dark:text-red-400"
+                                      >
+                                        Cancel
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                   {order.productName} · Qty {order.quantity} · Remaining {remaining}
@@ -744,13 +766,22 @@ export default function SuppliersPage() {
                           />
                         </label>
 
-                        <button
-                          type="button"
-                          onClick={() => postReceipt(order)}
-                          className="mt-3 h-11 rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground"
-                        >
-                          Post receipt
-                        </button>
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => postReceipt(order)}
+                            className="h-11 flex-1 rounded-lg bg-primary px-4 text-base font-semibold text-primary-foreground"
+                          >
+                            Post receipt
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => cancelOrder(order.id)}
+                            className="h-11 rounded-lg border border-red-400/50 bg-red-500/10 px-4 text-base font-medium text-red-700 hover:bg-red-500/15 dark:text-red-400"
+                          >
+                            Cancel order
+                          </button>
+                        </div>
                       </li>
                     );
                   })}

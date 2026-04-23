@@ -2,7 +2,7 @@ export type AuthUser = {
   id: string;
   fullName: string;
   email: string;
-  role: "owner" | "manager" | "staff";
+  role: "owner" | "manager" | "staff" | "accountant";
   createdAt: string;
 };
 
@@ -33,11 +33,14 @@ export function readAuthUser(): AuthUser | null {
     const parsed = JSON.parse(raw) as Partial<AuthUser>;
     if (!parsed.id || !parsed.fullName || !parsed.email || !parsed.createdAt) { _authCache = null; return null; }
 
+    const validRoles = ["staff", "manager", "accountant"] as const;
     _authCache = {
       id: parsed.id,
       fullName: parsed.fullName,
       email: parsed.email,
-      role: parsed.role === "staff" || parsed.role === "manager" ? parsed.role : "owner",
+      role: (validRoles as readonly string[]).includes(parsed.role ?? "")
+        ? (parsed.role as "staff" | "manager" | "accountant")
+        : "owner",
       createdAt: parsed.createdAt,
     };
     return _authCache;

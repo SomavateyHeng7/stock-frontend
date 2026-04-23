@@ -3,6 +3,7 @@ import { products as baseProducts } from "@/lib/smartstock-data";
 export type BranchLocation = {
   id: string;
   name: string;
+  createdAt?: string;
 };
 
 export type MovementType = "manual_adjustment" | "delivery_accepted" | "delivery_damaged" | "delivery_missing";
@@ -35,6 +36,7 @@ export type MovementInput = {
 };
 
 const STORAGE_KEY = "smartstock.inventory-ledger.v1";
+export const LEDGER_BRANCHES_CHANGED_EVENT = "smartstock:ledger-branches-changed";
 
 let _ledgerCache: InventoryLedgerState | null = null;
 let _ledgerListenerAttached = false;
@@ -104,6 +106,52 @@ export function saveInventoryLedgerState(state: InventoryLedgerState) {
   if (typeof window === "undefined") return;
   _ledgerCache = state;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  window.dispatchEvent(new CustomEvent(LEDGER_BRANCHES_CHANGED_EVENT));
+}
+
+export function addBranch(name: string): BranchLocation {
+  const state = getInventoryLedgerState();
+  const id = `branch-${Date.now().toString(36)}`;
+  const branch: BranchLocation = { id, name: name.trim(), createdAt: new Date().toISOString() };
+  saveInventoryLedgerState({
+    ...state,
+    branches: [...state.branches, branch],
+    stockByBranch: { ...state.stockByBranch, [id]: {} },
+  });
+  return branch;
+}
+
+export function renameBranch(id: string, name: string): void {
+  const state = getInventoryLedgerState();
+  saveInventoryLedgerState({
+    ...state,
+    branches: state.branches.map((b) => (b.id === id ? { ...b, name: name.trim() } : b)),
+  });
+}
+
+export function removeBranch(id: string): void {
+  const state = getInventoryLedgerState();
+  const { [id]: _dropped, ...remainingStock } = state.stockByBranch;
+  saveInventoryLedgerState({
+    ...state,
+    branches: state.branches.filter((b) => b.id !== id),
+    stockByBranch: remainingStock,
+  });
+}
+
+export function getBranchStats(
+  state: InventoryLedgerState,
+  branchId: string,
+): { activeSKUs: number; totalUnits: number; recentMovements: number } {
+  const stock = state.stockByBranch[branchId] ?? {};
+  const values = Object.values(stock);
+  const activeSKUs = values.filter((qty) => qty > 0).length;
+  const totalUnits = values.reduce((sum, qty) => sum + qty, 0);
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const recentMovements = state.movements.filter(
+    (m) => m.branchId === branchId && m.createdAt >= cutoff,
+  ).length;
+  return { activeSKUs, totalUnits, recentMovements };
 }
 
 export function ensureProductsInLedger(state: InventoryLedgerState, productIds: number[]) {
