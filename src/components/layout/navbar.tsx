@@ -123,7 +123,7 @@ export function Navbar() {
                     >
                       {item.label}
                       {showInboxCount && (
-                        <span className="inline-flex min-w-[1.125rem] justify-center rounded-full bg-blue-600 px-1 py-0.5 text-[10px] font-semibold leading-none text-white dark:bg-blue-500">
+                        <span className="inline-flex min-w-4.5 justify-center rounded-full bg-blue-600 px-1 py-0.5 text-[10px] font-semibold leading-none text-white dark:bg-blue-500">
 													{openNotificationCount > 99 ? "99+" : openNotificationCount}
 												</span>
                       )}
@@ -305,7 +305,7 @@ export function Navbar() {
                   >
                     <span>{item.label}</span>
                     {showInboxCount && (
-                      <span className="inline-flex min-w-[1.125rem] justify-center rounded-full bg-blue-600 px-1 py-0.5 text-[10px] font-semibold leading-none text-white dark:bg-blue-500">
+                      <span className="inline-flex min-w-4.5 justify-center rounded-full bg-blue-600 px-1 py-0.5 text-[10px] font-semibold leading-none text-white dark:bg-blue-500">
 												{openNotificationCount > 99 ? "99+" : openNotificationCount}
 											</span>
                     )}
