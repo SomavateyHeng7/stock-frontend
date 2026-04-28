@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { useToast } from "@/components/ui/toast-provider";
 import { getEnrichedProducts, getStatusClass } from "@/lib/smartstock-data";
@@ -13,7 +13,7 @@ import {
 } from "@/lib/procurement-orders";
 
 /* ------------------------------------------------------------------ */
-/*  Tiny icon components – avoids an icon-library dependency          */
+/*  Icons                                                              */
 /* ------------------------------------------------------------------ */
 const IconPackage = () => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4 7.55 4.24" /><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.29 7 12 12 20.71 7" /><line x1="12" x2="12" y1="22" y2="12" /></svg>
@@ -45,9 +45,12 @@ const IconClipboard = () => (
 const IconInbox = () => (
 	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
 );
+const IconSearch = () => (
+	<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+);
 
 /* ------------------------------------------------------------------ */
-/*  Status badge helper                                                */
+/*  Badge helpers                                                      */
 /* ------------------------------------------------------------------ */
 const statusBadge = (status: string) => {
 	const base = "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase";
@@ -78,109 +81,168 @@ const orderStatusBadge = (status: string) => {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Main page                                                         */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+type EnrichedProduct = ReturnType<typeof getEnrichedProducts>[number];
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
 /* ------------------------------------------------------------------ */
 export default function ReorderQueuePage() {
 	const { showToast } = useToast();
 
+	// All products (for manual order picker) — loaded client-side only to avoid SSR/hydration mismatch
+	const [allProducts, setAllProducts] = useState<EnrichedProduct[]>([]);
+	const [orders, setOrders]           = useState<PurchaseOrder[]>([]);
+
+	useEffect(() => {
+		setAllProducts(getEnrichedProducts());
+		setOrders(readPurchaseOrders());
+	}, []);
+
+	// Products that need reordering
 	const reorderItems = useMemo(
-		() =>
-			getEnrichedProducts().filter(
-				(item) => (item.status === "Low Stock" || item.status === "Out of Stock") && item.reorderQty > 0,
-			),
-		[],
+		() => allProducts.filter((item) => (item.status === "Low Stock" || item.status === "Out of Stock") && item.reorderQty > 0),
+		[allProducts],
 	);
-
-	const [reorderDialogItem, setReorderDialogItem] = useState<(typeof reorderItems)[number] | null>(null);
-	const [reorderDialogStep, setReorderDialogStep] = useState<1 | 2>(1);
-	const [reorderAmount, setReorderAmount] = useState(1);
-	const [orders, setOrders] = useState<PurchaseOrder[]>(() => readPurchaseOrders());
-
 	const activeOrderByProduct = useMemo(() => getActiveOrderByProduct(orders), [orders]);
-	const openOrders = orders.filter((o) => o.status === "placed" || o.status === "acknowledged");
+	const openOrders   = orders.filter((o) => o.status === "placed" || o.status === "acknowledged");
 	const openOrderQty = openOrders.reduce((sum, o) => sum + o.quantity, 0);
 	const receivedCount = orders.filter((o) => o.status === "received").length;
 
-	/* ---- actions ---- */
-	const markOrdered = (productId: number, productName: string, reorderQty: number) => {
-		const existing = activeOrderByProduct.get(productId);
-		if (existing) {
-			showToast({ title: "Order already open", description: `${productName} is already in PO ${existing.id}.` });
-			return;
-		}
-		const item = reorderItems.find((row) => row.id === productId);
-		createPurchaseOrder({
-			productId,
-			productName,
-			supplierId: item?.supplier?.id ?? null,
-			supplierName: item?.supplier?.name ?? "Unassigned",
-			quantity: reorderQty,
-		});
-		setOrders(readPurchaseOrders());
-		showToast({ title: "Reorder placed", description: `${productName}: ${reorderQty} units ordered.` });
-	};
+	// ── Recommended reorder dialog ───────────────────────────────────
+	const [reorderDialogItem, setReorderDialogItem]   = useState<EnrichedProduct | null>(null);
+	const [reorderDialogStep, setReorderDialogStep]   = useState<1 | 2>(1);
+	const [reorderAmount, setReorderAmount]           = useState(1);
 
-	const openReorderDialog = (item: (typeof reorderItems)[number]) => {
+	const openReorderDialog = (item: EnrichedProduct) => {
 		if (activeOrderByProduct.has(item.id)) return;
 		setReorderDialogItem(item);
 		setReorderAmount(Math.max(1, item.reorderQty));
 		setReorderDialogStep(1);
 	};
-
 	const closeReorderDialog = () => {
 		setReorderDialogItem(null);
 		setReorderDialogStep(1);
 		setReorderAmount(1);
 	};
-
 	const confirmReorderDialog = () => {
 		if (!reorderDialogItem) return;
-		markOrdered(reorderDialogItem.id, reorderDialogItem.name, Math.max(1, Math.floor(reorderAmount)));
+		const item = reorderDialogItem;
+		createPurchaseOrder({
+			productId:    item.id,
+			productName:  item.name,
+			supplierId:   item.supplier?.id ?? null,
+			supplierName: item.supplier?.name ?? "Unassigned",
+			quantity:     Math.max(1, Math.floor(reorderAmount)),
+		});
+		setOrders(readPurchaseOrders());
+		showToast({ title: "Reorder placed", description: `${item.name}: ${reorderAmount} units ordered.` });
 		closeReorderDialog();
 	};
 
+	// ── Manual "New Order" dialog ────────────────────────────────────
+	const [showManualDialog, setShowManualDialog]       = useState(false);
+	const [manualSearch, setManualSearch]               = useState("");
+	const [manualProduct, setManualProduct]             = useState<EnrichedProduct | null>(null);
+	const [manualQty, setManualQty]                     = useState(1);
+	const [manualStep, setManualStep]                   = useState<1 | 2 | 3>(1);
+
+	const manualFilteredProducts = useMemo(() => {
+		const kw = manualSearch.trim().toLowerCase();
+		return kw ? allProducts.filter((p) => p.name.toLowerCase().includes(kw)) : allProducts;
+	}, [allProducts, manualSearch]);
+
+	const openManualDialog = () => {
+		setManualProduct(null);
+		setManualSearch("");
+		setManualQty(1);
+		setManualStep(1);
+		setShowManualDialog(true);
+	};
+	const closeManualDialog = () => {
+		setShowManualDialog(false);
+		setManualProduct(null);
+		setManualSearch("");
+		setManualQty(1);
+		setManualStep(1);
+	};
+	const confirmManualDialog = () => {
+		if (!manualProduct) return;
+		createPurchaseOrder({
+			productId:    manualProduct.id,
+			productName:  manualProduct.name,
+			supplierId:   manualProduct.supplier?.id ?? null,
+			supplierName: manualProduct.supplier?.name ?? "Unassigned",
+			quantity:     Math.max(1, Math.floor(manualQty)),
+		});
+		setOrders(readPurchaseOrders());
+		showToast({ title: "Order placed", description: `${manualProduct.name}: ${manualQty} units ordered.` });
+		closeManualDialog();
+	};
+
+	// ── PO status update ─────────────────────────────────────────────
 	const setOrderStatus = (orderId: string, nextStatus: "acknowledged" | "received" | "cancelled") => {
 		const updated = updatePurchaseOrderStatus(orderId, nextStatus);
 		setOrders(updated);
 		showToast({ title: "Order updated", description: `PO ${orderId} → ${nextStatus}.` });
 	};
 
-	/* ------------------------------------------------------------------ */
-	/*  Render                                                             */
-	/* ------------------------------------------------------------------ */
+	/* ---------------------------------------------------------------- */
+	/*  Render                                                           */
+	/* ---------------------------------------------------------------- */
 	return (
 		<SmartStockShell
-			title="Reorder queue"
+			title="Reorder Queue"
 			subtitle="AI-powered reorder recommendations based on demand trends and supplier lead times."
 		>
 			{/* ── KPI strip ─────────────────────────────────────────── */}
-			<div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				{[
-					{ label: "Open POs", value: openOrders.length, icon: <IconClipboard />, color: "text-blue-600 dark:text-blue-400" },
-					{ label: "Units on order", value: openOrderQty, icon: <IconTruck />, color: "text-violet-600 dark:text-violet-400" },
-					{ label: "Recommendations", value: reorderItems.length, icon: <IconInbox />, color: "text-amber-600 dark:text-amber-400" },
-					{ label: "Received", value: receivedCount, icon: <IconPackage />, color: "text-emerald-600 dark:text-emerald-400" },
+					{ label: "Open POs",        value: openOrders.length,    icon: <IconClipboard />, color: "text-blue-600 dark:text-blue-400",   bg: "bg-blue-500/10" },
+					{ label: "Units on order",  value: openOrderQty,         icon: <IconTruck />,     color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-500/10" },
+					{ label: "Recommendations", value: reorderItems.length,  icon: <IconInbox />,     color: "text-amber-600 dark:text-amber-400",  bg: "bg-amber-500/10" },
+					{ label: "Received",        value: receivedCount,        icon: <IconPackage />,   color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
 				].map((kpi) => (
 					<div
 						key={kpi.label}
-						className="group relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 transition-shadow hover:shadow-md"
+						className="rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
 					>
-						<div className={`mb-2 ${kpi.color}`}>{kpi.icon}</div>
+						<div className={`mb-2 inline-flex rounded-lg p-2 ${kpi.bg}`}>
+							<span className={kpi.color}>{kpi.icon}</span>
+						</div>
 						<p className="text-2xl font-bold tracking-tight text-foreground">{kpi.value}</p>
 						<p className="mt-0.5 text-xs font-medium text-muted-foreground">{kpi.label}</p>
 					</div>
 				))}
 			</div>
 
-			{/* ── Recommendations table ────────────────────────────── */}
+			{/* ── Recommendations ──────────────────────────────────── */}
 			<section className="mt-6">
-				<h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-					<IconInbox /> Recommendations
-				</h2>
+				<div className="mb-3 flex items-center justify-between">
+					<h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+						<IconInbox /> Recommendations
+						{reorderItems.length > 0 && (
+							<span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600">
+								{reorderItems.length}
+							</span>
+						)}
+					</h2>
+
+					{/* New Order button — lets users place POs for ANY product */}
+					<button
+						type="button"
+						onClick={openManualDialog}
+						className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 active:scale-[0.97]"
+					>
+						<IconPlus />
+						New Order
+					</button>
+				</div>
 
 				<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 					{/* Header – desktop only */}
-					<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px_100px_120px]">
+					<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px_110px_130px]">
 						<span>Product</span>
 						<span>Supplier</span>
 						<span className="text-center">Lead time</span>
@@ -189,34 +251,41 @@ export default function ReorderQueuePage() {
 					</div>
 
 					{reorderItems.length === 0 && (
-						<p className="px-4 py-8 text-center text-sm text-muted-foreground">
-							All products are sufficiently stocked. Nothing to reorder.
-						</p>
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<span className="mb-2 text-2xl">✅</span>
+							<p className="text-sm font-medium text-foreground">All products are sufficiently stocked</p>
+							<p className="mt-0.5 text-xs text-muted-foreground">Nothing to reorder right now.</p>
+						</div>
 					)}
 
 					<ul className="divide-y divide-border/40">
 						{reorderItems.map((item) => {
 							const hasOpenPO = activeOrderByProduct.has(item.id);
-							const activePO = activeOrderByProduct.get(item.id);
+							const activePO  = activeOrderByProduct.get(item.id);
 
 							return (
 								<li
 									key={item.id}
-									className="group px-4 py-3 transition-colors hover:bg-muted/20 sm:grid sm:grid-cols-[1fr_140px_120px_100px_120px] sm:items-center"
+									className={`group px-4 py-3.5 transition-colors hover:bg-muted/20 sm:grid sm:grid-cols-[1fr_140px_120px_110px_130px] sm:items-center ${
+										item.status === "Out of Stock" ? "border-l-2 border-l-red-500" : "border-l-2 border-l-amber-500"
+									}`}
 								>
 									{/* Product info */}
 									<div className="min-w-0">
-										<p className="truncate font-medium text-foreground">{item.name}</p>
-										<p className="truncate text-xs text-muted-foreground">{item.reason}</p>
+										<div className="flex items-center gap-2">
+											<p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
+											<span className="sm:hidden">{statusBadge(item.status)}</span>
+										</div>
+										<p className="mt-0.5 truncate text-xs text-muted-foreground">{item.reason}</p>
 										{hasOpenPO && (
-											<p className="mt-0.5 text-[11px] text-muted-foreground/70">
-												Open: {activePO?.id} · {activePO?.quantity} units
+											<p className="mt-0.5 text-[11px] font-medium text-blue-600 dark:text-blue-400">
+												PO {activePO?.id} · {activePO?.quantity} units open
 											</p>
 										)}
 									</div>
 
 									{/* Supplier */}
-									<p className="mt-1 truncate text-sm text-muted-foreground sm:mt-0">
+									<p className="mt-1.5 truncate text-sm text-muted-foreground sm:mt-0">
 										{item.supplier?.name ?? <span className="italic opacity-50">Unassigned</span>}
 									</p>
 
@@ -225,8 +294,8 @@ export default function ReorderQueuePage() {
 										{item.supplier?.leadTimeDays ?? 0}d
 									</p>
 
-									{/* Status */}
-									<div className="mt-1.5 sm:mt-0 sm:text-center">{statusBadge(item.status)}</div>
+									{/* Status – desktop */}
+									<div className="hidden sm:block sm:text-center">{statusBadge(item.status)}</div>
 
 									{/* Action */}
 									<div className="mt-2 sm:mt-0 sm:text-right">
@@ -234,13 +303,11 @@ export default function ReorderQueuePage() {
 											type="button"
 											disabled={hasOpenPO}
 											onClick={() => openReorderDialog(item)}
-											className={`
-												inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all
-												${hasOpenPO
+											className={`inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+												hasOpenPO
 													? "cursor-not-allowed bg-muted/40 text-muted-foreground/50"
 													: "bg-primary text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.97]"
-												}
-											`}
+											}`}
 										>
 											{hasOpenPO ? "PO open" : <>Create PO <IconChevronRight /></>}
 										</button>
@@ -255,18 +322,31 @@ export default function ReorderQueuePage() {
 			{/* ── Purchase orders ──────────────────────────────────── */}
 			<section className="mt-6">
 				<h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-					<IconClipboard /> Purchase orders
+					<IconClipboard /> Purchase Orders
+					{orders.length > 0 && (
+						<span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+							{orders.length}
+						</span>
+					)}
 				</h2>
 
 				<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 					{orders.length === 0 ? (
-						<p className="px-4 py-8 text-center text-sm text-muted-foreground">
-							No purchase orders yet. Create one from the recommendations above.
-						</p>
+						<div className="flex flex-col items-center justify-center py-12 text-center">
+							<span className="mb-2 text-2xl">📋</span>
+							<p className="text-sm font-medium text-foreground">No purchase orders yet</p>
+							<p className="mt-0.5 text-xs text-muted-foreground">
+								Create one from the recommendations above or use{" "}
+								<button type="button" onClick={openManualDialog} className="font-semibold text-primary hover:underline">
+									New Order
+								</button>
+								.
+							</p>
+						</div>
 					) : (
 						<>
 							{/* Header – desktop */}
-							<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[100px_1fr_80px_100px_1fr]">
+							<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[100px_1fr_80px_110px_1fr]">
 								<span>PO #</span>
 								<span>Product · Supplier</span>
 								<span className="text-center">Qty</span>
@@ -278,16 +358,16 @@ export default function ReorderQueuePage() {
 								{orders.slice(0, 12).map((order) => (
 									<li
 										key={order.id}
-										className="px-4 py-3 transition-colors hover:bg-muted/20 sm:grid sm:grid-cols-[100px_1fr_80px_100px_1fr] sm:items-center"
+										className="px-4 py-3.5 transition-colors hover:bg-muted/20 sm:grid sm:grid-cols-[100px_1fr_80px_110px_1fr] sm:items-center"
 									>
-										<p className="text-sm font-semibold text-foreground">{order.id}</p>
+										<p className="font-mono text-sm font-semibold text-foreground">{order.id}</p>
 
 										<div className="mt-0.5 min-w-0 sm:mt-0">
-											<p className="truncate text-sm text-foreground">{order.productName}</p>
+											<p className="truncate text-sm font-medium text-foreground">{order.productName}</p>
 											<p className="truncate text-xs text-muted-foreground">{order.supplierName}</p>
 										</div>
 
-										<p className="hidden text-center text-sm font-medium text-foreground sm:block">
+										<p className="hidden text-center text-sm font-semibold text-foreground sm:block">
 											{order.quantity}
 										</p>
 
@@ -295,8 +375,8 @@ export default function ReorderQueuePage() {
 											{orderStatusBadge(order.status)}
 										</div>
 
-										{/* Action buttons */}
-										<div className="mt-2 flex flex-wrap justify-end gap-1.5 sm:mt-0">
+										{/* Actions */}
+										<div className="mt-2 flex flex-wrap items-center justify-end gap-1.5 sm:mt-0">
 											{order.status === "placed" && (
 												<button
 													type="button"
@@ -318,7 +398,7 @@ export default function ReorderQueuePage() {
 													<button
 														type="button"
 														onClick={() => setOrderStatus(order.id, "cancelled")}
-														className="inline-flex items-center gap-1 rounded-md border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 px-2.5 py-1 text-[11px] font-medium text-red-600 dark:text-red-400 transition-colors hover:bg-red-100 dark:hover:bg-red-950/50"
+														className="inline-flex items-center gap-1 rounded-md border border-red-300 bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-600 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50"
 													>
 														<IconX /> Cancel
 													</button>
@@ -333,17 +413,15 @@ export default function ReorderQueuePage() {
 				</div>
 			</section>
 
-			{/* ── Reorder dialog ───────────────────────────────────── */}
+			{/* ── Recommended reorder dialog ───────────────────────── */}
 			{reorderDialogItem && (
 				<div
 					className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4"
 					role="dialog"
 					aria-modal="true"
-					aria-label="Create purchase order"
 					onClick={(e) => e.target === e.currentTarget && closeReorderDialog()}
 				>
 					<div className="w-full max-w-md rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
-						{/* Dialog header */}
 						<div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
 							<div>
 								<h2 className="text-base font-semibold text-foreground">Create purchase order</h2>
@@ -352,22 +430,17 @@ export default function ReorderQueuePage() {
 							<button
 								type="button"
 								onClick={closeReorderDialog}
-								className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
-								aria-label="Close"
+								className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/40 hover:text-foreground"
 							>
 								<IconX />
 							</button>
 						</div>
 
-						{/* Steps indicator */}
+						{/* Steps */}
 						<div className="flex gap-2 px-5 pt-4">
 							{[1, 2].map((step) => (
 								<div key={step} className="flex flex-1 flex-col items-center gap-1">
-									<div
-										className={`h-1 w-full rounded-full transition-colors ${
-											step <= reorderDialogStep ? "bg-primary" : "bg-muted"
-										}`}
-									/>
+									<div className={`h-1 w-full rounded-full transition-colors ${step <= reorderDialogStep ? "bg-primary" : "bg-muted"}`} />
 									<span className="text-[10px] font-medium text-muted-foreground">
 										{step === 1 ? "Quantity" : "Confirm"}
 									</span>
@@ -375,31 +448,29 @@ export default function ReorderQueuePage() {
 							))}
 						</div>
 
-						{/* Step content */}
 						<div className="px-5 pb-5 pt-4">
 							{reorderDialogStep === 1 ? (
 								<div className="space-y-4">
 									<div className="rounded-lg bg-muted/30 px-3 py-2.5">
-										<p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-											Suggested quantity
-										</p>
+										<p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Suggested qty</p>
 										<p className="mt-0.5 text-lg font-bold text-foreground">
-											{reorderDialogItem.reorderQty} <span className="text-sm font-normal text-muted-foreground">units</span>
+											{reorderDialogItem.reorderQty}{" "}
+											<span className="text-sm font-normal text-muted-foreground">units</span>
 										</p>
 									</div>
 
-									<label htmlFor="reorder-queue-amount" className="block text-sm font-medium text-foreground">
+									<label htmlFor="rq-amount" className="block text-sm font-medium text-foreground">
 										Order quantity
 										<div className="mt-2 flex items-center gap-1.5">
 											<button
 												type="button"
 												onClick={() => setReorderAmount((c) => Math.max(1, c - 1))}
-												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground transition-colors hover:bg-muted/40"
+												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground hover:bg-muted/40"
 											>
 												<IconMinus />
 											</button>
 											<input
-												id="reorder-queue-amount"
+												id="rq-amount"
 												type="number"
 												min={1}
 												value={reorderAmount}
@@ -409,26 +480,18 @@ export default function ReorderQueuePage() {
 											<button
 												type="button"
 												onClick={() => setReorderAmount((c) => c + 1)}
-												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground transition-colors hover:bg-muted/40"
+												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground hover:bg-muted/40"
 											>
 												<IconPlus />
 											</button>
 										</div>
 									</label>
 
-									<div className="flex justify-end gap-2 pt-2">
-										<button
-											type="button"
-											onClick={closeReorderDialog}
-											className="rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
-										>
+									<div className="flex justify-end gap-2 pt-1">
+										<button type="button" onClick={closeReorderDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
 											Cancel
 										</button>
-										<button
-											type="button"
-											onClick={() => setReorderDialogStep(2)}
-											className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
-										>
+										<button type="button" onClick={() => setReorderDialogStep(2)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
 											Next <IconChevronRight />
 										</button>
 									</div>
@@ -437,7 +500,7 @@ export default function ReorderQueuePage() {
 								<div className="space-y-4">
 									<div className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
 										{[
-											{ label: "Product", value: reorderDialogItem.name },
+											{ label: "Product",  value: reorderDialogItem.name },
 											{ label: "Supplier", value: reorderDialogItem.supplier?.name ?? "Unassigned" },
 											{ label: "Quantity", value: `${reorderAmount} units` },
 										].map((row) => (
@@ -448,20 +511,219 @@ export default function ReorderQueuePage() {
 										))}
 									</div>
 
-									<div className="flex justify-end gap-2 pt-2">
-										<button
-											type="button"
-											onClick={() => setReorderDialogStep(1)}
-											className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
-										>
+									<div className="flex justify-end gap-2 pt-1">
+										<button type="button" onClick={() => setReorderDialogStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
 											<IconArrowLeft /> Back
+										</button>
+										<button type="button" onClick={confirmReorderDialog} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
+											<IconCheck /> Confirm PO
+										</button>
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* ── Manual "New Order" dialog ─────────────────────────── */}
+			{showManualDialog && (
+				<div
+					className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4"
+					role="dialog"
+					aria-modal="true"
+					onClick={(e) => e.target === e.currentTarget && closeManualDialog()}
+				>
+					<div className="w-full max-w-md rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
+						{/* Header */}
+						<div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
+							<div>
+								<h2 className="text-base font-semibold text-foreground">New Order</h2>
+								<p className="mt-0.5 text-xs text-muted-foreground">Order any product — not just recommendations</p>
+							</div>
+							<button
+								type="button"
+								onClick={closeManualDialog}
+								className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+							>
+								<IconX />
+							</button>
+						</div>
+
+						{/* Steps */}
+						<div className="flex gap-2 px-5 pt-4">
+							{["Select product", "Quantity", "Confirm"].map((label, i) => (
+								<div key={label} className="flex flex-1 flex-col items-center gap-1">
+									<div className={`h-1 w-full rounded-full transition-colors ${i + 1 <= manualStep ? "bg-primary" : "bg-muted"}`} />
+									<span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+								</div>
+							))}
+						</div>
+
+						<div className="px-5 pb-5 pt-4">
+
+							{/* Step 1: Product picker */}
+							{manualStep === 1 && (
+								<div className="space-y-3">
+									{/* Search */}
+									<div className="relative">
+										<span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+											<IconSearch />
+										</span>
+										<input
+											type="text"
+											placeholder="Search products…"
+											value={manualSearch}
+											onChange={(e) => setManualSearch(e.target.value)}
+											autoFocus
+											className="h-10 w-full rounded-lg border border-border/70 bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+										/>
+									</div>
+
+									{/* Product list */}
+									<div className="max-h-60 overflow-y-auto divide-y divide-border/40 rounded-lg border border-border/60">
+										{manualFilteredProducts.length === 0 ? (
+											<p className="py-6 text-center text-xs text-muted-foreground">No products match your search.</p>
+										) : (
+											manualFilteredProducts.map((p) => {
+												const isSelected = manualProduct?.id === p.id;
+												const hasOpenPO = activeOrderByProduct.has(p.id);
+												return (
+													<button
+														key={p.id}
+														type="button"
+														onClick={() => setManualProduct(p)}
+														className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors ${
+															isSelected
+																? "bg-primary/10"
+																: "hover:bg-muted/30"
+														}`}
+													>
+														<div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold ${
+															isSelected ? "bg-primary text-primary-foreground" : "bg-muted/50 text-foreground"
+														}`}>
+															{p.name[0]}
+														</div>
+														<div className="min-w-0 flex-1">
+															<p className="truncate text-sm font-medium text-foreground">{p.name}</p>
+															<p className="text-[11px] text-muted-foreground">
+																Stock: {p.currentStock}{" "}
+																{hasOpenPO && <span className="text-blue-600 font-medium">· PO open</span>}
+															</p>
+														</div>
+														<div className="shrink-0">
+															{p.status === "Out of Stock" && (
+																<span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-600">Out</span>
+															)}
+															{p.status === "Low Stock" && (
+																<span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600">Low</span>
+															)}
+															{isSelected && (
+																<span className="ml-1 text-primary"><IconCheck /></span>
+															)}
+														</div>
+													</button>
+												);
+											})
+										)}
+									</div>
+
+									<div className="flex justify-end gap-2 pt-1">
+										<button type="button" onClick={closeManualDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
+											Cancel
 										</button>
 										<button
 											type="button"
-											onClick={confirmReorderDialog}
-											className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+											disabled={!manualProduct}
+											onClick={() => {
+												setManualQty(Math.max(1, manualProduct?.reorderQty ?? 1));
+												setManualStep(2);
+											}}
+											className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-40"
 										>
-											<IconCheck /> Confirm PO
+											Next <IconChevronRight />
+										</button>
+									</div>
+								</div>
+							)}
+
+							{/* Step 2: Quantity */}
+							{manualStep === 2 && manualProduct && (
+								<div className="space-y-4">
+									<div className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5">
+										<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-[10px] font-bold text-primary">
+											{manualProduct.name[0]}
+										</div>
+										<div className="min-w-0">
+											<p className="truncate text-sm font-semibold text-foreground">{manualProduct.name}</p>
+											<p className="text-xs text-muted-foreground">
+												Supplier: {manualProduct.supplier?.name ?? "Unassigned"}
+											</p>
+										</div>
+									</div>
+
+									<label htmlFor="manual-qty" className="block text-sm font-medium text-foreground">
+										Order quantity
+										<div className="mt-2 flex items-center gap-1.5">
+											<button
+												type="button"
+												onClick={() => setManualQty((c) => Math.max(1, c - 1))}
+												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground hover:bg-muted/40"
+											>
+												<IconMinus />
+											</button>
+											<input
+												id="manual-qty"
+												type="number"
+												min={1}
+												value={manualQty}
+												onChange={(e) => setManualQty(Math.max(1, Number(e.target.value) || 1))}
+												className="h-10 w-full rounded-lg border border-border/70 bg-background px-3 text-center text-sm font-semibold text-foreground tabular-nums [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+											/>
+											<button
+												type="button"
+												onClick={() => setManualQty((c) => c + 1)}
+												className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground hover:bg-muted/40"
+											>
+												<IconPlus />
+											</button>
+										</div>
+									</label>
+
+									<div className="flex justify-end gap-2 pt-1">
+										<button type="button" onClick={() => setManualStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
+											<IconArrowLeft /> Back
+										</button>
+										<button type="button" onClick={() => setManualStep(3)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
+											Next <IconChevronRight />
+										</button>
+									</div>
+								</div>
+							)}
+
+							{/* Step 3: Confirm */}
+							{manualStep === 3 && manualProduct && (
+								<div className="space-y-4">
+									<div className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
+										{[
+											{ label: "Product",  value: manualProduct.name },
+											{ label: "Supplier", value: manualProduct.supplier?.name ?? "Unassigned" },
+											{ label: "Lead time", value: manualProduct.supplier?.leadTimeDays ? `${manualProduct.supplier.leadTimeDays} days` : "Unknown" },
+											{ label: "Quantity", value: `${manualQty} units` },
+										].map((row) => (
+											<div key={row.label} className="flex items-center justify-between px-3 py-2.5">
+												<span className="text-xs text-muted-foreground">{row.label}</span>
+												<span className="text-sm font-semibold text-foreground">{row.value}</span>
+											</div>
+										))}
+									</div>
+
+									<div className="flex justify-end gap-2 pt-1">
+										<button type="button" onClick={() => setManualStep(2)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
+											<IconArrowLeft /> Back
+										</button>
+										<button type="button" onClick={confirmManualDialog} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
+											<IconCheck /> Place Order
 										</button>
 									</div>
 								</div>

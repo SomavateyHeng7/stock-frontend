@@ -38,15 +38,17 @@ type SupplierImportError = {
 
 type AddSupplierPanelProps = {
   setSuppliers: React.Dispatch<React.SetStateAction<SupplierRow[]>>;
+  initialMode?: "choose" | "manual" | "bulk";
+  initialFormOpen?: boolean;
 };
 
 const allowedReliability = new Set<SupplierReliability>(["High", "Medium", "Low"]);
 
-export function AddSupplierPanel({ setSuppliers }: AddSupplierPanelProps) {
+export function AddSupplierPanel({ setSuppliers, initialMode = "choose", initialFormOpen = false }: AddSupplierPanelProps) {
   const { showToast } = useToast();
 
-  const [entryMode, setEntryMode] = useState<"choose" | "manual" | "bulk">("choose");
-  const [showManualForm, setShowManualForm] = useState(false);
+  const [entryMode, setEntryMode] = useState<"choose" | "manual" | "bulk">(initialMode);
+  const [showManualForm, setShowManualForm] = useState(initialFormOpen);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

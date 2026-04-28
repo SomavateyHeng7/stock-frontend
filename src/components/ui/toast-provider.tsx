@@ -258,10 +258,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
 
-      {/* Portal — bottom-right stack */}
+      {/* Portal — top-right stack */}
       <div
         aria-label="Notifications"
-        className="pointer-events-none fixed bottom-4 right-4 z-[200] flex w-full max-w-sm flex-col-reverse gap-2"
+        className="pointer-events-none fixed right-4 top-4 z-200 flex w-full max-w-sm flex-col-reverse gap-2"
       >
         <AnimatePresence initial={false} mode="sync">
           {toasts.map((toast) => (

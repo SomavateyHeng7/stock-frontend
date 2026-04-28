@@ -69,7 +69,7 @@ export default function LoginPage() {
 	};
 
 	return (
-		<PublicPageShell title="Sign In" subtitle="Access your SmartStock workspace.">
+		<PublicPageShell>
 			<div className="mx-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-border/60 bg-card shadow-lg sm:grid sm:grid-cols-[1fr_1.15fr]">
 
 				{/* ── Left: branded panel ─────────────────────────────── */}
@@ -147,7 +147,7 @@ export default function LoginPage() {
 									type="email"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
-									placeholder="you@business.com"
+									placeholder="example@gmail.com"
 									required
 									autoComplete="email"
 									className="h-11 w-full rounded-lg border border-border/70 bg-background pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"

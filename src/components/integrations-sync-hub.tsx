@@ -1,11 +1,12 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { IntegrationTestsSection } from "@/components/integrations-sync/integration-tests-section";
 import { SyncSection } from "@/components/integrations-sync/sync-section";
 import { ParsedOrderLine } from "@/components/integrations-sync/types";
 import { useToast } from "@/components/ui/toast-provider";
+import { useTelegramLink } from "@/hooks/use-telegram-link";
 import {
     getChannelSyncRows,
     writeSmartStockChannelInventory,
@@ -14,8 +15,6 @@ import {
     readNotificationSettings,
     writeNotificationSettings,
 } from "@/lib/notification-settings";
-
-type StatusResponse = { status: "waiting" } | { status: "connected"; chatId: string };
 
 type IntegrationsSyncHubProps = {
     title?: string;
@@ -37,54 +36,33 @@ export function IntegrationsSyncHub({
     const [telegramStatus, setTelegramStatus] = useState<string>(
       () => (typeof window !== "undefined" && readNotificationSettings().telegramChatId ? "Connected" : "Not linked")
     );
-    const [telegramPolling, setTelegramPolling] = useState(false);
-    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const { phase, chatId: linkedChatId, activate, stop: stopPolling } = useTelegramLink();
+    const telegramPolling = phase === "waiting";
+
+    // When the link flow completes, persist the new chat ID and notify.
+    useEffect(() => {
+        if (!linkedChatId) return;
+        setTelegramChatId(linkedChatId);
+        showToast({
+            title: "Telegram linked!",
+            description: `Chat ID ${linkedChatId} captured. Alerts are now active.`,
+            source: "Telegram",
+            severity: "info",
+        });
+    }, [linkedChatId, showToast]);
+
+    // Sync status label with hook phase.
+    useEffect(() => {
+        if (phase === "waiting") setTelegramStatus("Waiting...");
+        else if (phase === "connected") setTelegramStatus("Connected");
+        else if (phase === "error") setTelegramStatus("Error connecting");
+    }, [phase]);
 
     // Persist chat ID to notification settings whenever it changes.
     useEffect(() => {
         writeNotificationSettings({ telegramChatId });
     }, [telegramChatId]);
-
-    // ── Polling logic ────────────────────────────────────────────────────
-    const stopPolling = useCallback(() => {
-        if (pollingRef.current) {
-            clearInterval(pollingRef.current);
-            pollingRef.current = null;
-        }
-        setTelegramPolling(false);
-    }, []);
-
-    const startPolling = useCallback(() => {
-        // Don't double-start.
-        if (pollingRef.current) return;
-
-        setTelegramPolling(true);
-        setTelegramStatus("Waiting...");
-
-        pollingRef.current = setInterval(async () => {
-            try {
-                const response = await fetch("/api/integrations/telegram/status");
-                const data = (await response.json()) as StatusResponse;
-
-                if (data.status === "connected") {
-                    stopPolling();
-                    setTelegramChatId(data.chatId);
-                    setTelegramStatus("Connected");
-                    showToast({
-                        title: "Telegram linked!",
-                        description: `Chat ID ${data.chatId} captured. Alerts are now active.`,
-                        source: "Telegram",
-                        severity: "info",
-                    });
-                }
-            } catch {
-                // Network error — keep polling silently.
-            }
-        }, 2_000);
-    }, [stopPolling, showToast]);
-
-    // Clean up on unmount.
-    useEffect(() => () => { stopPolling(); }, [stopPolling]);
 
     // ── Facebook parser ─────────────────────────────────────────────────
     const [facebookInput, setFacebookInput] = useState("2 Rice 25kg\nFish Sauce 750ml x 3");
@@ -290,7 +268,7 @@ export function IntegrationsSyncHub({
                 onTelegramMessageChange={setTelegramMessage}
                 onFacebookInputChange={setFacebookInput}
                 onPosPayloadChange={setPosPayload}
-                onStartPolling={startPolling}
+                onActivate={activate}
                 onStopPolling={stopPolling}
                 onTestTelegram={testTelegram}
                 onTestFacebookParse={testFacebookParse}

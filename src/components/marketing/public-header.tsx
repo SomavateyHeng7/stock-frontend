@@ -71,18 +71,18 @@ export function PublicHeader() {
           </button>
 
           <Link
-            href="/login"
-            className="hidden rounded-lg border border-slate-200 px-3.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 sm:inline-flex"
+            href="/auth/login"
+            className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
           >
             Sign in
           </Link>
 
-          <Link
+          {/* <Link
             href="/onboarding"
             className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
           >
             Get started
-          </Link>
+          </Link> */}
         </div>
       </div>
 

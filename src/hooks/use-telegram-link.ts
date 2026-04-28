@@ -18,18 +18,35 @@ export function useTelegramLink(intervalMs = 2000): UseTelegramLinkResult {
   const [chatId, setChatId] = useState<string | null>(null);
   const [botUrl, setBotUrl] = useState<string | null>(null);
   const tokenRef            = useRef<string | null>(null);
-  const timerRef            = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef            = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inFlightRef         = useRef(false);
 
   const stopPolling = () => {
     if (timerRef.current != null) {
-      clearInterval(timerRef.current);
+      clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    inFlightRef.current = false;
   };
+
+  const scheduleNextPoll = useCallback(() => {
+    if (timerRef.current != null) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      void poll();
+    }, intervalMs);
+  }, [intervalMs]);
 
   const poll = useCallback(async () => {
     const token = tokenRef.current;
-    if (!token) return;
+    if (!token || inFlightRef.current) return;
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      scheduleNextPoll();
+      return;
+    }
+
+    inFlightRef.current = true;
 
     try {
       const res  = await fetch(`/api/integrations/telegram/status?token=${token}`);
@@ -39,11 +56,16 @@ export function useTelegramLink(intervalMs = 2000): UseTelegramLinkResult {
         setChatId(data.chatId);
         setPhase("connected");
         stopPolling();
+        return;
       }
+
+      scheduleNextPoll();
     } catch {
       setPhase("error");
+    } finally {
+      inFlightRef.current = false;
     }
-  }, []);
+  }, [scheduleNextPoll]);
 
   const activate = useCallback(async () => {
     if (phase === "waiting" || phase === "connected") return;
@@ -61,12 +83,12 @@ export function useTelegramLink(intervalMs = 2000): UseTelegramLinkResult {
       window.open(data.botUrl, "_blank");
 
       // 3. Start polling for this specific token
-      poll();
-      timerRef.current = setInterval(poll, intervalMs);
+      stopPolling();
+      void poll();
     } catch {
       setPhase("error");
     }
-  }, [phase, poll, intervalMs]);
+  }, [phase, poll]);
 
   useEffect(() => () => stopPolling(), []);
 

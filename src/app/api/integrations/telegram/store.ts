@@ -13,6 +13,7 @@ const dir = process.env.SQLITE_PATH ?? join(tmpdir(), "smartstock");
 mkdirSync(dir, { recursive: true });
 
 const db = new Database(join(dir, "tg-state.db"));
+db.pragma("busy_timeout = 5000"); // retry up to 5 s before throwing SQLITE_BUSY
 db.pragma("journal_mode = WAL");
 
 db.exec(`

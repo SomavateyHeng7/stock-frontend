@@ -43,11 +43,23 @@ export const SMARTSTOCK_STATE_KEY = "smartstock.data.v1";
 
 let _ssCache: SmartStockState | null = null;
 let _ssListenerAttached = false;
+const _forecastCache = new Map<string, number[]>();
+
+function makeForecastCacheKey(product: Product, asOfDate: Date) {
+  const dayKey = `${asOfDate.getFullYear()}-${asOfDate.getMonth() + 1}-${asOfDate.getDate()}`;
+  const weeklyKey = product.weeklySales.join(",");
+  const salesHistoryKey = Array.isArray(product.salesHistory) ? product.salesHistory.join(",") : "";
+  return [product.id, product.currentStock, product.todaySales, product.reorderPoint, weeklyKey, salesHistoryKey, dayKey].join("|");
+}
+
 function ensureSSListener() {
   if (_ssListenerAttached || typeof window === "undefined") return;
   _ssListenerAttached = true;
   window.addEventListener("storage", (e) => {
-    if (e.key === SMARTSTOCK_STATE_KEY) _ssCache = null;
+    if (e.key === SMARTSTOCK_STATE_KEY) {
+      _ssCache = null;
+      _forecastCache.clear();
+    }
   });
 }
 
@@ -244,6 +256,7 @@ export function writeSmartStockState(next: Partial<SmartStockState>) {
   });
 
   _ssCache = merged;
+  _forecastCache.clear();
   window.localStorage.setItem(SMARTSTOCK_STATE_KEY, JSON.stringify(merged));
 }
 
@@ -367,6 +380,12 @@ export function getReliabilityClass(reliability: SupplierReliability): string {
 }
 
 export function getThirtyDayForecast(product: Product, asOfDate = new Date()) {
+  const cacheKey = makeForecastCacheKey(product, asOfDate);
+  const cached = _forecastCache.get(cacheKey);
+  if (cached) {
+    return [...cached];
+  }
+
   const history = getSalesHistory(product);
   const recent = history.slice(-42);
   const level = recent.reduce((acc, value, index) => {
@@ -381,7 +400,7 @@ export function getThirtyDayForecast(product: Product, asOfDate = new Date()) {
   const trailingAverage =
     trailingWindow.reduce((sum, value) => sum + value, 0) / Math.max(1, trailingWindow.length);
 
-  return Array.from({ length: 30 }, (_value, offset) => {
+  const forecast = Array.from({ length: 30 }, (_value, offset) => {
     const horizon = offset + 1;
     const date = new Date(asOfDate);
     date.setDate(asOfDate.getDate() + horizon);
@@ -394,6 +413,9 @@ export function getThirtyDayForecast(product: Product, asOfDate = new Date()) {
 
     return Math.max(1, Math.round(prediction));
   });
+
+  _forecastCache.set(cacheKey, forecast);
+  return [...forecast];
 }
 
 export function getEnrichedProducts(input?: Partial<SmartStockState>) {

@@ -1,476 +1,651 @@
 import Link from "next/link";
 import { plans } from "@/lib/billing";
-import { ArrowRight, BarChart3, Bell, Package, TrendingUp, CheckCircle2, Zap, Globe, MessageSquare } from "lucide-react";
+import { PublicHeader } from "@/components/marketing/public-header";
+import { PublicFooter } from "@/components/marketing/public-footer";
+import {
+  ArrowRight,
+  BarChart3,
+  Bell,
+  Package,
+  TrendingUp,
+  CheckCircle2,
+  Zap,
+  Globe,
+  MessageSquare,
+  Star,
+  Users,
+} from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-linear-to-b from-background via-background to-muted/20">
-        <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
-        
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <div className="text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary">
-              <Zap className="h-3 w-3" />
-              <span>Built for Cambodia&apos;s SME retailers</span>
-            </div>
+    <div className="min-h-screen bg-background">
+      <PublicHeader />
 
-            {/* Main Headline */}
-            <h1 className="mt-8 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Stop guessing.
-              <br />
-              <span className="bg-linear-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                Start knowing
-              </span>{" "}
-              when to reorder.
-            </h1>
+      <main>
+        {/* ── Hero ─────────────────────────────────────────────────────── */}
+        <section className="relative overflow-hidden bg-linear-to-br from-blue-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-16 sm:py-24 lg:py-28">
+          <div className="absolute inset-0 bg-grid-pattern text-slate-900 opacity-[0.025]" />
+          <div className="absolute top-20 left-1/4 h-80 w-80 rounded-full bg-blue-400/10 blur-3xl" />
+          <div className="absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl" />
 
-            {/* Subheadline */}
-            <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              SmartStock uses AI to predict demand 30 days ahead, automatically flag low stock, and send reorder alerts
-              directly to your Telegram — so you never run out during Khmer New Year again.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/onboarding"
-                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
-              >
-                Start free trial
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-              >
-                See how it works
-              </Link>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span>1 month free trial</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <span>Setup in 10 minutes</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Proof */}
-          <div className="mt-16 rounded-2xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
-            <p className="text-center text-sm font-medium text-muted-foreground">
-              Trusted by retailers across Phnom Penh
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-4 text-center text-sm sm:grid-cols-4">
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+              {/* Left: headline + CTAs */}
               <div>
-                <p className="text-2xl font-bold text-foreground">70%</p>
-                <p className="text-xs text-muted-foreground">Fewer stockouts</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">5 hrs</p>
-                <p className="text-xs text-muted-foreground">Saved per week</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">85%+</p>
-                <p className="text-xs text-muted-foreground">Forecast accuracy</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">$15/mo</p>
-                <p className="text-xs text-muted-foreground">Starting price</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Problem Statement */}
-      <section className="bg-muted/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Running out of stock costs you money.
-              <br />
-              <span className="text-muted-foreground">Especially when you can&apos;t afford it.</span>
-            </h2>
-            <p className="mt-6 text-base text-muted-foreground sm:text-lg">
-              70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New Year hits, they either
-              run out of best-sellers or lock up cash in overstock. There&apos;s a better way.
-            </p>
-          </div>
-
-          {/* Pain Points */}
-          <div className="mt-12 grid gap-6 sm:grid-cols-3">
-            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-                <span className="text-lg font-bold">😰</span>
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Guesswork reordering</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                &quot;Should I call my supplier? I think we&apos;re low...&quot; Then customers start asking and it&apos;s too late.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-                <span className="text-lg font-bold">📉</span>
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Peak season disasters</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you&apos;ll never get back.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-                <span className="text-lg font-bold">💸</span>
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Cash locked in overstock</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Order too much to avoid stockouts, but now your money is sitting on shelves instead of working.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">How it works</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              From manual tracking to intelligent decisions
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-              SmartStock turns your sales history into actionable forecasts and alerts — built for sellers who live on
-              their phones, not desktop dashboards.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-8 lg:grid-cols-3">
-            {/* Step 1 */}
-            <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-                1
-              </div>
-              <h3 className="mt-4 text-xl font-semibold text-foreground">Upload your sales data</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Import from CSV, connect your POS, or paste Facebook Messenger orders. Our AI understands Khmer and
-                English mixed messages.
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-primary">
-                <MessageSquare className="h-4 w-4" />
-                <span className="font-medium">Facebook Messenger parsing included</span>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-                2
-              </div>
-              <h3 className="mt-4 text-xl font-semibold text-foreground">AI predicts demand</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Get 30-day forecasts for every product. Our model knows Cambodia&apos;s calendar — Khmer New Year, Pchum Ben,
-                11.11 shopping events.
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-primary">
-                <TrendingUp className="h-4 w-4" />
-                <span className="font-medium">85%+ accuracy after 60 days</span>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
-                3
-              </div>
-              <h3 className="mt-4 text-xl font-semibold text-foreground">Get alerts on Telegram</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Every morning at 8 AM: &quot;Blue T-Shirt (M) — Order 25 units by Tuesday.&quot; No desktop needed. Just tap, call
-                your supplier, done.
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-primary">
-                <Bell className="h-4 w-4" />
-                <span className="font-medium">Alerts in English or Khmer</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="bg-muted/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Everything you need to stop stockouts
-            </h2>
-          </div>
-
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">AI Demand Forecasting</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                30-day predictions with seasonal awareness for Cambodia&apos;s peak shopping periods.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Bell className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Smart Reorder Alerts</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Automatic notifications with recommended quantities before you run out.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <MessageSquare className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Facebook Messenger Parsing</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Paste order messages, AI extracts products and quantities. Khmer + English supported.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Package className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Multi-Channel Sync</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                One view of stock across Facebook, walk-in, and online sales channels.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Globe className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Khmer Language Support</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Full UI and alerts in Khmer or English. Switch anytime.</p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <TrendingUp className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Seasonal Trend Detection</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Built-in awareness of Khmer New Year, Pchum Ben, and shopping events.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">Sales Analytics</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Track trends, top sellers, and forecast accuracy in one dashboard.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mt-4 font-semibold text-foreground">10-Minute Setup</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Guided onboarding with demo mode. No tech skills required.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-primary">Pricing</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Enterprise AI at SME pricing
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-              Start with 1 month free. No credit card required. Cancel anytime.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-4 lg:gap-8">
-            {plans.map((plan, idx) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-2xl border p-6 shadow-sm transition-all hover:shadow-lg ${
-                  idx === 1
-                    ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                    : "border-border bg-card"
-                }`}
-              >
-                {idx === 1 && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-primary bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
-                    Most Popular
-                  </div>
-                )}
-
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{plan.targetCustomer}</p>
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/60 dark:text-blue-300">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
+                  </span>
+                  Built for Cambodia&apos;s SME retailers
                 </div>
 
-                <div className="mt-6">
-                  <p className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-foreground">{plan.monthlyPriceLabel.split("/")[0]}</span>
-                    <span className="text-sm text-muted-foreground">/month</span>
+                <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl leading-[1.1]">
+                  Stop guessing.
+                  <br />
+                  <span className="bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+                    Start knowing
+                  </span>{" "}
+                  when to reorder.
+                </h1>
+
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
+                  SmartStock uses AI to predict demand 30 days ahead, flag low stock, and send
+                  reorder alerts directly to your Telegram — so you never run out during Khmer New
+                  Year again.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    href="/onboarding"
+                    className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-500/30"
+                  >
+                    Start free — 1 month trial
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    href="#how-it-works"
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  >
+                    See how it works
+                  </Link>
+                </div>
+
+                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> No credit card
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> Setup in 10 min
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> Cancel anytime
+                  </span>
+                </div>
+              </div>
+
+              {/* Right: product mockup */}
+              <div className="relative lg:pl-4">
+                {/* Floating Telegram notification */}
+                <div className="absolute -right-2 -top-5 z-10 hidden w-56 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-800 sm:block">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#2AABEE] text-[11px] font-bold text-white">
+                      S
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-[11px] font-semibold text-slate-800 dark:text-slate-200">
+                        SmartStock Bot
+                      </p>
+                      <p className="text-[9px] text-slate-400">Telegram · just now</p>
+                    </div>
+                    <span className="relative ml-auto flex h-2 w-2 shrink-0">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                    </span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                    📦 <strong>Blue T-Shirt (M)</strong> is running low. Order 25 units by Tuesday to
+                    avoid stockout.
                   </p>
                 </div>
 
-                <ul className="mt-6 space-y-3 text-sm">
-                  {plan.features.map((feature) => (
-                    <li key={`${plan.id}-${feature}`} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 shrink-0 text-primary" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Main dashboard card */}
+                <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/10 dark:border-slate-700/50 dark:bg-slate-800/90">
+                  {/* Fake browser chrome */}
+                  <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5 dark:border-slate-700/60 dark:bg-slate-800">
+                    <div className="flex gap-1.5">
+                      <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                    </div>
+                    <span className="ml-2 text-[10px] font-medium text-slate-400">
+                      SmartStock · Reorder Queue
+                    </span>
+                  </div>
 
-                <Link
-                  href="/billing"
-                  className={`mt-8 block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition-colors ${
-                    idx === 1
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-border bg-background text-foreground hover:bg-muted"
-                  }`}
-                >
-                  Start free trial
-                </Link>
+                  <div className="p-4 space-y-2.5">
+                    {/* Urgent item */}
+                    <div className="flex items-center justify-between rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 dark:border-red-900/40 dark:bg-red-950/30">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
+                          <Package className="h-3.5 w-3.5 text-red-600 dark:text-red-400" />
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            Blue T-Shirt (M)
+                          </p>
+                          <p className="text-[10px] font-medium text-red-600 dark:text-red-400">
+                            3 left — Order 25 units by Tue
+                          </p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-900/60 dark:text-red-300">
+                        URGENT
+                      </span>
+                    </div>
+
+                    {/* Warning item */}
+                    <div className="flex items-center justify-between rounded-xl border border-amber-100 bg-amber-50 px-3 py-2.5 dark:border-amber-900/40 dark:bg-amber-950/30">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/50">
+                          <Package className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            Jasmine Rice (5kg)
+                          </p>
+                          <p className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                            12 left — Order 40 bags by Fri
+                          </p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">
+                        LOW
+                      </span>
+                    </div>
+
+                    {/* OK item */}
+                    <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 dark:border-slate-700/40 dark:bg-slate-700/30">
+                      <div className="flex items-center gap-2.5">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
+                          <Package className="h-3.5 w-3.5 text-slate-500" />
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                            Coconut Water (24pk)
+                          </p>
+                          <p className="text-[10px] text-slate-500">
+                            47 in stock · Forecast +18 this week
+                          </p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:bg-green-900/60 dark:text-green-300">
+                        OK
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Mini forecast */}
+                  <div className="border-t border-slate-100 px-4 py-3 dark:border-slate-700/60">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                        30-Day Demand Forecast
+                      </p>
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-green-600">
+                        <CheckCircle2 className="h-3 w-3" /> 87% accuracy
+                      </span>
+                    </div>
+                    <div className="flex h-10 items-end gap-0.5">
+                      {[55, 70, 60, 85, 72, 90, 65, 88, 75, 92, 68, 95].map((h, i) => (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-sm bg-blue-500/70 dark:bg-blue-400/60"
+                          style={{ height: `${h}%` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating stats pill */}
+                <div className="absolute -bottom-3 -left-3 hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:flex">
+                  <TrendingUp className="h-4 w-4 shrink-0 text-green-600" />
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    70% fewer stockouts
+                  </p>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
+        </section>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            All plans include 1 month free trial • Annual plans save 20% • Custom enterprise pricing available
-          </p>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section className="bg-muted/30 py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-sm sm:p-12">
-            <div className="flex items-start gap-1 text-yellow-500">
-              {[...Array(5)].map((_, i) => (
-                <svg key={i} className="h-5 w-5 fill-current" viewBox="0 0 20 20">
-                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                </svg>
+        {/* ── Stats bar ────────────────────────────────────────────────── */}
+        <section className="border-y border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 gap-8 text-center sm:grid-cols-4">
+              {[
+                { value: "70%", label: "Fewer stockouts" },
+                { value: "5 hrs", label: "Saved per week" },
+                { value: "85%+", label: "Forecast accuracy" },
+                { value: "$15/mo", label: "Starting price" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+                </div>
               ))}
             </div>
-            <blockquote className="mt-6 text-lg text-foreground sm:text-xl">
-              &quot;I only realize I&apos;m out of stock when customers start asking. By then it&apos;s already too late. SmartStock
-              tells me <strong>before</strong> I run out — saved me during last Khmer New Year.&quot;
-            </blockquote>
-            <div className="mt-6 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
-                L
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">Lika</p>
-                <p className="text-sm text-muted-foreground">Clothing seller via Facebook, Phnom Penh</p>
-              </div>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-2xl bg-linear-to-r from-primary to-primary/80 px-6 py-12 text-center sm:px-12 sm:py-16">
-            <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-            <div className="relative">
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                Stop running out of stock during peak season
+        {/* ── Problem statement ────────────────────────────────────────── */}
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                The problem
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                Running out of stock costs you money.{" "}
+                <span className="text-slate-400">Especially when you can&apos;t afford it.</span>
               </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base text-primary-foreground/90 sm:text-lg">
-                Join Cambodian SMEs using SmartStock to reduce stockouts, free up cash, and make smarter reorder
-                decisions every day.
+              <p className="mt-4 text-base text-slate-500 dark:text-slate-400 sm:text-lg">
+                70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New
+                Year hits, they either run out of best-sellers or lock up cash in overstock.
               </p>
+            </div>
 
-              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Link
-                  href="/onboarding"
-                  className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-primary shadow-lg transition-transform hover:scale-105"
+            <div className="mt-12 grid gap-5 sm:grid-cols-3">
+              {[
+                {
+                  emoji: "😰",
+                  title: "Guesswork reordering",
+                  desc: '"Should I call my supplier? I think we\'re low…" Then customers start asking and it\'s too late.',
+                },
+                {
+                  emoji: "📉",
+                  title: "Peak season disasters",
+                  desc: "Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you'll never get back.",
+                },
+                {
+                  emoji: "💸",
+                  title: "Cash locked in overstock",
+                  desc: "Order too much to avoid stockouts, but now your money sits on shelves instead of working for you.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="group rounded-2xl border border-red-100 bg-linear-to-b from-red-50 to-white p-6 transition-all hover:border-red-200 hover:shadow-md dark:border-red-900/30 dark:from-red-950/30 dark:to-transparent"
                 >
-                  Start your free trial
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/billing"
-                  className="inline-flex items-center gap-2 rounded-lg border-2 border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                >
-                  View pricing
-                </Link>
-              </div>
-
-              <p className="mt-6 text-sm text-primary-foreground/80">
-                ✓ No credit card required • ✓ Setup in 10 minutes • ✓ Cancel anytime
-              </p>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-100 text-xl dark:bg-red-900/40">
+                    {item.emoji}
+                  </div>
+                  <h3 className="mt-4 font-semibold text-slate-800 dark:text-slate-200">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-muted/30 py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-foreground">SmartStock</span>
+        {/* ── How it works ─────────────────────────────────────────────── */}
+        <section
+          id="how-it-works"
+          className="bg-linear-to-b from-slate-50 to-white py-16 dark:from-slate-900/60 dark:to-transparent sm:py-20"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                How it works
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                From manual tracking to intelligent decisions
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 dark:text-slate-400">
+                Built for sellers who live on their phones, not desktop dashboards.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2026 SomaTech. Built for Cambodia&apos;s SME retailers.
-            </p>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <Link href="/features" className="hover:text-foreground">
+
+            <div className="relative mt-14 grid gap-8 lg:grid-cols-3">
+              {/* Connector line (desktop) */}
+              <div className="absolute left-[calc(16.7%+24px)] right-[calc(16.7%+24px)] top-6 hidden h-px bg-linear-to-r from-blue-200 via-indigo-300 to-blue-200 dark:from-blue-800/50 dark:via-indigo-700/50 dark:to-blue-800/50 lg:block" />
+
+              {[
+                {
+                  step: 1,
+                  title: "Upload your sales data",
+                  desc: "Import from CSV, connect your POS, or paste Facebook Messenger orders. Our AI understands Khmer and English mixed messages.",
+                  detail: "Facebook Messenger parsing included",
+                  icon: <MessageSquare className="h-4 w-4" />,
+                },
+                {
+                  step: 2,
+                  title: "AI predicts demand",
+                  desc: "Get 30-day forecasts for every product. Our model knows Cambodia's calendar — Khmer New Year, Pchum Ben, 11.11 shopping events.",
+                  detail: "85%+ accuracy after 60 days",
+                  icon: <TrendingUp className="h-4 w-4" />,
+                },
+                {
+                  step: 3,
+                  title: "Get alerts on Telegram",
+                  desc: 'Every morning at 8 AM: "Blue T-Shirt (M) — Order 25 units by Tuesday." No desktop needed. Just tap, call your supplier, done.',
+                  detail: "Alerts in English or Khmer",
+                  icon: <Bell className="h-4 w-4" />,
+                },
+              ].map((item) => (
+                <div key={item.step} className="relative flex flex-col items-start">
+                  <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-lg font-bold text-white shadow-lg shadow-blue-500/30">
+                    {item.step}
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                    {item.desc}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+                    {item.icon}
+                    {item.detail}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Features ─────────────────────────────────────────────────── */}
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Features
-              </Link>
-              <Link href="/pricing" className="hover:text-foreground">
-                Pricing
-              </Link>
-              <Link href="/faq" className="hover:text-foreground">
-                FAQ
-              </Link>
-              <Link href="/legal/privacy" className="hover:text-foreground">
-                Privacy
-              </Link>
-              <Link href="/legal/terms" className="hover:text-foreground">
-                Terms
-              </Link>
-              <a href="mailto:somatech18@gmail.com" className="hover:text-foreground">
-                Contact
-              </a>
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                Everything you need to stop stockouts
+              </h2>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  icon: <BarChart3 className="h-6 w-6" />,
+                  title: "AI Demand Forecasting",
+                  desc: "30-day predictions with seasonal awareness for Cambodia's peak shopping periods.",
+                  color: "text-blue-600 bg-blue-50 dark:bg-blue-950/50 dark:text-blue-400",
+                },
+                {
+                  icon: <Bell className="h-6 w-6" />,
+                  title: "Smart Reorder Alerts",
+                  desc: "Automatic notifications with recommended quantities before you run out.",
+                  color: "text-violet-600 bg-violet-50 dark:bg-violet-950/50 dark:text-violet-400",
+                },
+                {
+                  icon: <MessageSquare className="h-6 w-6" />,
+                  title: "Messenger Parsing",
+                  desc: "Paste order messages, AI extracts products and quantities. Khmer + English supported.",
+                  color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-400",
+                },
+                {
+                  icon: <Package className="h-6 w-6" />,
+                  title: "Multi-Channel Sync",
+                  desc: "One view of stock across Facebook, walk-in, and online sales channels.",
+                  color: "text-cyan-600 bg-cyan-50 dark:bg-cyan-950/50 dark:text-cyan-400",
+                },
+                {
+                  icon: <Globe className="h-6 w-6" />,
+                  title: "Khmer Language Support",
+                  desc: "Full UI and alerts in Khmer or English. Switch anytime.",
+                  color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400",
+                },
+                {
+                  icon: <TrendingUp className="h-6 w-6" />,
+                  title: "Seasonal Trend Detection",
+                  desc: "Built-in awareness of Khmer New Year, Pchum Ben, and 11.11 shopping events.",
+                  color: "text-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-400",
+                },
+                {
+                  icon: <BarChart3 className="h-6 w-6" />,
+                  title: "Sales Analytics",
+                  desc: "Track trends, top sellers, and forecast accuracy in one dashboard.",
+                  color: "text-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-400",
+                },
+                {
+                  icon: <Zap className="h-6 w-6" />,
+                  title: "10-Minute Setup",
+                  desc: "Guided onboarding with demo mode. No tech skills required.",
+                  color: "text-orange-600 bg-orange-50 dark:bg-orange-950/50 dark:text-orange-400",
+                },
+              ].map((f) => (
+                <div
+                  key={f.title}
+                  className="group rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
+                >
+                  <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${f.color}`}>
+                    {f.icon}
+                  </div>
+                  <h3 className="mt-4 font-semibold text-slate-800 dark:text-slate-200">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{f.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </footer>
-    </main>
+        </section>
+
+        {/* ── Pricing ──────────────────────────────────────────────────── */}
+        <section className="bg-linear-to-b from-slate-50 to-white py-16 dark:from-slate-900/60 dark:to-transparent sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                Pricing
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                Enterprise AI at SME pricing
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 dark:text-slate-400">
+                Start with 1 month free. No credit card required. Cancel anytime.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-5 lg:grid-cols-4 lg:gap-6">
+              {plans.map((plan, idx) => (
+                <div
+                  key={plan.id}
+                  className={`relative flex flex-col rounded-2xl border p-6 shadow-sm transition-all hover:shadow-lg ${
+                    idx === 1
+                      ? "border-blue-500 bg-linear-to-b from-blue-600 to-blue-700 text-white ring-4 ring-blue-500/20"
+                      : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                  }`}
+                >
+                  {idx === 1 && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
+                      Most Popular
+                    </div>
+                  )}
+
+                  <div>
+                    <h3
+                      className={`text-lg font-bold ${idx === 1 ? "text-white" : "text-slate-900 dark:text-white"}`}
+                    >
+                      {plan.name}
+                    </h3>
+                    <p
+                      className={`mt-1 text-xs ${idx === 1 ? "text-blue-100" : "text-slate-500 dark:text-slate-400"}`}
+                    >
+                      {plan.targetCustomer}
+                    </p>
+                  </div>
+
+                  <div className="mt-5">
+                    <p className="flex items-baseline gap-1">
+                      <span
+                        className={`text-3xl font-bold ${idx === 1 ? "text-white" : "text-slate-900 dark:text-white"}`}
+                      >
+                        {plan.monthlyPriceLabel.split("/")[0]}
+                      </span>
+                      {plan.monthlyPriceUsd && (
+                        <span
+                          className={`text-sm ${idx === 1 ? "text-blue-100" : "text-slate-400"}`}
+                        >
+                          /month
+                        </span>
+                      )}
+                    </p>
+                  </div>
+
+                  <ul className="mt-5 flex-1 space-y-2.5 text-sm">
+                    {plan.features.map((feature) => (
+                      <li key={`${plan.id}-${feature}`} className="flex items-start gap-2.5">
+                        <CheckCircle2
+                          className={`mt-0.5 h-4 w-4 shrink-0 ${idx === 1 ? "text-blue-200" : "text-blue-500"}`}
+                        />
+                        <span className={idx === 1 ? "text-blue-50" : "text-slate-500 dark:text-slate-400"}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/billing"
+                    className={`mt-7 block w-full rounded-xl py-2.5 text-center text-sm font-semibold transition-all ${
+                      idx === 1
+                        ? "bg-white text-blue-700 hover:bg-blue-50"
+                        : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    Start free trial
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-8 text-center text-sm text-slate-400">
+              All plans include 1 month free trial · Annual plans save 20% · Custom enterprise
+              pricing available
+            </p>
+          </div>
+        </section>
+
+        {/* ── Testimonials ─────────────────────────────────────────────── */}
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                Testimonials
+              </p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                Trusted by retailers across Phnom Penh
+              </h2>
+            </div>
+
+            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  quote:
+                    "I only realize I'm out of stock when customers start asking. By then it's already too late. SmartStock tells me before I run out — saved me during last Khmer New Year.",
+                  name: "Lika",
+                  role: "Clothing seller via Facebook, Phnom Penh",
+                  initial: "L",
+                },
+                {
+                  quote:
+                    "Setting up took less than 15 minutes. Now I get a Telegram message every morning telling me what to order. I don't even look at my Excel file anymore.",
+                  name: "Dara",
+                  role: "Grocery store owner, Toul Kork",
+                  initial: "D",
+                },
+                {
+                  quote:
+                    "During the 11.11 sale, SmartStock predicted the spike 2 weeks early. I ordered extra stock and sold out completely — best sale day ever.",
+                  name: "Sreymom",
+                  role: "Cosmetics & beauty shop, BKK1",
+                  initial: "S",
+                },
+              ].map((t) => (
+                <div
+                  key={t.name}
+                  className="flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <div className="flex gap-0.5 text-amber-400">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    &ldquo;{t.quote}&rdquo;
+                  </blockquote>
+                  <div className="mt-6 flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                      {t.initial}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t.name}</p>
+                      <p className="text-xs text-slate-400">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Final CTA ────────────────────────────────────────────────── */}
+        <section className="pb-16 sm:pb-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-600 via-blue-700 to-indigo-700 px-6 py-14 text-center sm:px-12 sm:py-20">
+              <div className="absolute inset-0 bg-grid-pattern text-white opacity-[0.07]" />
+              <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
+              <div className="absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-indigo-400/20 blur-2xl" />
+
+              <div className="relative">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+                  <Users className="h-3.5 w-3.5" />
+                  Join retailers across Cambodia
+                </div>
+
+                <h2 className="mt-5 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+                  Stop running out of stock
+                  <br className="hidden sm:block" /> during peak season
+                </h2>
+
+                <p className="mx-auto mt-4 max-w-xl text-base text-blue-100 sm:text-lg">
+                  Join Cambodian SMEs using SmartStock to reduce stockouts, free up cash, and make
+                  smarter reorder decisions every day.
+                </p>
+
+                <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Link
+                    href="/onboarding"
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-blue-700 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
+                  >
+                    Start your free trial
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/billing"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                  >
+                    View pricing
+                  </Link>
+                </div>
+
+                <p className="mt-6 text-sm text-blue-200">
+                  ✓ No credit card required &nbsp;·&nbsp; ✓ Setup in 10 minutes &nbsp;·&nbsp; ✓
+                  Cancel anytime
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <PublicFooter />
+    </div>
   );
 }

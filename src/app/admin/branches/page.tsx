@@ -476,7 +476,7 @@ export default function AdminBranchesPage() {
             ))}
 
             {/* Add branch prompt card */}
-            {isOwner && (
+            {/* {isOwner && (
               <button
                 type="button"
                 onClick={() => setShowAddModal(true)}
@@ -487,7 +487,7 @@ export default function AdminBranchesPage() {
                 </div>
                 <p className="text-sm font-medium">Add branch</p>
               </button>
-            )}
+            )} */}
           </div>
         )}
 

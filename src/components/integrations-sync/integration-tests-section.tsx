@@ -50,16 +50,8 @@ export function IntegrationTestsSection({
                                         }: IntegrationTestsSectionProps) {
   const dotsRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    if (!telegramPolling || !dotsRef.current) return;
-    const frames = ["·", "··", "···", "····"];
-    let i = 0;
-    const id = setInterval(() => {
-      if (dotsRef.current) {
-        dotsRef.current.textContent = frames[i % frames.length];
-        i++;
-      }
-    }, 400);
-    return () => clearInterval(id);
+    if (!dotsRef.current) return;
+    dotsRef.current.textContent = "·";
   }, [telegramPolling]);
 
   const isConnected = telegramChatId.length > 0;
@@ -106,7 +98,7 @@ export function IntegrationTestsSection({
                 onClick={onStopPolling}
                 className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
               >
-                <span ref={dotsRef} className="font-mono text-blue-600 dark:text-blue-400 w-5 inline-block">·</span>
+                <span ref={dotsRef} className="inline-block w-5 font-mono text-blue-600 motion-safe:animate-pulse dark:text-blue-400">·</span>
                 Waiting for message — cancel
               </button>
             ) : (
