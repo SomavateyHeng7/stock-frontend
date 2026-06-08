@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/data-state";
 import { useToast } from "@/components/ui/toast-provider";
 import { formatCurrencyAmount, formatDateTime } from "@/lib/user-preferences";
+import { useT } from "@/lib/i18n";
 import {
 	getStatusClass,
 	getStockStatus,
@@ -73,6 +74,7 @@ const ARCHIVED_PRODUCTS_KEY = "smartstock.inventory.archived-product-ids.v1";
 export default function InventoryPage() {
 	const { showToast } = useToast();
 	const preferences = useUserPreferences();
+	const t = useT();
 
 	const [products, setProducts] = useState<InventoryProduct[]>(() =>
 		readSmartStockState().products as InventoryProduct[],
@@ -728,13 +730,13 @@ export default function InventoryPage() {
 	if (isBootstrapping) {
 		return (
 			<SmartStockShell
-				title="Inventory Management"
-				subtitle="Track stock levels, adjust quantities, and monitor movements across locations."
+				title={t("inventory.title", "Inventory Management")}
+				subtitle={t("inventory.subtitle", "Track stock levels, adjust quantities, and monitor movements across locations.")}
 			>
 				<section className="space-y-4" aria-label="Inventory loading">
 					<LoadingState
-						title="Loading inventory"
-						description="Syncing branch stock and recent movement history."
+						title={t("inventory.loading", "Loading inventory")}
+						description={t("inventory.syncing", "Syncing branch stock and recent movement history.")}
 						rows={4}
 					/>
 				</section>
@@ -745,15 +747,15 @@ export default function InventoryPage() {
 	if (bootstrapError) {
 		return (
 			<SmartStockShell
-				title="Inventory Management"
-				subtitle="Track stock levels, adjust quantities, and monitor movements across locations."
+				title={t("inventory.title", "Inventory Management")}
+				subtitle={t("inventory.subtitle", "Track stock levels, adjust quantities, and monitor movements across locations.")}
 			>
 				<section className="space-y-4" aria-label="Inventory error">
 					<ErrorState
 						description={bootstrapError}
 						onRetry={bootstrapInventory}
-						retryLabel="Retry inventory"
-						hint="Check browser local storage permissions if the issue repeats."
+						retryLabel={t("inventory.retry", "Retry inventory")}
+						hint={t("inventory.checkPermissions", "Check browser local storage permissions if the issue repeats.")}
 					/>
 				</section>
 			</SmartStockShell>
@@ -763,8 +765,8 @@ export default function InventoryPage() {
 	return (
 		<>
 			<SmartStockShell
-				title="Inventory Management"
-				subtitle="Track stock levels, adjust quantities, and monitor movements across locations."
+				title={t("inventory.title", "Inventory Management")}
+				subtitle={t("inventory.subtitle", "Track stock levels, adjust quantities, and monitor movements across locations.")}
 			>
 				<section className="space-y-6" aria-label="Inventory">
 					<div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
@@ -775,10 +777,10 @@ export default function InventoryPage() {
 								</div>
 								<div>
 									<p className="text-sm font-medium text-muted-foreground">
-										Location
+										{t("inventory.location", "Location")}
 									</p>
 									<p className="text-base font-semibold text-foreground">
-										{branchById[selectedBranchId] ?? "Select branch"}
+										{branchById[selectedBranchId] ?? t("inventory.selectBranch", "Select branch")}
 									</p>
 								</div>
 							</div>
@@ -801,7 +803,7 @@ export default function InventoryPage() {
 								<div className="flex items-center justify-between gap-3">
 									<div>
 										<p className="text-sm font-medium text-muted-foreground">
-											Products
+											{t("inventory.products", "Products")}
 										</p>
 										<p className="mt-1 text-3xl font-bold text-foreground">
 											{inventoryStats.totalProducts}
@@ -817,7 +819,7 @@ export default function InventoryPage() {
 								<div className="flex items-center justify-between gap-3">
 									<div>
 										<p className="text-sm font-medium text-muted-foreground">
-											Stock value
+											{t("inventory.stockValue", "Stock value")}
 										</p>
 										<p className="mt-1 text-3xl font-bold text-foreground">
 											{formatCurrencyAmount(
@@ -836,7 +838,7 @@ export default function InventoryPage() {
 								<div className="flex items-center justify-between gap-3">
 									<div>
 										<p className="text-sm font-medium text-muted-foreground">
-											Low stock
+											{t("inventory.lowStock", "Low stock")}
 										</p>
 										<p className="mt-1 text-3xl font-bold text-foreground">
 											{inventoryStats.lowStock}
@@ -852,7 +854,7 @@ export default function InventoryPage() {
 								<div className="flex items-center justify-between gap-3">
 									<div>
 										<p className="text-sm font-medium text-muted-foreground">
-											Out of stock
+											{t("inventory.outOfStock", "Out of stock")}
 										</p>
 										<p className="mt-1 text-3xl font-bold text-foreground">
 											{inventoryStats.outOfStock}
@@ -878,7 +880,7 @@ export default function InventoryPage() {
 								}`}
 							>
 								<Package className="h-4 w-4" />
-								Overview
+								{t("inventory.overview", "Overview")}
 							</button>
 
 							<button
@@ -891,7 +893,7 @@ export default function InventoryPage() {
 								}`}
 							>
 								<ArrowUpDown className="h-4 w-4" />
-								Adjust
+								{t("inventory.adjust", "Adjust")}
 							</button>
 
 							<button
@@ -904,7 +906,7 @@ export default function InventoryPage() {
 								}`}
 							>
 								<History className="h-4 w-4" />
-								Movements
+								{t("inventory.movements", "Movements")}
 							</button>
 						</div>
 
@@ -920,7 +922,7 @@ export default function InventoryPage() {
 									}`}
 								>
 									<Grid2X2 className="h-4 w-4" />
-									Grid
+									{t("inventory.grid", "Grid")}
 								</button>
 
 								<button
@@ -933,7 +935,7 @@ export default function InventoryPage() {
 									}`}
 								>
 									<List className="h-4 w-4" />
-									Table
+									{t("inventory.table", "Table")}
 								</button>
 							</div>
 						)}
@@ -951,7 +953,7 @@ export default function InventoryPage() {
 												onChange={(event) =>
 													setSearchQuery(event.target.value)
 												}
-												placeholder="Search products by name or tag"
+												placeholder={t("inventory.search", "Search products by name or tag")}
 												className="h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-sm text-foreground"
 											/>
 										</div>
@@ -984,8 +986,8 @@ export default function InventoryPage() {
 												className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground hover:bg-muted"
 											>
 												{showArchived
-													? "Hide archived"
-													: `Show archived (${archivedProductIds.length})`}
+													? t("inventory.hideArchived", "Hide archived")
+													: `${t("inventory.showArchived", "Show archived")} (${archivedProductIds.length})`}
 											</button>
 										</div>
 									</div>
@@ -1005,10 +1007,10 @@ export default function InventoryPage() {
 										<div className="flex items-center justify-between gap-3">
 											<div>
 												<p className="text-sm font-semibold text-foreground">
-													Saved views
+													{t("inventory.savedViews", "Saved views")}
 												</p>
 												<p className="text-xs text-muted-foreground">
-													Save filters for repeat checks.
+													{t("inventory.saveFiltersDesc", "Save filters for repeat checks.")}
 												</p>
 											</div>
 										</div>
@@ -1019,7 +1021,7 @@ export default function InventoryPage() {
 												onChange={(event) =>
 													setNewViewName(event.target.value)
 												}
-												placeholder="View name"
+												placeholder={t("inventory.viewName", "View name")}
 												className="h-10 flex-1 rounded-lg border border-border bg-background px-3 text-sm text-foreground"
 											/>
 
@@ -1028,14 +1030,14 @@ export default function InventoryPage() {
 												onClick={saveCurrentView}
 												className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
 											>
-												Save
+												{t("inventory.save", "Save")}
 											</button>
 										</div>
 
 										<div className="mt-3 flex flex-wrap gap-2">
 											{savedViews.length === 0 && (
 												<span className="text-xs text-muted-foreground">
-													No saved views yet.
+													{t("inventory.noSavedViews", "No saved views yet.")}
 												</span>
 											)}
 
@@ -1080,14 +1082,14 @@ export default function InventoryPage() {
 
 											<div>
 												<p className="text-sm font-semibold text-foreground">
-													{bulkSelectedCount} selected
+													{bulkSelectedCount} {t("inventory.selected", "selected")}
 												</p>
 												<button
 													type="button"
 													onClick={clearBulkSelection}
 													className="text-xs font-medium text-muted-foreground hover:text-foreground"
 												>
-													Clear selection
+													{t("inventory.clearSelection", "Clear selection")}
 												</button>
 											</div>
 										</div>
@@ -1111,7 +1113,7 @@ export default function InventoryPage() {
 													onClick={applyBulkAdjustment}
 													className="h-9 rounded bg-primary px-3 text-sm font-semibold text-primary-foreground"
 												>
-													Apply
+													{t("inventory.apply", "Apply")}
 												</button>
 											</div>
 
@@ -1121,14 +1123,14 @@ export default function InventoryPage() {
 													value={bulkTag}
 													onChange={(event) => setBulkTag(event.target.value)}
 													className="h-9 w-full rounded border border-border bg-background px-2 text-sm text-foreground"
-													placeholder="Tag"
+													placeholder={t("inventory.tag", "Tag")}
 												/>
 												<button
 													type="button"
 													onClick={applyBulkTag}
 													className="h-9 rounded bg-primary px-3 text-sm font-semibold text-primary-foreground"
 												>
-													Apply
+													{t("inventory.apply", "Apply")}
 												</button>
 											</div>
 
@@ -1138,7 +1140,7 @@ export default function InventoryPage() {
 												className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
 											>
 												<Download className="h-4 w-4" />
-												Export
+												{t("inventory.export", "Export")}
 											</button>
 
 											<button
@@ -1147,7 +1149,7 @@ export default function InventoryPage() {
 												className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
 											>
 												<Archive className="h-4 w-4" />
-												Archive
+												{t("inventory.archive", "Archive")}
 											</button>
 
 											<button
@@ -1156,7 +1158,7 @@ export default function InventoryPage() {
 												className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-red-400/40 bg-red-500/10 px-3 text-sm font-medium text-red-700 hover:bg-red-500/15 dark:text-red-400"
 											>
 												<Trash2 className="h-4 w-4" />
-												Delete
+												{t("inventory.delete", "Delete")}
 											</button>
 										</div>
 									</div>
@@ -1171,7 +1173,7 @@ export default function InventoryPage() {
 										onChange={toggleSelectAllVisible}
 										className="h-4 w-4 rounded border-border"
 									/>
-									<span>Select visible products for bulk actions.</span>
+									<span>{t("inventory.selectVisibleInfo", "Select visible products for bulk actions.")}</span>
 								</div>
 							)}
 
@@ -1210,7 +1212,7 @@ export default function InventoryPage() {
 													<div className="flex items-center gap-2">
 														{isArchived && (
 															<span className="rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-																Archived
+																{t("inventory.archived", "Archived")}
 															</span>
 														)}
 
@@ -1248,19 +1250,19 @@ export default function InventoryPage() {
 													</h3>
 
 													<p className="mt-1 text-xs text-muted-foreground">
-														{item.quality || "No tag"}
+														{item.quality || t("inventory.noTag", "No tag")}
 													</p>
 
 													<div className="mt-4 grid grid-cols-2 gap-3">
 														<div>
-															<p className="text-xs text-muted-foreground">Stock</p>
+															<p className="text-xs text-muted-foreground">{t("inventory.stock", "Stock")}</p>
 															<p className="text-2xl font-bold text-foreground">
 																{scopedQty}
 															</p>
 														</div>
 
 														<div className="text-right">
-															<p className="text-xs text-muted-foreground">Value</p>
+															<p className="text-xs text-muted-foreground">{t("inventory.value", "Value")}</p>
 															<p className="text-sm font-semibold text-foreground">
 																{formatCurrencyAmount(
 																	scopedQty * getUnitPrice(item),
@@ -1280,7 +1282,7 @@ export default function InventoryPage() {
 														}}
 														className="inline-flex h-10 flex-1 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
 													>
-														Adjust
+														{t("inventory.adjust", "Adjust")}
 													</button>
 
 													<button
@@ -1288,7 +1290,7 @@ export default function InventoryPage() {
 														onClick={() => setDetailProductId(item.id)}
 														className="inline-flex h-10 flex-1 items-center justify-center rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground"
 													>
-														Details
+														{t("inventory.details", "Details")}
 													</button>
 
 													{isArchived && (
@@ -1297,7 +1299,7 @@ export default function InventoryPage() {
 															onClick={() => unarchiveProduct(item.id)}
 															className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
 														>
-															Restore
+															{t("inventory.restore", "Restore")}
 														</button>
 													)}
 												</div>
@@ -1308,14 +1310,14 @@ export default function InventoryPage() {
 									{filteredProducts.length === 0 && (
 										<EmptyState
 											className="col-span-full"
-											title="No matching products"
-											description="Your current filters returned no products in this location."
-											actionLabel="Clear filters"
+											title={t("inventory.noProducts", "No matching products")}
+											description={t("inventory.noProductsDesc", "Your current filters returned no products in this location.")}
+											actionLabel={t("inventory.clearFilters", "Clear filters")}
 											onAction={() => {
 												setSearchQuery("");
 												setStockFilter("all");
 											}}
-											hint="Try saving common filters for quick daily checks."
+											hint={t("inventory.trySavingHint", "Try saving common filters for quick daily checks.")}
 										/>
 									)}
 								</div>
@@ -1326,25 +1328,25 @@ export default function InventoryPage() {
 											<thead>
 												<tr className="border-b border-border/70 bg-muted/30">
 													<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Select
+														{t("inventory.select", "Select")}
 													</th>
 													<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Product
+														{t("inventory.product", "Product")}
 													</th>
 													<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Tag
+														{t("inventory.tag", "Tag")}
 													</th>
 													<th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														On hand
+														{t("inventory.onHand", "On hand")}
 													</th>
 													<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Status
+														{t("inventory.status", "Status")}
 													</th>
 													<th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Value
+														{t("inventory.value", "Value")}
 													</th>
 													<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-														Actions
+														{t("inventory.actions", "Actions")}
 													</th>
 												</tr>
 											</thead>

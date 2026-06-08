@@ -1,16 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { PublicPageShell } from "@/components/marketing/public-page-shell";
+import { useT } from "@/lib/i18n";
 
 export default function LegalPage() {
+  const t = useT();
   return (
-    <PublicPageShell title="Legal" subtitle="Policy and legal terms for using SmartStock.">
+    <PublicPageShell title={t("legalPage.title", "Legal")} subtitle={t("legalPage.subtitle", "Policy and legal terms for using SmartStock.")}>
       <div className="space-y-10">
 
         {/* Section header */}
         <div className="flex items-center gap-4">
           <div className="h-px flex-1 bg-border/50" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/60">
-            Legal Documents
+            {t("legalPage.legalDocuments", "Legal Documents")}
           </span>
           <div className="h-px flex-1 bg-border/50" />
         </div>
@@ -32,14 +36,14 @@ export default function LegalPage() {
               </div>
 
               {/* Text */}
-              <h2 className="text-base font-semibold text-foreground">Privacy Policy</h2>
+              <h2 className="text-base font-semibold text-foreground">{t("legalPage.privacyPolicy", "Privacy Policy")}</h2>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                Learn how we collect, use, and protect your business and account data.
+                {t("legalPage.privacyDesc", "Learn how we collect, use, and protect your business and account data.")}
               </p>
 
               {/* Footer */}
               <div className="mt-5 flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400">
-                <span>Read privacy policy</span>
+                <span>{t("legalPage.readPrivacy", "Read privacy policy")}</span>
                 <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 8h10M9 4l4 4-4 4" />
                 </svg>
@@ -62,14 +66,14 @@ export default function LegalPage() {
               </div>
 
               {/* Text */}
-              <h2 className="text-base font-semibold text-foreground">Terms of Service</h2>
+              <h2 className="text-base font-semibold text-foreground">{t("legalPage.termsOfService", "Terms of Service")}</h2>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                Understand account usage terms, service scope, and customer responsibilities.
+                {t("legalPage.termsDesc", "Understand account usage terms, service scope, and customer responsibilities.")}
               </p>
 
               {/* Footer */}
               <div className="mt-5 flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-400">
-                <span>Read terms of service</span>
+                <span>{t("legalPage.readTerms", "Read terms of service")}</span>
                 <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 8h10M9 4l4 4-4 4" />
                 </svg>
@@ -80,9 +84,9 @@ export default function LegalPage() {
 
         {/* Footer note */}
         <p className="text-center text-xs text-muted-foreground/60">
-          Last updated January 2025 &middot; Questions?{" "}
+          {t("legalPage.lastUpdated", "Last updated January 2025")} &middot; {t("legalPage.questions", "Questions?")}{" "}
           <Link href="/contact" className="underline underline-offset-4 hover:text-muted-foreground transition-colors">
-            Contact us
+            {t("legalPage.contactUs", "Contact us")}
           </Link>
         </p>
 

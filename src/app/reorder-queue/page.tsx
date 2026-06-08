@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SmartStockShell } from "@/components/smartstock-shell";
+import { useT } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast-provider";
 import { getEnrichedProducts, getStatusClass } from "@/lib/smartstock-data";
 import {
@@ -90,6 +91,7 @@ type EnrichedProduct = ReturnType<typeof getEnrichedProducts>[number];
 /* ------------------------------------------------------------------ */
 export default function ReorderQueuePage() {
 	const { showToast } = useToast();
+	const t = useT();
 
 	// All products (for manual order picker) — loaded client-side only to avoid SSR/hydration mismatch
 	const [allProducts, setAllProducts] = useState<EnrichedProduct[]>([]);
@@ -133,7 +135,7 @@ export default function ReorderQueuePage() {
 			productId:    item.id,
 			productName:  item.name,
 			supplierId:   item.supplier?.id ?? null,
-			supplierName: item.supplier?.name ?? "Unassigned",
+			supplierName: item.supplier?.name ?? t("reorderQueue.unassigned", "Unassigned"),
 			quantity:     Math.max(1, Math.floor(reorderAmount)),
 		});
 		setOrders(readPurchaseOrders());
@@ -173,7 +175,7 @@ export default function ReorderQueuePage() {
 			productId:    manualProduct.id,
 			productName:  manualProduct.name,
 			supplierId:   manualProduct.supplier?.id ?? null,
-			supplierName: manualProduct.supplier?.name ?? "Unassigned",
+			supplierName: manualProduct.supplier?.name ?? t("reorderQueue.unassigned", "Unassigned"),
 			quantity:     Math.max(1, Math.floor(manualQty)),
 		});
 		setOrders(readPurchaseOrders());
@@ -193,16 +195,16 @@ export default function ReorderQueuePage() {
 	/* ---------------------------------------------------------------- */
 	return (
 		<SmartStockShell
-			title="Reorder Queue"
-			subtitle="AI-powered reorder recommendations based on demand trends and supplier lead times."
+			title={t("reorderQueue.title", "Reorder Queue")}
+			subtitle={t("reorderQueue.subtitle", "AI-powered reorder recommendations based on demand trends and supplier lead times.")}
 		>
 			{/* ── KPI strip ─────────────────────────────────────────── */}
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				{[
-					{ label: "Open POs",        value: openOrders.length,    icon: <IconClipboard />, color: "text-blue-600 dark:text-blue-400",   bg: "bg-blue-500/10" },
-					{ label: "Units on order",  value: openOrderQty,         icon: <IconTruck />,     color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-500/10" },
-					{ label: "Recommendations", value: reorderItems.length,  icon: <IconInbox />,     color: "text-amber-600 dark:text-amber-400",  bg: "bg-amber-500/10" },
-					{ label: "Received",        value: receivedCount,        icon: <IconPackage />,   color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
+					{ label: t("reorderQueue.openPos", "Open POs"),        value: openOrders.length,    icon: <IconClipboard />, color: "text-blue-600 dark:text-blue-400",   bg: "bg-blue-500/10" },
+					{ label: t("reorderQueue.unitsOnOrder", "Units on order"),  value: openOrderQty,         icon: <IconTruck />,     color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-500/10" },
+					{ label: t("reorderQueue.recommendations", "Recommendations"), value: reorderItems.length,  icon: <IconInbox />,     color: "text-amber-600 dark:text-amber-400",  bg: "bg-amber-500/10" },
+					{ label: t("reorderQueue.received", "Received"),        value: receivedCount,        icon: <IconPackage />,   color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10" },
 				].map((kpi) => (
 					<div
 						key={kpi.label}
@@ -221,7 +223,7 @@ export default function ReorderQueuePage() {
 			<section className="mt-6">
 				<div className="mb-3 flex items-center justify-between">
 					<h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-						<IconInbox /> Recommendations
+						<IconInbox /> {t("reorderQueue.recommendations", "Recommendations")}
 						{reorderItems.length > 0 && (
 							<span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600">
 								{reorderItems.length}
@@ -236,25 +238,25 @@ export default function ReorderQueuePage() {
 						className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 active:scale-[0.97]"
 					>
 						<IconPlus />
-						New Order
+						{t("reorderQueue.newOrder", "New Order")}
 					</button>
 				</div>
 
 				<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 					{/* Header – desktop only */}
 					<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_140px_120px_110px_130px]">
-						<span>Product</span>
-						<span>Supplier</span>
-						<span className="text-center">Lead time</span>
-						<span className="text-center">Status</span>
-						<span className="text-right">Action</span>
+						<span>{t("reorderQueue.product", "Product")}</span>
+						<span>{t("reorderQueue.supplier", "Supplier")}</span>
+						<span className="text-center">{t("reorderQueue.leadTime", "Lead time")}</span>
+						<span className="text-center">{t("reorderQueue.status", "Status")}</span>
+						<span className="text-right">{t("reorderQueue.action", "Action")}</span>
 					</div>
 
 					{reorderItems.length === 0 && (
 						<div className="flex flex-col items-center justify-center py-12 text-center">
 							<span className="mb-2 text-2xl">✅</span>
-							<p className="text-sm font-medium text-foreground">All products are sufficiently stocked</p>
-							<p className="mt-0.5 text-xs text-muted-foreground">Nothing to reorder right now.</p>
+							<p className="text-sm font-medium text-foreground">{t("reorderQueue.allStocked", "All products are sufficiently stocked")}</p>
+							<p className="mt-0.5 text-xs text-muted-foreground">{t("reorderQueue.nothingToReorder", "Nothing to reorder right now.")}</p>
 						</div>
 					)}
 
@@ -286,12 +288,12 @@ export default function ReorderQueuePage() {
 
 									{/* Supplier */}
 									<p className="mt-1.5 truncate text-sm text-muted-foreground sm:mt-0">
-										{item.supplier?.name ?? <span className="italic opacity-50">Unassigned</span>}
+										{item.supplier?.name ?? <span className="italic opacity-50">{t("reorderQueue.unassigned", "Unassigned")}</span>}
 									</p>
 
 									{/* Lead time */}
 									<p className="hidden text-center text-sm text-muted-foreground sm:block">
-										{item.supplier?.leadTimeDays ?? 0}d
+										{item.supplier?.leadTimeDays ?? 0}{t("reorderQueue.days", "days") === "days" ? "d" : ` ${t("reorderQueue.days", "days")}`}
 									</p>
 
 									{/* Status – desktop */}
@@ -309,7 +311,7 @@ export default function ReorderQueuePage() {
 													: "bg-primary text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.97]"
 											}`}
 										>
-											{hasOpenPO ? "PO open" : <>Create PO <IconChevronRight /></>}
+											{hasOpenPO ? t("reorderQueue.poOpen", "PO open") : <>{t("reorderQueue.createPo", "Create PO")} <IconChevronRight /></>}
 										</button>
 									</div>
 								</li>
@@ -322,7 +324,7 @@ export default function ReorderQueuePage() {
 			{/* ── Purchase orders ──────────────────────────────────── */}
 			<section className="mt-6">
 				<h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-					<IconClipboard /> Purchase Orders
+					<IconClipboard /> {t("reorderQueue.purchaseOrders", "Purchase Orders")}
 					{orders.length > 0 && (
 						<span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
 							{orders.length}
@@ -334,11 +336,11 @@ export default function ReorderQueuePage() {
 					{orders.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-12 text-center">
 							<span className="mb-2 text-2xl">📋</span>
-							<p className="text-sm font-medium text-foreground">No purchase orders yet</p>
+							<p className="text-sm font-medium text-foreground">{t("reorderQueue.noPoYet", "No purchase orders yet")}</p>
 							<p className="mt-0.5 text-xs text-muted-foreground">
-								Create one from the recommendations above or use{" "}
+								{t("reorderQueue.createFromRec", "Create one from the recommendations above or use")}{" "}
 								<button type="button" onClick={openManualDialog} className="font-semibold text-primary hover:underline">
-									New Order
+									{t("reorderQueue.newOrder", "New Order")}
 								</button>
 								.
 							</p>
@@ -347,11 +349,11 @@ export default function ReorderQueuePage() {
 						<>
 							{/* Header – desktop */}
 							<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[100px_1fr_80px_110px_1fr]">
-								<span>PO #</span>
-								<span>Product · Supplier</span>
-								<span className="text-center">Qty</span>
-								<span className="text-center">Status</span>
-								<span className="text-right">Actions</span>
+								<span>{t("reorderQueue.poNumber", "PO #")}</span>
+								<span>{t("reorderQueue.productSupplier", "Product · Supplier")}</span>
+								<span className="text-center">{t("reorderQueue.qty", "Qty")}</span>
+								<span className="text-center">{t("reorderQueue.status", "Status")}</span>
+								<span className="text-right">{t("reorderQueue.actions", "Actions")}</span>
 							</div>
 
 							<ul className="divide-y divide-border/40">
@@ -383,7 +385,7 @@ export default function ReorderQueuePage() {
 													onClick={() => setOrderStatus(order.id, "acknowledged")}
 													className="inline-flex items-center gap-1 rounded-md border border-border/70 bg-background px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-muted/40"
 												>
-													Acknowledge
+													{t("reorderQueue.acknowledge", "Acknowledge")}
 												</button>
 											)}
 											{order.status !== "received" && order.status !== "cancelled" && (
@@ -393,14 +395,14 @@ export default function ReorderQueuePage() {
 														onClick={() => setOrderStatus(order.id, "received")}
 														className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
 													>
-														<IconCheck /> Received
+														<IconCheck /> {t("reorderQueue.received", "Received")}
 													</button>
 													<button
 														type="button"
 														onClick={() => setOrderStatus(order.id, "cancelled")}
 														className="inline-flex items-center gap-1 rounded-md border border-red-300 bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-600 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50"
 													>
-														<IconX /> Cancel
+														<IconX /> {t("reorderQueue.cancel", "Cancel")}
 													</button>
 												</>
 											)}
@@ -424,7 +426,7 @@ export default function ReorderQueuePage() {
 					<div className="w-full max-w-md rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
 						<div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
 							<div>
-								<h2 className="text-base font-semibold text-foreground">Create purchase order</h2>
+								<h2 className="text-base font-semibold text-foreground">{t("reorderQueue.createPurchaseOrder", "Create purchase order")}</h2>
 								<p className="mt-0.5 text-xs text-muted-foreground">{reorderDialogItem.name}</p>
 							</div>
 							<button
@@ -442,7 +444,7 @@ export default function ReorderQueuePage() {
 								<div key={step} className="flex flex-1 flex-col items-center gap-1">
 									<div className={`h-1 w-full rounded-full transition-colors ${step <= reorderDialogStep ? "bg-primary" : "bg-muted"}`} />
 									<span className="text-[10px] font-medium text-muted-foreground">
-										{step === 1 ? "Quantity" : "Confirm"}
+										{step === 1 ? t("reorderQueue.quantity", "Quantity") : t("reorderQueue.confirm", "Confirm")}
 									</span>
 								</div>
 							))}
@@ -452,15 +454,15 @@ export default function ReorderQueuePage() {
 							{reorderDialogStep === 1 ? (
 								<div className="space-y-4">
 									<div className="rounded-lg bg-muted/30 px-3 py-2.5">
-										<p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Suggested qty</p>
+										<p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t("reorderQueue.suggestedQty", "Suggested qty")}</p>
 										<p className="mt-0.5 text-lg font-bold text-foreground">
 											{reorderDialogItem.reorderQty}{" "}
-											<span className="text-sm font-normal text-muted-foreground">units</span>
+											<span className="text-sm font-normal text-muted-foreground">{t("reorderQueue.units", "units")}</span>
 										</p>
 									</div>
 
 									<label htmlFor="rq-amount" className="block text-sm font-medium text-foreground">
-										Order quantity
+										{t("reorderQueue.orderQuantity", "Order quantity")}
 										<div className="mt-2 flex items-center gap-1.5">
 											<button
 												type="button"
@@ -489,10 +491,10 @@ export default function ReorderQueuePage() {
 
 									<div className="flex justify-end gap-2 pt-1">
 										<button type="button" onClick={closeReorderDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
-											Cancel
+											{t("reorderQueue.cancel", "Cancel")}
 										</button>
 										<button type="button" onClick={() => setReorderDialogStep(2)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
-											Next <IconChevronRight />
+											{t("reorderQueue.next", "Next")} <IconChevronRight />
 										</button>
 									</div>
 								</div>
@@ -500,9 +502,9 @@ export default function ReorderQueuePage() {
 								<div className="space-y-4">
 									<div className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
 										{[
-											{ label: "Product",  value: reorderDialogItem.name },
-											{ label: "Supplier", value: reorderDialogItem.supplier?.name ?? "Unassigned" },
-											{ label: "Quantity", value: `${reorderAmount} units` },
+											{ label: t("reorderQueue.product", "Product"),  value: reorderDialogItem.name },
+											{ label: t("reorderQueue.supplier", "Supplier"), value: reorderDialogItem.supplier?.name ?? t("reorderQueue.unassigned", "Unassigned") },
+											{ label: t("reorderQueue.quantity", "Quantity"), value: `${reorderAmount} ${t("reorderQueue.units", "units")}` },
 										].map((row) => (
 											<div key={row.label} className="flex items-center justify-between px-3 py-2.5">
 												<span className="text-xs text-muted-foreground">{row.label}</span>
@@ -513,10 +515,10 @@ export default function ReorderQueuePage() {
 
 									<div className="flex justify-end gap-2 pt-1">
 										<button type="button" onClick={() => setReorderDialogStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
-											<IconArrowLeft /> Back
+											<IconArrowLeft /> {t("reorderQueue.back", "Back")}
 										</button>
 										<button type="button" onClick={confirmReorderDialog} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
-											<IconCheck /> Confirm PO
+											<IconCheck /> {t("reorderQueue.confirmPo", "Confirm PO")}
 										</button>
 									</div>
 								</div>
@@ -538,8 +540,8 @@ export default function ReorderQueuePage() {
 						{/* Header */}
 						<div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
 							<div>
-								<h2 className="text-base font-semibold text-foreground">New Order</h2>
-								<p className="mt-0.5 text-xs text-muted-foreground">Order any product — not just recommendations</p>
+								<h2 className="text-base font-semibold text-foreground">{t("reorderQueue.newOrder", "New Order")}</h2>
+								<p className="mt-0.5 text-xs text-muted-foreground">{t("reorderQueue.orderAnyProduct", "Order any product — not just recommendations")}</p>
 							</div>
 							<button
 								type="button"
@@ -552,7 +554,7 @@ export default function ReorderQueuePage() {
 
 						{/* Steps */}
 						<div className="flex gap-2 px-5 pt-4">
-							{["Select product", "Quantity", "Confirm"].map((label, i) => (
+							{[t("reorderQueue.selectProduct", "Select product"), t("reorderQueue.quantity", "Quantity"), t("reorderQueue.confirm", "Confirm")].map((label, i) => (
 								<div key={label} className="flex flex-1 flex-col items-center gap-1">
 									<div className={`h-1 w-full rounded-full transition-colors ${i + 1 <= manualStep ? "bg-primary" : "bg-muted"}`} />
 									<span className="text-[10px] font-medium text-muted-foreground">{label}</span>
@@ -572,7 +574,7 @@ export default function ReorderQueuePage() {
 										</span>
 										<input
 											type="text"
-											placeholder="Search products…"
+											placeholder={t("reorderQueue.searchProducts", "Search products…")}
 											value={manualSearch}
 											onChange={(e) => setManualSearch(e.target.value)}
 											autoFocus
@@ -583,7 +585,7 @@ export default function ReorderQueuePage() {
 									{/* Product list */}
 									<div className="max-h-60 overflow-y-auto divide-y divide-border/40 rounded-lg border border-border/60">
 										{manualFilteredProducts.length === 0 ? (
-											<p className="py-6 text-center text-xs text-muted-foreground">No products match your search.</p>
+											<p className="py-6 text-center text-xs text-muted-foreground">{t("reorderQueue.noProductsMatch", "No products match your search.")}</p>
 										) : (
 											manualFilteredProducts.map((p) => {
 												const isSelected = manualProduct?.id === p.id;
@@ -607,16 +609,16 @@ export default function ReorderQueuePage() {
 														<div className="min-w-0 flex-1">
 															<p className="truncate text-sm font-medium text-foreground">{p.name}</p>
 															<p className="text-[11px] text-muted-foreground">
-																Stock: {p.currentStock}{" "}
-																{hasOpenPO && <span className="text-blue-600 font-medium">· PO open</span>}
+																{t("reorderQueue.stock", "Stock")}: {p.currentStock}{" "}
+																{hasOpenPO && <span className="text-blue-600 font-medium">· {t("reorderQueue.poOpen", "PO open")}</span>}
 															</p>
 														</div>
 														<div className="shrink-0">
 															{p.status === "Out of Stock" && (
-																<span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-600">Out</span>
+																<span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-600">{t("reorderQueue.out", "Out")}</span>
 															)}
 															{p.status === "Low Stock" && (
-																<span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600">Low</span>
+																<span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600">{t("reorderQueue.low", "Low")}</span>
 															)}
 															{isSelected && (
 																<span className="ml-1 text-primary"><IconCheck /></span>
@@ -630,7 +632,7 @@ export default function ReorderQueuePage() {
 
 									<div className="flex justify-end gap-2 pt-1">
 										<button type="button" onClick={closeManualDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
-											Cancel
+											{t("reorderQueue.cancel", "Cancel")}
 										</button>
 										<button
 											type="button"
@@ -641,7 +643,7 @@ export default function ReorderQueuePage() {
 											}}
 											className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-40"
 										>
-											Next <IconChevronRight />
+											{t("reorderQueue.next", "Next")} <IconChevronRight />
 										</button>
 									</div>
 								</div>
@@ -657,13 +659,13 @@ export default function ReorderQueuePage() {
 										<div className="min-w-0">
 											<p className="truncate text-sm font-semibold text-foreground">{manualProduct.name}</p>
 											<p className="text-xs text-muted-foreground">
-												Supplier: {manualProduct.supplier?.name ?? "Unassigned"}
+												{t("reorderQueue.supplier", "Supplier")}: {manualProduct.supplier?.name ?? t("reorderQueue.unassigned", "Unassigned")}
 											</p>
 										</div>
 									</div>
 
 									<label htmlFor="manual-qty" className="block text-sm font-medium text-foreground">
-										Order quantity
+										{t("reorderQueue.orderQuantity", "Order quantity")}
 										<div className="mt-2 flex items-center gap-1.5">
 											<button
 												type="button"
@@ -692,10 +694,10 @@ export default function ReorderQueuePage() {
 
 									<div className="flex justify-end gap-2 pt-1">
 										<button type="button" onClick={() => setManualStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
-											<IconArrowLeft /> Back
+											<IconArrowLeft /> {t("reorderQueue.back", "Back")}
 										</button>
 										<button type="button" onClick={() => setManualStep(3)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
-											Next <IconChevronRight />
+											{t("reorderQueue.next", "Next")} <IconChevronRight />
 										</button>
 									</div>
 								</div>
@@ -706,10 +708,10 @@ export default function ReorderQueuePage() {
 								<div className="space-y-4">
 									<div className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
 										{[
-											{ label: "Product",  value: manualProduct.name },
-											{ label: "Supplier", value: manualProduct.supplier?.name ?? "Unassigned" },
-											{ label: "Lead time", value: manualProduct.supplier?.leadTimeDays ? `${manualProduct.supplier.leadTimeDays} days` : "Unknown" },
-											{ label: "Quantity", value: `${manualQty} units` },
+											{ label: t("reorderQueue.product", "Product"),  value: manualProduct.name },
+											{ label: t("reorderQueue.supplier", "Supplier"), value: manualProduct.supplier?.name ?? t("reorderQueue.unassigned", "Unassigned") },
+											{ label: t("reorderQueue.leadTime", "Lead time"), value: manualProduct.supplier?.leadTimeDays ? `${manualProduct.supplier.leadTimeDays} ${t("reorderQueue.days", "days")}` : t("reorderQueue.unknown", "Unknown") },
+											{ label: t("reorderQueue.quantity", "Quantity"), value: `${manualQty} ${t("reorderQueue.units", "units")}` },
 										].map((row) => (
 											<div key={row.label} className="flex items-center justify-between px-3 py-2.5">
 												<span className="text-xs text-muted-foreground">{row.label}</span>
@@ -720,10 +722,10 @@ export default function ReorderQueuePage() {
 
 									<div className="flex justify-end gap-2 pt-1">
 										<button type="button" onClick={() => setManualStep(2)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/40">
-											<IconArrowLeft /> Back
+											<IconArrowLeft /> {t("reorderQueue.back", "Back")}
 										</button>
 										<button type="button" onClick={confirmManualDialog} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90">
-											<IconCheck /> Place Order
+											<IconCheck /> {t("reorderQueue.placeOrder", "Place Order")}
 										</button>
 									</div>
 								</div>

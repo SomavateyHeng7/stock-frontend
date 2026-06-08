@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SmartStockShell } from "@/components/smartstock-shell";
+import { useT } from "@/lib/i18n";
 import { getEnrichedProducts, getThirtyDayForecast } from "@/lib/smartstock-data";
 import {
 	Activity,
@@ -97,6 +98,7 @@ export default function ForecastPage() {
 	const [sortBy, setSortBy] = useState<"risk" | "demand" | "name">("risk");
 	const [filter, setFilter] = useState<FilterType>("all");
 	const [expandedId, setExpandedId] = useState<number | null>(null);
+	const t = useT();
 
 	const forecastRows = useMemo(() => {
 		return getEnrichedProducts().map((item) => {
@@ -142,7 +144,7 @@ export default function ForecastPage() {
 	);
 
 	return (
-		<SmartStockShell title="Demand Forecast" subtitle="30-day projections driven by velocity, trend, and seasonality signals.">
+		<SmartStockShell title={t("forecast.title", "Demand Forecast")} subtitle={t("forecast.subtitle", "30-day projections driven by velocity, trend, and seasonality signals.")}>
 
 			{/* ── KPI strip ──────────────────────────────────────────────────── */}
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -151,9 +153,9 @@ export default function ForecastPage() {
 						icon: TrendingUp,
 						iconColor: "text-blue-600 dark:text-blue-400",
 						bg: "bg-blue-500/10",
-						label: "30-day demand",
+						label: t("forecast.thirtyDayDemand", "30-day demand"),
 						value: totalProjectedDemand.toLocaleString(),
-						sub: "projected units",
+						sub: t("forecast.projectedUnits", "projected units"),
 						urgent: false,
 						truncate: false,
 					},
@@ -161,9 +163,9 @@ export default function ForecastPage() {
 						icon: AlertTriangle,
 						iconColor: outOfStockCount > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600",
 						bg: outOfStockCount > 0 ? "bg-red-500/10" : "bg-emerald-500/10",
-						label: "Out of stock",
+						label: t("forecast.outOfStock", "Out of stock"),
 						value: String(outOfStockCount),
-						sub: outOfStockCount === 0 ? "All clear" : "needs reorder",
+						sub: outOfStockCount === 0 ? t("forecast.allClear", "All clear") : t("forecast.needsReorder", "needs reorder"),
 						urgent: outOfStockCount > 0,
 						truncate: false,
 					},
@@ -171,9 +173,9 @@ export default function ForecastPage() {
 						icon: Crown,
 						iconColor: "text-amber-600 dark:text-amber-400",
 						bg: "bg-amber-500/10",
-						label: "Top demand SKU",
+						label: t("forecast.topDemandSku", "Top demand SKU"),
 						value: highestDemandItem?.name ?? "—",
-						sub: `${highestDemandItem?.total30 ?? 0} units`,
+						sub: `${highestDemandItem?.total30 ?? 0} ${t("forecast.units", "units")}`,
 						urgent: false,
 						truncate: true,
 					},
@@ -181,9 +183,9 @@ export default function ForecastPage() {
 						icon: Activity,
 						iconColor: "text-violet-600 dark:text-violet-400",
 						bg: "bg-violet-500/10",
-						label: "Avg daily (all)",
+						label: t("forecast.avgDailyAll", "Avg daily (all)"),
 						value: String(avgDailyPortfolio),
-						sub: "units across portfolio",
+						sub: t("forecast.unitsAcrossPortfolio", "units across portfolio"),
 						urgent: false,
 						truncate: false,
 					},
@@ -215,7 +217,7 @@ export default function ForecastPage() {
 			{/* ── Status filter strip ─────────────────────────────────────────── */}
 			<div className="mt-5 flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-card px-4 py-3">
 				<span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-					Portfolio:
+					{t("forecast.portfolio", "Portfolio:")}
 				</span>
 
 				<button
@@ -227,7 +229,7 @@ export default function ForecastPage() {
 							: "border-border/60 text-muted-foreground hover:border-foreground/30 hover:text-foreground"
 					}`}
 				>
-					All
+					{t("forecast.all", "All")}
 					<span className="rounded-full bg-muted px-1.5 py-px text-[10px] font-bold">
 						{forecastRows.length}
 					</span>
@@ -258,13 +260,13 @@ export default function ForecastPage() {
 
 				<span className="flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1 text-xs font-medium text-muted-foreground">
 					<span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-					In stock
+					{t("forecast.inStock", "In stock")}
 					<span className="rounded-full bg-muted px-1.5 py-px text-[10px] font-bold">{inStockCount}</span>
 				</span>
 
 				{highestDemandItem && (
 					<span className="ml-auto hidden text-xs text-muted-foreground sm:block">
-						Top mover:{" "}
+						{t("forecast.topMover", "Top mover:")}{" "}
 						<span className="font-semibold text-foreground">{highestDemandItem.name}</span>
 					</span>
 				)}
@@ -278,7 +280,7 @@ export default function ForecastPage() {
 						type="text"
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						placeholder="Search products…"
+						placeholder={t("forecast.searchProducts", "Search products…")}
 						className="h-10 w-full rounded-xl border border-border/70 bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
 					/>
 				</div>
@@ -289,9 +291,9 @@ export default function ForecastPage() {
 						onChange={(e) => setSortBy(e.target.value as "risk" | "demand" | "name")}
 						className="h-10 appearance-none rounded-xl border border-border/70 bg-card pl-8 pr-7 text-sm font-medium text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
 					>
-						<option value="risk">Risk priority</option>
-						<option value="demand">30-day demand</option>
-						<option value="name">Name A–Z</option>
+						<option value="risk">{t("forecast.riskPriority", "Risk priority")}</option>
+						<option value="demand">{t("forecast.thirtyDayDemandOpt", "30-day demand")}</option>
+						<option value="name">{t("forecast.nameAsc", "Name A–Z")}</option>
 					</select>
 					<ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
 				</div>
@@ -302,7 +304,7 @@ export default function ForecastPage() {
 				<div className="mb-3 flex items-center gap-2">
 					<BarChart3 className="h-4 w-4 text-muted-foreground" />
 					<h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-						Product Forecast
+						{t("forecast.productForecast", "Product Forecast")}
 					</h2>
 					<span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
 						{visibleRows.length}
@@ -310,21 +312,20 @@ export default function ForecastPage() {
 				</div>
 
 				<div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
-					{/* Desktop header */}
 					<div className="hidden border-b border-border/40 bg-muted/30 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid lg:grid-cols-[minmax(200px,1fr)_160px_80px_80px_130px_150px_24px]">
-						<span>Product</span>
-						<span>14-day trend</span>
-						<span className="text-center">30-day</span>
-						<span className="text-center">Avg/day</span>
-						<span className="text-center">Status</span>
-						<span>Risk score</span>
+						<span>{t("forecast.product", "Product")}</span>
+						<span>{t("forecast.fourteenDayTrend", "14-day trend")}</span>
+						<span className="text-center">{t("forecast.thirtyDay", "30-day")}</span>
+						<span className="text-center">{t("forecast.avgPerDay", "Avg/day")}</span>
+						<span className="text-center">{t("forecast.status", "Status")}</span>
+						<span>{t("forecast.riskScore", "Risk score")}</span>
 						<span />
 					</div>
 
 					{visibleRows.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-16 text-center">
 							<PackageCheck className="mb-3 h-8 w-8 text-muted-foreground/30" />
-							<p className="text-sm text-muted-foreground">No products match your search.</p>
+							<p className="text-sm text-muted-foreground">{t("forecast.noProductsMatch", "No products match your search.")}</p>
 						</div>
 					) : (
 						<ul className="divide-y divide-border/40">
@@ -355,7 +356,7 @@ export default function ForecastPage() {
 														30d: <span className="font-semibold text-foreground">{item.total30}</span>
 													</span>
 													<span className="text-xs text-muted-foreground">
-														avg: <span className="font-semibold text-foreground">{item.avgDailyForecast}/day</span>
+														{t("forecast.avg", "avg")}: <span className="font-semibold text-foreground">{item.avgDailyForecast}{t("forecast.perDay", "/day")}</span>
 													</span>
 												</div>
 
@@ -407,7 +408,7 @@ export default function ForecastPage() {
 													{/* Chart */}
 													<div>
 														<p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-															14-day demand curve
+															{t("forecast.fourteenDayDemandCurve", "14-day demand curve")}
 														</p>
 														<div className="rounded-xl border border-border/40 bg-background p-4">
 															<div className="flex h-28 items-end gap-0.5">
@@ -429,9 +430,9 @@ export default function ForecastPage() {
 																})}
 															</div>
 															<div className="mt-2 flex justify-between text-xs text-muted-foreground/60">
-																<span>Day 1</span>
-																<span>Day 7</span>
-																<span>Day 14</span>
+																<span>{t("forecast.day1", "Day 1")}</span>
+																<span>{t("forecast.day7", "Day 7")}</span>
+																<span>{t("forecast.day14", "Day 14")}</span>
 															</div>
 														</div>
 													</div>
@@ -439,14 +440,14 @@ export default function ForecastPage() {
 													{/* Details */}
 													<div>
 														<p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-															Details
+															{t("forecast.details", "Details")}
 														</p>
 														<div className="divide-y divide-border/40 rounded-xl border border-border/40 bg-background">
 															{[
-																{ label: "Current stock", value: `${item.currentStock} units` },
-																{ label: "Reorder qty", value: `${item.reorderQty} units` },
-																{ label: "Coverage", value: `${item.coverageDays} days` },
-																{ label: "Risk score", value: `${item.riskScore} / 130` },
+																{ label: t("forecast.currentStock", "Current stock"), value: `${item.currentStock} ${t("forecast.units", "units")}` },
+																{ label: t("forecast.reorderQty", "Reorder qty"), value: `${item.reorderQty} ${t("forecast.units", "units")}` },
+																{ label: t("forecast.coverage", "Coverage"), value: `${item.coverageDays} ${t("forecast.days", "days")}` },
+																{ label: t("forecast.riskScore", "Risk score"), value: `${item.riskScore} / 130` },
 															].map((row) => (
 																<div
 																	key={row.label}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Search, Keyboard, Moon, Sun, Monitor, ArrowRight } from "lucide-react";
+import { useT } from "@/lib/i18n";
 
 type CommandAction = {
   id: string;
@@ -26,6 +27,7 @@ export function GlobalCommandPalette() {
   const router = useRouter();
   const { setTheme, resolvedTheme } = useTheme();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const t = useT();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -208,7 +210,7 @@ export function GlobalCommandPalette() {
         aria-label="Open command palette"
       >
         <Keyboard className="h-4 w-4" />
-        Quick actions
+        {t("dashboard.sections.quickActions", "Quick actions")}
         <span className="rounded border border-border bg-background px-1.5 py-0.5 text-[10px]">Cmd/Ctrl+K</span>
       </button>
 

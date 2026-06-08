@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
+import { useT } from "@/lib/i18n";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { ErrorState, HelpHint, LoadingState } from "@/components/ui/data-state";
 import { useToast } from "@/components/ui/toast-provider";
@@ -45,6 +46,7 @@ type ProrationPreview = {
 export default function BillingPage() {
 	const { showToast } = useToast();
 	const preferences = useUserPreferences();
+	const t = useT();
 
 	const [billingState, setBillingState] = useState<BillingState>(() => ({
 		planId: "starter" as PlanId,
@@ -87,7 +89,7 @@ export default function BillingPage() {
 			setPaymentMethod(nextPaymentMethod);
 			setLoadError(null);
 		} catch {
-			setLoadError("We couldn't load your billing profile. Please retry.");
+			setLoadError(t("billing.errorLoad", "We couldn't load your billing profile. Please retry."));
 		} finally {
 			setIsHydrating(false);
 		}
@@ -403,13 +405,13 @@ export default function BillingPage() {
 	if (isHydrating) {
 		return (
 			<SmartStockShell
-				title="Billing & Plans"
-				subtitle="Manage your subscription lifecycle, payment methods, and pricing."
+				title={t("billing.title", "Billing & Plans")}
+				subtitle={t("billing.subtitle", "Manage your subscription lifecycle, payment methods, and pricing.")}
 			>
 				<section className="space-y-4" aria-label="Billing loading">
 					<LoadingState
-						title="Loading billing details"
-						description="Fetching your plan and payment setup."
+						title={t("billing.loadingDetails", "Loading billing details")}
+						description={t("billing.fetchingSetup", "Fetching your plan and payment setup.")}
 						rows={4}
 					/>
 				</section>
@@ -420,8 +422,8 @@ export default function BillingPage() {
 	if (loadError) {
 		return (
 			<SmartStockShell
-				title="Billing & Plans"
-				subtitle="Manage your subscription lifecycle, payment methods, and pricing."
+				title={t("billing.title", "Billing & Plans")}
+				subtitle={t("billing.subtitle", "Manage your subscription lifecycle, payment methods, and pricing.")}
 			>
 				<section className="space-y-4" aria-label="Billing error">
 					<ErrorState
@@ -429,8 +431,8 @@ export default function BillingPage() {
 						onRetry={() => {
 							void hydrateBilling();
 						}}
-						retryLabel="Retry loading"
-						hint="If this keeps happening, refresh the page and check browser storage permissions."
+						retryLabel={t("billing.retryLoading", "Retry loading")}
+						hint={t("billing.errorRetryHint", "If this keeps happening, refresh the page and check browser storage permissions.")}
 					/>
 				</section>
 			</SmartStockShell>
@@ -439,8 +441,8 @@ export default function BillingPage() {
 
 	return (
 		<SmartStockShell
-			title="Billing & Plans"
-			subtitle="Manage your subscription lifecycle, payment methods, and pricing."
+			title={t("billing.title", "Billing & Plans")}
+			subtitle={t("billing.subtitle", "Manage your subscription lifecycle, payment methods, and pricing.")}
 		>
 			<section className="space-y-6" aria-label="Billing">
 				<div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
@@ -455,17 +457,17 @@ export default function BillingPage() {
 									{trialActive ? (
 										<span className="inline-flex items-center gap-1 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
 											<Clock className="h-3.5 w-3.5" />
-											{trialDaysLeft}d trial left
+											{t("billing.trialLeft", "{{days}}d trial left", { days: trialDaysLeft })}
 										</span>
 									) : (
 										<span className="rounded-full border border-border bg-muted/30 px-3 py-1 text-xs font-medium text-muted-foreground">
-											Trial ended
+											{t("billing.trialEnded", "Trial ended")}
 										</span>
 									)}
 
 									{billingState.cancelAtPeriodEnd && (
 										<span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
-											Cancellation scheduled
+											{t("billing.cancellationScheduled", "Cancellation scheduled")}
 										</span>
 									)}
 								</div>
@@ -492,7 +494,7 @@ export default function BillingPage() {
 											: "text-muted-foreground hover:text-foreground"
 									}`}
 								>
-									Monthly
+									{t("billing.monthly", "Monthly")}
 								</button>
 
 								<button
@@ -504,7 +506,7 @@ export default function BillingPage() {
 											: "text-muted-foreground hover:text-foreground"
 									}`}
 								>
-									Yearly
+									{t("billing.yearly", "Yearly")}
 								</button>
 							</div>
 						</div>
@@ -512,8 +514,8 @@ export default function BillingPage() {
 						{trialActive && (
 							<div className="mt-5">
 								<div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-									<span>Trial progress</span>
-									<span>Day {30 - trialDaysLeft} of 30</span>
+									<span>{t("billing.trialProgress", "Trial progress")}</span>
+									<span>{t("billing.dayOf", "Day {{current}} of {{total}}", { current: 30 - trialDaysLeft, total: 30 })}</span>
 								</div>
 
 								<div className="h-2 overflow-hidden rounded-full bg-primary/15">
@@ -527,32 +529,32 @@ export default function BillingPage() {
 
 						<div className="mt-5 grid gap-3 sm:grid-cols-3">
 							<div className="rounded-xl bg-muted/30 p-3">
-								<p className="text-xs text-muted-foreground">Renewal</p>
+								<p className="text-xs text-muted-foreground">{t("billing.renewal", "Renewal")}</p>
 								<p className="mt-1 text-sm font-semibold text-foreground">
 									{billingState.cancelAtPeriodEnd
-										? "Ends this period"
-										: "Auto renew active"}
+										? t("billing.endsThisPeriod", "Ends this period")
+										: t("billing.autoRenewActive", "Auto renew active")}
 								</p>
 							</div>
 
 							<div className="rounded-xl bg-muted/30 p-3">
-								<p className="text-xs text-muted-foreground">Billing cycle</p>
+								<p className="text-xs text-muted-foreground">{t("billing.billingCycle", "Billing cycle")}</p>
 								<p className="mt-1 text-sm font-semibold capitalize text-foreground">
-									{billingState.billingCycle}
+									{billingState.billingCycle === "monthly" ? t("billing.monthly", "Monthly") : t("billing.yearly", "Yearly")}
 								</p>
 							</div>
 
 							<div className="rounded-xl bg-muted/30 p-3">
-								<p className="text-xs text-muted-foreground">Plan status</p>
+								<p className="text-xs text-muted-foreground">{t("billing.planStatus", "Plan status")}</p>
 								<p className="mt-1 text-sm font-semibold text-foreground">
-									{billingState.cancelAtPeriodEnd ? "Cancelling" : "Active"}
+									{billingState.cancelAtPeriodEnd ? t("billing.cancelling", "Cancelling") : t("billing.active", "Active")}
 								</p>
 							</div>
 						</div>
 
 						{billingState.cancellationRequestedAt && (
 							<p className="mt-4 text-xs text-muted-foreground">
-								Cancellation requested ·{" "}
+								{t("billing.cancellationRequested", "Cancellation requested")} ·{" "}
 								{formatDateTime(
 									billingState.cancellationRequestedAt,
 									preferences,
@@ -565,10 +567,10 @@ export default function BillingPage() {
 						<div className="flex items-start justify-between gap-3">
 							<div>
 								<h2 className="text-lg font-semibold text-foreground">
-									Payment
+									{t("billing.payment", "Payment")}
 								</h2>
 								<p className="mt-1 text-sm text-muted-foreground">
-									Manage the method used for renewals.
+									{t("billing.manageMethod", "Manage the method used for renewals.")}
 								</p>
 							</div>
 
@@ -593,7 +595,7 @@ export default function BillingPage() {
 											{paymentMethod.label}
 										</p>
 										<p className="text-xs text-muted-foreground">
-											Ending in {paymentMethod.last4}
+											{t("billing.endingIn", "Ending in {{last4}}", { last4: paymentMethod.last4 ?? "" })}
 										</p>
 									</div>
 
@@ -611,10 +613,10 @@ export default function BillingPage() {
 
 									<div>
 										<p className="text-sm font-semibold text-foreground">
-											Add payment method
+											{t("billing.addPaymentMethod", "Add payment method")}
 										</p>
 										<p className="text-xs text-muted-foreground">
-											Card, bank transfer, or mobile wallet.
+											{t("billing.paymentTypesDesc", "Card, bank transfer, or mobile wallet.")}
 										</p>
 									</div>
 								</button>
@@ -628,7 +630,7 @@ export default function BillingPage() {
 									onClick={() => setShowCancelModal(true)}
 									className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-red-400/40 bg-red-500/10 px-4 text-sm font-semibold text-red-700 transition-colors hover:bg-red-500/15 dark:text-red-400"
 								>
-									Cancel subscription
+									{t("billing.cancelSubscription", "Cancel subscription")}
 								</button>
 							) : (
 								<button
@@ -636,7 +638,7 @@ export default function BillingPage() {
 									onClick={() => setShowReactivateModal(true)}
 									className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
 								>
-									Reactivate subscription
+									{t("billing.reactivateSubscription", "Reactivate subscription")}
 								</button>
 							)}
 						</div>
@@ -649,11 +651,12 @@ export default function BillingPage() {
 
 						<div className="flex-1">
 							<p className="text-sm font-semibold text-foreground">
-								Trial ending in {trialDaysLeft} day
-								{trialDaysLeft === 1 ? "" : "s"}
+								{trialDaysLeft === 1
+									? t("billing.trialEndingIn", "Trial ending in {{days}} day", { days: trialDaysLeft })
+									: t("billing.trialEndingInPlural", "Trial ending in {{days}} days", { days: trialDaysLeft })}
 							</p>
 							<p className="text-sm text-muted-foreground">
-								Add a payment method to avoid access restrictions.
+								{t("billing.addPaymentAvoidRestrictions", "Add a payment method to avoid access restrictions.")}
 							</p>
 						</div>
 
@@ -662,7 +665,7 @@ export default function BillingPage() {
 							onClick={openPaymentDrawer}
 							className="inline-flex h-10 items-center justify-center rounded-lg bg-amber-600 px-4 text-sm font-semibold text-white hover:bg-amber-700"
 						>
-							Add now
+							{t("billing.addNow", "Add now")}
 						</button>
 					</div>
 				)}
@@ -673,10 +676,10 @@ export default function BillingPage() {
 
 						<div className="flex-1">
 							<p className="text-sm font-semibold text-foreground">
-								Trial ended
+								{t("billing.trialEnded", "Trial ended")}
 							</p>
 							<p className="text-sm text-muted-foreground">
-								Add a payment method to restore full access.
+								{t("billing.addPaymentRestoreAccess", "Add a payment method to restore full access.")}
 							</p>
 						</div>
 
@@ -685,7 +688,7 @@ export default function BillingPage() {
 							onClick={openPaymentDrawer}
 							className="inline-flex h-10 items-center justify-center rounded-lg bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700"
 						>
-							Add now
+							{t("billing.addNow", "Add now")}
 						</button>
 					</div>
 				)}
@@ -694,10 +697,10 @@ export default function BillingPage() {
 					<div className="flex flex-col gap-3 border-b border-border/70 p-5 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<h2 className="text-xl font-semibold text-foreground">
-								Choose a plan
+								{t("billing.choosePlan", "Choose a plan")}
 							</h2>
 							<p className="mt-1 text-sm text-muted-foreground">
-								Compare features and change plans with a proration preview.
+								{t("billing.compareFeatures", "Compare features and change plans with a proration preview.")}
 							</p>
 						</div>
 
@@ -711,7 +714,7 @@ export default function BillingPage() {
 										: "text-muted-foreground hover:text-foreground"
 								}`}
 							>
-								Monthly
+								{t("billing.monthly", "Monthly")}
 							</button>
 
 							<button
@@ -723,7 +726,7 @@ export default function BillingPage() {
 										: "text-muted-foreground hover:text-foreground"
 								}`}
 							>
-								Yearly
+								{t("billing.yearly", "Yearly")}
 							</button>
 						</div>
 					</div>
@@ -737,10 +740,10 @@ export default function BillingPage() {
 							const currentRank = planRank(billingState.planId);
 							const buttonLabel =
 								nextRank > currentRank
-									? "Upgrade"
+									? t("billing.upgrade", "Upgrade")
 									: nextRank < currentRank
-										? "Downgrade"
-										: "Current plan";
+										? t("billing.downgrade", "Downgrade")
+										: t("billing.currentPlan", "Current plan");
 
 							return (
 								<div
@@ -760,7 +763,7 @@ export default function BillingPage() {
 
 												{isPopular && (
 													<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
-														Popular
+														{t("billing.popular", "Popular")}
 													</span>
 												)}
 											</div>
@@ -781,7 +784,7 @@ export default function BillingPage() {
 										<div className="flex items-end gap-1">
 											<span className="text-2xl font-bold text-foreground">
 												{getPlanPrice(plan, billingState.billingCycle) === null
-													? "Custom"
+													? t("billing.custom", "Custom")
 													: formatCurrencyAmount(
 															getPlanPrice(
 																plan,
@@ -793,7 +796,7 @@ export default function BillingPage() {
 
 											<span className="pb-1 text-xs text-muted-foreground">
 												/
-												{billingState.billingCycle === "monthly" ? "mo" : "yr"}
+												{billingState.billingCycle === "monthly" ? t("billing.mo", "mo") : t("billing.yr", "yr")}
 											</span>
 										</div>
 
