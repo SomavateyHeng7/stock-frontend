@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/lib/i18n";
 import { useTheme } from "@/components/theme-provider";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -327,6 +328,7 @@ function SectionCard({ title, description, children }: { title: string; descript
 /*  Main page                                                           */
 /* ------------------------------------------------------------------ */
 export default function SettingPage() {
+  const t = useT();
   const router = useRouter();
   const { showToast } = useToast();
   const preferences = useUserPreferences();
@@ -478,19 +480,19 @@ export default function SettingPage() {
   };
 
   /* ---- Sidebar nav ---- */
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "profile", label: "Profile", icon: <IconUser /> },
-    { id: "appearance", label: "Appearance", icon: <IconPalette /> },
-    { id: "security", label: "Security", icon: <IconShield /> },
-    { id: "team", label: "Team", icon: <IconUsers /> },
-  ];
+  const tabs = useMemo(() => [
+    { id: "profile" as Tab, label: t("settings.tabs.profile", "Profile"), icon: <IconUser /> },
+    { id: "appearance" as Tab, label: t("settings.tabs.appearance", "Appearance"), icon: <IconPalette /> },
+    { id: "security" as Tab, label: t("settings.tabs.security", "Security"), icon: <IconShield /> },
+    { id: "team" as Tab, label: t("settings.tabs.team", "Team"), icon: <IconUsers /> },
+  ], [t]);
 
   const avatarInitials = getInitials(settings.fullName || "User");
 
   return (
     <SmartStockShell
-      title="Settings"
-      subtitle="Manage your profile, appearance, security, and team."
+      title={t("settings.title", "Settings")}
+      subtitle={t("settings.subtitle", "Manage your profile, appearance, security, and team.")}
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
         {/* Sidebar */}
@@ -540,10 +542,10 @@ export default function SettingPage() {
           {/* ── Profile tab ── */}
           {activeTab === "profile" && (
             <>
-              <SectionCard title="Personal information" description="This information appears across billing, exports, and team notifications.">
+              <SectionCard title={t("settings.personalInfo", "Personal information")} description={t("settings.personalInfoDesc", "This information appears across billing, exports, and team notifications.")}>
                 <form className="space-y-4" onSubmit={onSubmit}>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Full name" htmlFor="settings-full-name">
+                    <Field label={t("settings.fullName", "Full name")} htmlFor="settings-full-name">
                       <input
                         id="settings-full-name"
                         className={inputCls}
@@ -552,7 +554,7 @@ export default function SettingPage() {
                         onChange={(e) => setSettings((c) => ({ ...c, fullName: e.target.value }))}
                       />
                     </Field>
-                    <Field label="Email address" htmlFor="settings-email">
+                    <Field label={t("settings.emailAddress", "Email address")} htmlFor="settings-email">
                       <input
                         id="settings-email"
                         className={inputCls}
@@ -562,7 +564,7 @@ export default function SettingPage() {
                         onChange={(e) => setSettings((c) => ({ ...c, email: e.target.value }))}
                       />
                     </Field>
-                    <Field label="Phone number" htmlFor="settings-phone">
+                    <Field label={t("settings.phoneNumber", "Phone number")} htmlFor="settings-phone">
                       <input
                         id="settings-phone"
                         className={inputCls}
@@ -571,7 +573,7 @@ export default function SettingPage() {
                         onChange={(e) => setSettings((c) => ({ ...c, phone: e.target.value }))}
                       />
                     </Field>
-                    <Field label="Business name" htmlFor="settings-business-name">
+                    <Field label={t("settings.businessName", "Business name")} htmlFor="settings-business-name">
                       <input
                         id="settings-business-name"
                         className={inputCls}
@@ -583,7 +585,7 @@ export default function SettingPage() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-3">
-                    <Field label="Timezone" htmlFor="settings-timezone">
+                    <Field label={t("settings.timezone", "Timezone")} htmlFor="settings-timezone">
                       <select
                         id="settings-timezone"
                         className={selectCls}
@@ -595,7 +597,7 @@ export default function SettingPage() {
                         <option value="UTC">UTC</option>
                       </select>
                     </Field>
-                    <Field label="Language" htmlFor="settings-language">
+                    <Field label={t("settings.language", "Language")} htmlFor="settings-language">
                       <select
                         id="settings-language"
                         className={selectCls}
@@ -606,7 +608,7 @@ export default function SettingPage() {
                         <option value="km">Khmer</option>
                       </select>
                     </Field>
-                    <Field label="Currency" htmlFor="settings-currency">
+                    <Field label={t("settings.currency", "Currency")} htmlFor="settings-currency">
                       <select
                         id="settings-currency"
                         className={selectCls}
@@ -621,25 +623,25 @@ export default function SettingPage() {
 
                   <div className="flex gap-2 pt-1">
                     <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
-                      Save changes
+                      {t("settings.saveChanges", "Save changes")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setSettings(defaultSettings)}
                       className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Reset
+                      {t("settings.reset", "Reset")}
                     </button>
                   </div>
                 </form>
               </SectionCard>
 
-              <SectionCard title="Preferences" description="Notifications and display settings for your workspace.">
+              <SectionCard title={t("settings.preferences", "Preferences")} description={t("settings.preferencesDesc", "Notifications and display settings for your workspace.")}>
                 <div className="space-y-1 divide-y divide-border/60">
                   {[
-                    { id: "email-alerts", icon: <IconMail />, label: "Email alerts", description: "Receive important updates via email", key: "emailAlerts" as const },
-                    { id: "telegram-alerts", icon: <IconSmartphone />, label: "Telegram alerts", description: "Get stock notifications on Telegram", key: "telegramAlerts" as const },
-                    { id: "compact-rows", icon: <IconLayout />, label: "Compact table rows", description: "Show more items per screen in tables", key: "compactTables" as const },
+                    { id: "email-alerts", icon: <IconMail />, label: t("settings.emailAlerts", "Email alerts"), description: t("settings.emailAlertsDesc", "Receive important updates via email"), key: "emailAlerts" as const },
+                    { id: "telegram-alerts", icon: <IconSmartphone />, label: t("settings.telegramAlerts", "Telegram alerts"), description: t("settings.telegramAlertsDesc", "Get stock notifications on Telegram"), key: "telegramAlerts" as const },
+                    { id: "compact-rows", icon: <IconLayout />, label: t("settings.compactRows", "Compact table rows"), description: t("settings.compactRowsDesc", "Show more items per screen in tables"), key: "compactTables" as const },
                   ].map((item) => (
                     <div key={item.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
                       <div className="flex items-center gap-3">
@@ -663,9 +665,9 @@ export default function SettingPage() {
 
           {/* ── Appearance tab ── */}
           {activeTab === "appearance" && (
-            <SectionCard title="Theme" description="Choose how SmartStock looks on your device.">
+            <SectionCard title={t("settings.themeSection", "Theme")} description={t("settings.themeSectionDesc", "Choose how SmartStock looks on your device.")}>
               <div className="mb-4 flex items-center justify-between rounded-lg border border-border/70 bg-background/60 px-3 py-2.5">
-                <p className="text-sm font-medium text-foreground">Quick toggle</p>
+                <p className="text-sm font-medium text-foreground">{t("settings.themeQuickToggle", "Quick toggle")}</p>
                 <ModeToggle />
               </div>
 
@@ -693,7 +695,7 @@ export default function SettingPage() {
                       <div className={`h-12 w-full rounded-lg border ${option.preview}`} />
                       <div className="flex items-center gap-1.5">
                         <span className={active ? "text-primary" : "text-muted-foreground"}>{option.icon}</span>
-                        <span className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>{option.label}</span>
+                        <span className={`font-medium ${active ? "text-foreground" : "text-muted-foreground"}`}>{t(`settings.${option.value}`, option.label)}</span>
                       </div>
                       {active && (
                         <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -710,20 +712,20 @@ export default function SettingPage() {
           {/* ── Security tab ── */}
           {activeTab === "security" && (
             <>
-              <SectionCard title="Change password" description="Use a strong password of at least 8 characters.">
+              <SectionCard title={t("settings.changePassword", "Change password")} description={t("settings.changePasswordDesc", "Use a strong password of at least 8 characters.")}>
                 <form className="space-y-3" onSubmit={submitPasswordChange}>
-                  <Field label="Current password" htmlFor="settings-current-password">
+                  <Field label={t("settings.currentPassword", "Current password")} htmlFor="settings-current-password">
                     <input
                       id="settings-current-password"
                       className={inputCls}
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter current password"
+                      placeholder={t("settings.currentPassword", "Enter current password")}
                     />
                   </Field>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <Field label="New password" htmlFor="settings-new-password">
+                    <Field label={t("settings.newPassword", "New password")} htmlFor="settings-new-password">
                       <input
                         id="settings-new-password"
                         className={inputCls}
@@ -733,7 +735,7 @@ export default function SettingPage() {
                         placeholder="At least 8 characters"
                       />
                     </Field>
-                    <Field label="Confirm password" htmlFor="settings-confirm-password">
+                    <Field label={t("settings.confirmPassword", "Confirm password")} htmlFor="settings-confirm-password">
                       <input
                         id="settings-confirm-password"
                         className={inputCls}
@@ -745,12 +747,12 @@ export default function SettingPage() {
                     </Field>
                   </div>
                   <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
-                    Update password
+                    {t("settings.updatePassword", "Update password")}
                   </button>
                 </form>
               </SectionCard>
 
-              <SectionCard title="Two-factor authentication" description="Add an extra layer of security to your account.">
+              <SectionCard title={t("settings.twoFactor", "Two-factor authentication")} description={t("settings.twoFactorDesc", "Add an extra layer of security to your account.")}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-4 rounded-lg border border-border/70 bg-background/60 p-3">
                     <div className="flex items-center gap-3">
@@ -758,8 +760,8 @@ export default function SettingPage() {
                         <IconShield />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">Authenticator app</p>
-                        <p className="text-xs text-muted-foreground">{securitySettings.twoFactorEnabled ? "Active and protecting your account" : "Not configured"}</p>
+                        <p className="text-sm font-medium text-foreground">{t("settings.authenticatorApp", "Authenticator app")}</p>
+                        <p className="text-xs text-muted-foreground">{securitySettings.twoFactorEnabled ? t("settings.activeProtect", "Active and protecting your account") : t("settings.notConfigured", "Not configured")}</p>
                       </div>
                     </div>
                     <button
@@ -771,11 +773,11 @@ export default function SettingPage() {
                           : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
                     >
-                      {securitySettings.twoFactorEnabled ? "Disable" : "Enable 2FA"}
+                      {securitySettings.twoFactorEnabled ? t("settings.disable", "Disable") : t("settings.enable2fa", "Enable 2FA")}
                     </button>
                   </div>
 
-                  <Field label="Recovery email" htmlFor="settings-recovery-email">
+                  <Field label={t("settings.recoveryEmail", "Recovery email")} htmlFor="settings-recovery-email">
                     <input
                       id="settings-recovery-email"
                       className={inputCls}
@@ -789,8 +791,8 @@ export default function SettingPage() {
               </SectionCard>
 
               <SectionCard
-                title="Active sessions"
-                description={`${sessions.length} active session${sessions.length === 1 ? "" : "s"}`}
+                title={t("settings.activeSessions", "Active sessions")}
+                description={t(sessions.length === 1 ? "settings.activeSessionCount" : "settings.activeSessionsCount", "{{count}} active sessions", { count: sessions.length })}
               >
                 <ul className="space-y-2">
                   {sessions.map((session) => (
@@ -804,13 +806,13 @@ export default function SettingPage() {
                             {session.deviceName}
                             {session.current && (
                               <span className="ml-2 rounded-full bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-green-600 dark:text-green-400">
-                                Current
+                                {t("settings.current", "Current")}
                               </span>
                             )}
                           </p>
                           <p className="text-xs text-muted-foreground">{session.location}</p>
                           <p className="text-xs text-muted-foreground">
-                            Last active: {formatDateTime(session.lastActiveAt, preferences)}
+                            {t("settings.lastActive", "Last active: {{time}}", { time: formatDateTime(session.lastActiveAt, preferences) })}
                           </p>
                         </div>
                       </div>
@@ -820,7 +822,7 @@ export default function SettingPage() {
                           onClick={() => revokeSession(session.id)}
                           className="shrink-0 rounded border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors"
                         >
-                          Revoke
+                          {t("settings.revoke", "Revoke")}
                         </button>
                       )}
                     </li>
@@ -831,14 +833,14 @@ export default function SettingPage() {
                   onClick={revokeAllOtherSessions}
                   className="mt-3 text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline transition-colors"
                 >
-                  Sign out all other devices
+                  {t("settings.signOutOther", "Sign out all other devices")}
                 </button>
               </SectionCard>
 
               <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-5">
-                <p className="text-sm font-semibold text-foreground">Danger zone</p>
+                <p className="text-sm font-semibold text-foreground">{t("settings.dangerZone", "Danger zone")}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Permanently remove this account profile and sign out from the workspace. This action cannot be undone.
+                  {t("settings.dangerZoneDesc", "Permanently remove this account profile and sign out from the workspace. This action cannot be undone.")}
                 </p>
                 <button
                   type="button"
@@ -846,7 +848,7 @@ export default function SettingPage() {
                   className="mt-3 flex items-center gap-1.5 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20 transition-colors"
                 >
                   <IconTrash />
-                  Delete account
+                  {t("settings.deleteAccount", "Delete account")}
                 </button>
               </div>
             </>
@@ -855,10 +857,10 @@ export default function SettingPage() {
           {/* ── Team tab ── */}
           {activeTab === "team" && (
             <>
-              <SectionCard title="Invite a team member" description="New members will receive an invitation email.">
+              <SectionCard title={t("settings.inviteTeam", "Invite a team member")} description={t("settings.inviteTeamDesc", "New members will receive an invitation email.")}>
                 <form className="space-y-3" onSubmit={inviteTeamMember}>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <Field label="Full name" htmlFor="team-invite-name">
+                    <Field label={t("settings.fullName", "Full name")} htmlFor="team-invite-name">
                       <input
                         id="team-invite-name"
                         className={inputCls}
@@ -867,7 +869,7 @@ export default function SettingPage() {
                         placeholder="Team member name"
                       />
                     </Field>
-                    <Field label="Email address" htmlFor="team-invite-email">
+                    <Field label={t("settings.emailAddress", "Email address")} htmlFor="team-invite-email">
                       <input
                         id="team-invite-email"
                         className={inputCls}
@@ -878,7 +880,7 @@ export default function SettingPage() {
                       />
                     </Field>
                   </div>
-                  <Field label="Role" htmlFor="team-invite-role">
+                  <Field label={t("settings.role", "Role")} htmlFor="team-invite-role">
                     <select
                       id="team-invite-role"
                       className={selectCls}
@@ -892,12 +894,12 @@ export default function SettingPage() {
                   </Field>
                   <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
                     <IconPlus />
-                    Invite member
+                    {t("settings.inviteMember", "Invite member")}
                   </button>
                 </form>
               </SectionCard>
 
-              <SectionCard title="Team members" description={`${teamMembers.length} member${teamMembers.length === 1 ? "" : "s"} in your workspace`}>
+              <SectionCard title={t("settings.teamMembers", "Team members")} description={t(teamMembers.length === 1 ? "settings.memberWorkspace" : "settings.membersWorkspace", "{{count}} members in your workspace", { count: teamMembers.length })}>
                 <div className="space-y-3">
                   {teamMembers.map((member) => (
                     <div key={member.id} className="rounded-xl border border-border/70 bg-background/60 p-4">
@@ -914,7 +916,7 @@ export default function SettingPage() {
                               </span>
                               {member.status === "invited" && (
                                 <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-                                  Pending
+                                  {t("settings.pending", "Pending")}
                                 </span>
                               )}
                             </div>

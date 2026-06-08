@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     description: "Minimal, mobile-first inventory decisions for SMEs.",
 };
 
+
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
@@ -30,6 +31,14 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${jakartaSans.variable} h-full antialiased`}
       >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&display=swap"
+        />
+      </head>
       <body className="min-h-full flex flex-col">
       <ThemeProvider defaultTheme="system" enableSystem>
           <PreferencesProvider>

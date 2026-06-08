@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { SmartStockShell } from "@/components/smartstock-shell";
 import { EmptyState, ErrorState, HelpHint, LoadingState } from "@/components/ui/data-state";
 import { useToast } from "@/components/ui/toast-provider";
 import { getEnrichedProducts, getStatusClass, getWeeklyTotals } from "@/lib/smartstock-data";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
+import { formatCurrencyAmount } from "@/lib/user-preferences";
 
 /* ------------------------------------------------------------------ */
 /*  Inline icons (consistent with other redesigned pages)              */
@@ -179,6 +182,8 @@ const statusBadge = (status: string) => {
 /*  Main page                                                          */
 /* ------------------------------------------------------------------ */
 export default function DashboardPage() {
+	const t = useT();
+	const preferences = useUserPreferences();
 	const [expanded, setExpanded] = useState(false);
 	const [orderedQuantities, setOrderedQuantities] = useState<Record<number, number>>({});
 	const [enrichedProducts, setEnrichedProducts] = useState<ReturnType<typeof getEnrichedProducts>>([]);
@@ -236,28 +241,31 @@ export default function DashboardPage() {
 		if (!reorderDialogItem) return;
 		const qty = Math.max(1, Math.floor(reorderAmount));
 		setOrderedQuantities((c) => ({ ...c, [reorderDialogItem.id]: qty }));
-		showToast({ title: "Reorder confirmed", description: `${reorderDialogItem.name}: ${qty} units marked as ordered.` });
+		showToast({
+			title: t("dashboard.reorderDialog.reorderConfirmed", "Reorder confirmed"),
+			description: t("dashboard.reorderDialog.markedOrdered", "{{name}}: {{qty}} units marked as ordered.", { name: reorderDialogItem.name, qty })
+		});
 		closeReorderDialog();
 	};
 
 	/* ---- loading / error / empty states ---- */
 	if (isLoading) {
 		return (
-			<SmartStockShell title="Dashboard" subtitle="Real-time inventory intelligence at a glance.">
+			<SmartStockShell title={t("dashboard.title", "Dashboard")} subtitle={t("dashboard.subtitle", "Real-time inventory intelligence at a glance.")}>
 				<LoadingState title="Loading dashboard" description="Crunching inventory metrics and alerts." rows={5} />
 			</SmartStockShell>
 		);
 	}
 	if (loadError) {
 		return (
-			<SmartStockShell title="Dashboard" subtitle="Real-time inventory intelligence at a glance.">
+			<SmartStockShell title={t("dashboard.title", "Dashboard")} subtitle={t("dashboard.subtitle", "Real-time inventory intelligence at a glance.")}>
 				<ErrorState description={loadError} onRetry={loadDashboard} retryLabel="Retry dashboard" hint="If this persists, confirm inventory data exists and reload the app." />
 			</SmartStockShell>
 		);
 	}
 	if (enrichedProducts.length === 0) {
 		return (
-			<SmartStockShell title="Dashboard" subtitle="Real-time inventory intelligence at a glance.">
+			<SmartStockShell title={t("dashboard.title", "Dashboard")} subtitle={t("dashboard.subtitle", "Real-time inventory intelligence at a glance.")}>
 				<EmptyState title="No inventory data yet" description="Add your first products to unlock alerts, reorder insights, and sales trends." actionLabel="Go to inventory" onAction={() => { window.location.href = "/inventory"; }} hint="Use Import CSV in Inventory for faster setup." />
 			</SmartStockShell>
 		);
@@ -267,15 +275,15 @@ export default function DashboardPage() {
 	/*  Render                                                             */
 	/* ------------------------------------------------------------------ */
 	return (
-		<SmartStockShell title="Dashboard" subtitle="Real-time inventory intelligence at a glance.">
+		<SmartStockShell title={t("dashboard.title", "Dashboard")} subtitle={t("dashboard.subtitle", "Real-time inventory intelligence at a glance.")}>
 
 			{/* ── Primary KPI strip ────────────────────────────────── */}
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
 				{[
-					{ label: "Total products", value: enrichedProducts.length, sub: `${goodStockItems.length} in stock`, icon: <IconPackage />, color: "text-blue-600 dark:text-blue-400" },
-					{ label: "Low stock", value: lowStockItems.length, sub: "Requires attention", icon: <IconTrendDown />, color: "text-amber-600 dark:text-amber-400" },
-					{ label: "Out of stock", value: stockoutItems.length, sub: "Lost sales risk", icon: <IconXCircle />, color: stockoutItems.length > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400" },
-					{ label: "Sales this week", value: salesThisWeek, sub: "Units sold", icon: <IconShoppingCart />, color: "text-emerald-600 dark:text-emerald-400" },
+					{ label: t("dashboard.kpis.totalProducts", "Total products"), value: enrichedProducts.length, sub: `${goodStockItems.length} ${t("dashboard.status.inStock", "in stock")}`, icon: <IconPackage />, color: "text-blue-600 dark:text-blue-400" },
+					{ label: t("dashboard.kpis.lowStock", "Low stock"), value: lowStockItems.length, sub: t("dashboard.status.requiresAttention", "Requires attention"), icon: <IconTrendDown />, color: "text-amber-600 dark:text-amber-400" },
+					{ label: t("dashboard.kpis.outOfStock", "Out of stock"), value: stockoutItems.length, sub: t("dashboard.status.lostSalesRisk", "Lost sales risk"), icon: <IconXCircle />, color: stockoutItems.length > 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400" },
+					{ label: t("dashboard.kpis.salesThisWeek", "Sales this week"), value: salesThisWeek, sub: t("dashboard.status.unitsSold", "Units sold"), icon: <IconShoppingCart />, color: "text-emerald-600 dark:text-emerald-400" },
 				].map((kpi) => (
 					<div key={kpi.label} className="group relative overflow-hidden rounded-xl border border-border/60 bg-card p-4 transition-shadow hover:shadow-md">
 						<div className={`mb-2 ${kpi.color}`}>{kpi.icon}</div>
@@ -289,9 +297,9 @@ export default function DashboardPage() {
 			{/* ── Financial row ────────────────────────────────────── */}
 			<div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
 				{[
-					{ label: "Inventory value", value: `$${totalInventoryValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: <IconDollar />, color: "text-blue-600 dark:text-blue-400" },
-					{ label: "Reorder queue", value: `${reorderItems.length} items`, icon: <IconShoppingCart />, color: "text-violet-600 dark:text-violet-400" },
-					{ label: "Reorder value", value: `$${reorderValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: <IconDollar />, color: "text-amber-600 dark:text-amber-400" },
+					{ label: t("dashboard.kpis.inventoryValue", "Inventory value"), value: formatCurrencyAmount(totalInventoryValue, preferences), icon: <IconDollar />, color: "text-blue-600 dark:text-blue-400" },
+					{ label: t("dashboard.kpis.reorderQueue", "Reorder queue"), value: `${reorderItems.length} ${t("dashboard.status.items", "items")}`, icon: <IconShoppingCart />, color: "text-violet-600 dark:text-violet-400" },
+					{ label: t("dashboard.kpis.reorderValue", "Reorder value"), value: formatCurrencyAmount(reorderValue, preferences), icon: <IconDollar />, color: "text-amber-600 dark:text-amber-400" },
 				].map((kpi) => (
 					<div key={kpi.label} className="group rounded-xl border border-border/60 bg-card p-4 transition-shadow hover:shadow-md">
 						<div className={`mb-1.5 ${kpi.color}`}>{kpi.icon}</div>
@@ -311,7 +319,7 @@ export default function DashboardPage() {
 					<section>
 						<div className="mb-3 flex items-center justify-between">
 							<h2 className="flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
-								<IconZap /> Action required
+								<IconZap /> {t("dashboard.sections.actionRequired", "Action required")}
 								{urgentItems.length > 0 && (
 									<span className="ml-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold tabular-nums text-red-600 dark:text-red-400 ring-1 ring-inset ring-red-500/20">
 										{urgentItems.length}
@@ -324,7 +332,7 @@ export default function DashboardPage() {
 									onClick={() => setExpanded((p) => !p)}
 									className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 								>
-									{expanded ? "Show less" : `View all ${urgentItems.length}`}
+									{expanded ? t("dashboard.actions.showLess", "Show less") : t("dashboard.actions.viewAll", "View all {{count}}", { count: urgentItems.length })}
 								</button>
 							)}
 						</div>
@@ -335,18 +343,18 @@ export default function DashboardPage() {
 									<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
 										<IconCheckCircle />
 									</div>
-									<p className="text-base font-medium text-foreground">All clear</p>
-									<p className="mt-0.5 text-sm text-muted-foreground">No urgent stock issues right now.</p>
+									<p className="text-base font-medium text-foreground">{t("dashboard.allClear", "All clear")}</p>
+									<p className="mt-0.5 text-sm text-muted-foreground">{t("dashboard.noUrgentIssues", "No urgent stock issues right now.")}</p>
 								</div>
 							) : (
 								<>
 									{/* Header – desktop */}
 									<div className="hidden border-b border-border/40 bg-muted/30 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground sm:grid sm:grid-cols-[1fr_80px_90px_90px_110px]">
-										<span>Product</span>
-										<span className="text-center">Stock</span>
-										<span className="text-center">Status</span>
-										<span className="text-center">Reorder</span>
-										<span className="text-right">Action</span>
+										<span>{t("dashboard.reorderDialog.product", "Product")}</span>
+										<span className="text-center">{t("dashboard.reorderDialog.units", "Stock")}</span>
+										<span className="text-center">{t("settings.role", "Status")}</span>
+										<span className="text-center">{t("dashboard.actions.reorder", "Reorder")}</span>
+										<span className="text-right">{t("dashboard.reorderDialog.confirmStep", "Action")}</span>
 									</div>
 
 									<ul className="divide-y divide-border/40">
@@ -391,10 +399,10 @@ export default function DashboardPage() {
 																		: "bg-primary text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.97]"
 																}`}
 															>
-																{isOrdered ? <><IconCheck /> Ordered</> : <>Reorder <IconChevronRight /></>}
+																{isOrdered ? <><IconCheck /> {t("dashboard.actions.ordered", "Ordered")}</> : <>{t("dashboard.actions.reorder", "Reorder")} <IconChevronRight /></>}
 															</button>
 														) : (
-															<span className="text-sm text-muted-foreground/50">No action</span>
+															<span className="text-sm text-muted-foreground/50">{t("dashboard.actions.noAction", "No action")}</span>
 														)}
 													</div>
 												</li>
@@ -409,12 +417,12 @@ export default function DashboardPage() {
 					{/* Weekly sales chart */}
 					<section>
 						<h2 className="mb-3 flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
-							<IconBarChart /> Weekly sales
+							<IconBarChart /> {t("dashboard.sections.weeklySales", "Weekly sales")}
 						</h2>
 						<div className="rounded-xl border border-border/60 bg-card p-4">
 							<div className="mb-2 flex items-baseline justify-between">
-								<p className="text-sm text-muted-foreground">Daily unit sales</p>
-								<p className="text-base font-bold tabular-nums text-foreground">{salesThisWeek} total</p>
+								<p className="text-sm text-muted-foreground">{t("dashboard.dailyUnitSales", "Daily unit sales")}</p>
+								<p className="text-base font-bold tabular-nums text-foreground">{t("dashboard.totalSales", "{{count}} total", { count: salesThisWeek })}</p>
 							</div>
 							<WeeklySalesChart data={weeklyTotals} />
 						</div>
@@ -427,7 +435,7 @@ export default function DashboardPage() {
 					{/* Top stock items */}
 					<section>
 						<h2 className="mb-3 flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
-							<IconTrendUp /> Top stock
+							<IconTrendUp /> {t("dashboard.sections.topStock", "Top stock")}
 						</h2>
 						<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 							<ul className="divide-y divide-border/40">
@@ -438,7 +446,7 @@ export default function DashboardPage() {
 										</span>
 										<div className="min-w-0 flex-1">
 											<p className="truncate text-base font-medium text-foreground">{item.name}</p>
-											<p className="text-sm text-muted-foreground">{item.currentStock} units</p>
+											<p className="text-sm text-muted-foreground">{item.currentStock} {t("dashboard.reorderDialog.units", "units")}</p>
 										</div>
 									</li>
 								))}
@@ -449,17 +457,17 @@ export default function DashboardPage() {
 					{/* Quick actions */}
 					<section>
 						<h2 className="mb-3 flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
-							<IconZap /> Quick actions
+							<IconZap /> {t("dashboard.sections.quickActions", "Quick actions")}
 						</h2>
 						<div className="space-y-1.5">
 							{[
-								{ label: "View all products", href: "/inventory" },
-								{ label: "Add new product", href: "/inventory" },
-								{ label: "Adjust stock levels", href: "/inventory" },
-								{ label: "View reports", href: "/forecast" },
+								{ label: t("dashboard.actions.viewAllProducts", "View all products"), href: "/inventory" },
+								{ label: t("dashboard.actions.addNewProduct", "Add new product"), href: "/inventory" },
+								{ label: t("dashboard.actions.adjustStockLevels", "Adjust stock levels"), href: "/inventory" },
+								{ label: t("dashboard.actions.viewReports", "View reports"), href: "/forecast" },
 							].map((action) => (
 								<button
-									key={action.label}
+									key={action.href + action.label}
 									type="button"
 									onClick={() => { window.location.href = action.href; }}
 									className="flex w-full items-center justify-between rounded-lg border border-border/60 bg-card px-4 py-2.5 text-base font-medium text-foreground transition-colors hover:bg-muted/30"
@@ -474,16 +482,16 @@ export default function DashboardPage() {
 					{/* Alert summary */}
 					<section>
 						<h2 className="mb-3 flex items-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
-							<IconBell /> Alert summary
+							<IconBell /> {t("dashboard.sections.alertSummary", "Alert summary")}
 						</h2>
 						<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
 							<ul className="divide-y divide-border/40">
 								{[
-									{ label: "Critical", count: stockoutItems.length, dotColor: "bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]" },
-									{ label: "Warning", count: lowStockItems.length, dotColor: "bg-amber-500" },
-									{ label: "Normal", count: goodStockItems.length, dotColor: "bg-emerald-500" },
+									{ label: t("dashboard.alertSummaryRows.critical", "Critical"), count: stockoutItems.length, dotColor: "bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.4)]", key: "critical" },
+									{ label: t("dashboard.alertSummaryRows.warning", "Warning"), count: lowStockItems.length, dotColor: "bg-amber-500", key: "warning" },
+									{ label: t("dashboard.alertSummaryRows.normal", "Normal"), count: goodStockItems.length, dotColor: "bg-emerald-500", key: "normal" },
 								].map((row) => (
-									<li key={row.label} className="flex items-center justify-between px-4 py-3">
+									<li key={row.key} className="flex items-center justify-between px-4 py-3">
 										<div className="flex items-center gap-2.5">
 											<span className={`flex h-2 w-2 shrink-0 rounded-full ${row.dotColor}`} />
 											<span className="text-base text-foreground">{row.label}</span>
@@ -497,7 +505,7 @@ export default function DashboardPage() {
 				</div>
 			</div>
 
-			<HelpHint description="Prioritize 'Out of Stock' items first, then clear low-stock items with highest reorder value to protect weekly sales." />
+			<HelpHint description={t("dashboard.helpHint", "Prioritize 'Out of Stock' items first, then clear low-stock items with highest reorder value to protect weekly sales.")} />
 
 			{/* ── Reorder dialog ───────────────────────────────────── */}
 			{reorderDialogItem && (
@@ -505,14 +513,14 @@ export default function DashboardPage() {
 					className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center sm:p-4"
 					role="dialog"
 					aria-modal="true"
-					aria-label="Reorder product"
+					aria-label={t("dashboard.reorderDialog.title", "Reorder product")}
 					onClick={(e) => e.target === e.currentTarget && closeReorderDialog()}
 				>
 					<div className="w-full max-w-md rounded-t-2xl border border-border/60 bg-card shadow-2xl sm:rounded-2xl">
 						{/* Header */}
 						<div className="flex items-center justify-between border-b border-border/40 px-5 py-4">
 							<div>
-								<h2 className="text-base font-semibold text-foreground">Reorder product</h2>
+								<h2 className="text-base font-semibold text-foreground">{t("dashboard.reorderDialog.title", "Reorder product")}</h2>
 								<p className="mt-0.5 text-sm text-muted-foreground">{reorderDialogItem.name}</p>
 							</div>
 							<button type="button" onClick={closeReorderDialog} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground" aria-label="Close">
@@ -525,7 +533,7 @@ export default function DashboardPage() {
 							{[1, 2].map((step) => (
 								<div key={step} className="flex flex-1 flex-col items-center gap-1">
 									<div className={`h-1 w-full rounded-full transition-colors ${step <= reorderDialogStep ? "bg-primary" : "bg-muted"}`} />
-									<span className="text-xs font-medium text-muted-foreground">{step === 1 ? "Quantity" : "Confirm"}</span>
+									<span className="text-xs font-medium text-muted-foreground">{step === 1 ? t("dashboard.reorderDialog.quantityStep", "Quantity") : t("dashboard.reorderDialog.confirmStep", "Confirm")}</span>
 								</div>
 							))}
 						</div>
@@ -534,14 +542,14 @@ export default function DashboardPage() {
 							{reorderDialogStep === 1 ? (
 								<div className="space-y-4">
 									<div className="rounded-lg bg-muted/30 px-3 py-2.5">
-										<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Suggested quantity</p>
+										<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("dashboard.reorderDialog.suggestedQty", "Suggested quantity")}</p>
 										<p className="mt-0.5 text-lg font-bold text-foreground">
-											{reorderDialogItem.reorderQty} <span className="text-base font-normal text-muted-foreground">units</span>
+											{reorderDialogItem.reorderQty} <span className="text-base font-normal text-muted-foreground">{t("dashboard.reorderDialog.units", "units")}</span>
 										</p>
 									</div>
 
 									<label htmlFor="dashboard-reorder-amount" className="block text-base font-medium text-foreground">
-										Order quantity
+										{t("dashboard.reorderDialog.orderQty", "Order quantity")}
 										<div className="mt-2 flex items-center gap-1.5">
 											<button type="button" onClick={() => setReorderAmount((c) => Math.max(1, c - 1))} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background text-foreground transition-colors hover:bg-muted/40"><IconMinus /></button>
 											<input
@@ -558,24 +566,24 @@ export default function DashboardPage() {
 
 									{getUnitPrice(reorderDialogItem) > 0 && (
 										<p className="text-sm text-muted-foreground">
-											Est. cost: <span className="font-semibold text-foreground">${(reorderAmount * getUnitPrice(reorderDialogItem)).toFixed(2)}</span>
+											{t("dashboard.reorderDialog.estCost", "Est. cost")}: <span className="font-semibold text-foreground">{formatCurrencyAmount(reorderAmount * getUnitPrice(reorderDialogItem), preferences)}</span>
 										</p>
 									)}
 
 									<div className="flex justify-end gap-2 pt-2">
-										<button type="button" onClick={closeReorderDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-base font-medium text-foreground transition-colors hover:bg-muted/40">Cancel</button>
-										<button type="button" onClick={() => setReorderDialogStep(2)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-base font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90">Next <IconChevronRight /></button>
+										<button type="button" onClick={closeReorderDialog} className="rounded-lg border border-border/70 bg-background px-4 py-2 text-base font-medium text-foreground transition-colors hover:bg-muted/40">{t("dashboard.reorderDialog.cancel", "Cancel")}</button>
+										<button type="button" onClick={() => setReorderDialogStep(2)} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-base font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90">{t("dashboard.reorderDialog.next", "Next")} <IconChevronRight /></button>
 									</div>
 								</div>
 							) : (
 								<div className="space-y-4">
 									<div className="divide-y divide-border/40 rounded-lg border border-border/60 bg-muted/20">
 										{[
-											{ label: "Product", value: reorderDialogItem.name },
-											{ label: "Quantity", value: `${reorderAmount} units` },
-											...(getUnitPrice(reorderDialogItem) > 0 ? [{ label: "Est. cost", value: `$${(reorderAmount * getUnitPrice(reorderDialogItem)).toFixed(2)}` }] : []),
+											{ label: t("dashboard.reorderDialog.product", "Product"), value: reorderDialogItem.name, key: "prod" },
+											{ label: t("dashboard.reorderDialog.orderQty", "Quantity"), value: `${reorderAmount} ${t("dashboard.reorderDialog.units", "units")}`, key: "qty" },
+											...(getUnitPrice(reorderDialogItem) > 0 ? [{ label: t("dashboard.reorderDialog.estCost", "Est. cost"), value: formatCurrencyAmount(reorderAmount * getUnitPrice(reorderDialogItem), preferences), key: "cost" }] : []),
 										].map((row) => (
-											<div key={row.label} className="flex items-center justify-between px-3 py-2.5">
+											<div key={row.key} className="flex items-center justify-between px-3 py-2.5">
 														<span className="text-sm text-muted-foreground">{row.label}</span>
 												<span className="text-base font-semibold text-foreground">{row.value}</span>
 											</div>
@@ -583,8 +591,8 @@ export default function DashboardPage() {
 									</div>
 
 									<div className="flex justify-end gap-2 pt-2">
-										<button type="button" onClick={() => setReorderDialogStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-base font-medium text-foreground transition-colors hover:bg-muted/40"><IconArrowLeft /> Back</button>
-										<button type="button" onClick={confirmReorder} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-base font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"><IconCheck /> Confirm</button>
+										<button type="button" onClick={() => setReorderDialogStep(1)} className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-4 py-2 text-base font-medium text-foreground transition-colors hover:bg-muted/40"><IconArrowLeft /> {t("dashboard.reorderDialog.back", "Back")}</button>
+										<button type="button" onClick={confirmReorder} className="inline-flex items-center gap-1 rounded-lg bg-primary px-5 py-2 text-base font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90"><IconCheck /> {t("dashboard.reorderDialog.confirm", "Confirm")}</button>
 									</div>
 								</div>
 							)}

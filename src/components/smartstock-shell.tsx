@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/lib/i18n";
 import { Navbar } from "@/components/layout/navbar";
 import {
     BILLING_CHANGED_EVENT,
@@ -21,6 +22,7 @@ type SmartStockShellProps = {
 };
 
 export function SmartStockShell({ title, subtitle, children }: SmartStockShellProps) {
+    const t = useT();
     const pathname = usePathname();
     const [billingState, setBillingState] = useState(() => getDefaultBillingState());
 
@@ -49,6 +51,14 @@ export function SmartStockShell({ title, subtitle, children }: SmartStockShellPr
     const isAllowed = canAccessPlan(billingState, requiredPlan);
     const requiredPlanName = getPlanById(requiredPlan).name;
 
+    const renderTrialText = () => {
+        if (trialDaysLeft > 0) {
+            const translationKey = trialDaysLeft === 1 ? "dashboard.trialDayLeft" : "dashboard.trialDaysLeft";
+            return ` · ${t(translationKey, undefined, { days: trialDaysLeft })}`;
+        }
+        return ` · ${t("dashboard.trialEnded", "Trial ended")}`;
+    };
+
     return (
         <div className="min-h-screen w-full bg-background">
             {/* Sticky top bar */}
@@ -68,16 +78,14 @@ export function SmartStockShell({ title, subtitle, children }: SmartStockShellPr
                             <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
                         </div>
                         <span className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground">
-              Real-time workspace
-            </span>
+                            {t("dashboard.realtimeWorkspace", "Real-time workspace")}
+                        </span>
                     </div>
 
                     <p className="mt-2 text-xs text-muted-foreground">
-                        Plan:{" "}
+                        {t("dashboard.planLabel", "Plan")}:{" "}
                         <span className="font-semibold text-foreground">{currentPlan.name}</span>
-                        {trialDaysLeft > 0
-                            ? ` · Trial ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left`
-                            : " · Trial ended"}
+                        {renderTrialText()}
                     </p>
                 </section>
 
@@ -92,16 +100,15 @@ export function SmartStockShell({ title, subtitle, children }: SmartStockShellPr
                                 </svg>
                             </div>
                             <div>
-                                <h2 className="text-base font-semibold text-foreground">Feature locked</h2>
+                                <h2 className="text-base font-semibold text-foreground">{t("dashboard.featureLocked", "Feature locked")}</h2>
                                 <p className="mt-1 text-sm text-muted-foreground">
-                                    This page requires the{" "}
-                                    <span className="font-semibold text-foreground">{requiredPlanName}</span> plan or higher.
+                                    {t("dashboard.requiresPlan", "This page requires the {{plan}} plan or higher.", { plan: requiredPlanName })}
                                 </p>
                                 <Link
                                     href="/billing"
                                     className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 >
-                                    View billing plans
+                                    {t("dashboard.viewBilling", "View billing plans")}
                                 </Link>
                             </div>
                         </div>

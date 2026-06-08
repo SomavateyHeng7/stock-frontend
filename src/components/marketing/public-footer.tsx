@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useT } from "@/lib/i18n";
 
 export function PublicFooter() {
+  const t = useT();
+
   return (
     <footer className="mt-16 border-t border-border bg-white dark:bg-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -8,14 +13,14 @@ export function PublicFooter() {
           <span className="font-semibold text-slate-900 dark:text-white">
             Smart<span className="text-blue-600 dark:text-blue-400">Stock</span>
           </span>
-          <span>· © {new Date().getFullYear()} · Built for retail SMEs.</span>
+          <span>· © {new Date().getFullYear()} · {t("nav.footerBuiltFor", "Built for retail SMEs.")}</span>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          <Link href="/features" className="transition-colors hover:text-foreground">Features</Link>
-          <Link href="/pricing" className="transition-colors hover:text-foreground">Pricing</Link>
-          <Link href="/faq" className="transition-colors hover:text-foreground">FAQ</Link>
-          <Link href="/legal/privacy" className="transition-colors hover:text-foreground">Privacy</Link>
-          <Link href="/legal/terms" className="transition-colors hover:text-foreground">Terms</Link>
+          <Link href="/features" className="transition-colors hover:text-foreground">{t("nav.features", "Features")}</Link>
+          <Link href="/pricing" className="transition-colors hover:text-foreground">{t("nav.billing", "Pricing")}</Link>
+          <Link href="/faq" className="transition-colors hover:text-foreground">{t("nav.faq", "FAQ")}</Link>
+          <Link href="/legal/privacy" className="transition-colors hover:text-foreground">{t("nav.privacy", "Privacy")}</Link>
+          <Link href="/legal/terms" className="transition-colors hover:text-foreground">{t("nav.terms", "Terms")}</Link>
         </div>
       </div>
     </footer>

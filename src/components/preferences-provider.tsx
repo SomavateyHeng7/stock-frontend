@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { I18nProvider } from "@/lib/i18n";
 import {
   USER_PREFERENCES_CHANGED_EVENT,
   readUserPreferences,
@@ -10,21 +11,20 @@ import {
 export function PreferencesProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const apply = () => {
-      const preferences = readUserPreferences();
-      document.documentElement.lang = toLocaleTag(preferences.language);
-      document.documentElement.dataset.timezone = preferences.timezone;
-      document.documentElement.dataset.currency = preferences.currency;
+      const prefs = readUserPreferences();
+      document.documentElement.lang = toLocaleTag(prefs.language);
+      document.documentElement.dataset.timezone = prefs.timezone;
+      document.documentElement.dataset.currency = prefs.currency;
     };
 
     apply();
-    window.addEventListener("storage", apply);
     window.addEventListener(USER_PREFERENCES_CHANGED_EVENT, apply);
-
+    window.addEventListener("storage", apply);
     return () => {
-      window.removeEventListener("storage", apply);
       window.removeEventListener(USER_PREFERENCES_CHANGED_EVENT, apply);
+      window.removeEventListener("storage", apply);
     };
   }, []);
 
-  return <>{children}</>;
+  return <I18nProvider>{children}</I18nProvider>;
 }

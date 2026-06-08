@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { plans } from "@/lib/billing";
 import { PublicHeader } from "@/components/marketing/public-header";
 import { PublicFooter } from "@/components/marketing/public-footer";
+import { useT } from "@/lib/i18n";
 import {
   ArrowRight,
   BarChart3,
@@ -17,6 +20,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const t = useT();
+
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
@@ -37,22 +42,20 @@ export default function Home() {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
                   </span>
-                  Built for Cambodia&apos;s SME retailers
+                  {t("landing.tagline", "Built for Cambodia's SME retailers")}
                 </div>
 
                 <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl leading-[1.1]">
-                  Stop guessing.
+                  {t("landing.headlineStop", "Stop guessing.")}
                   <br />
                   <span className="bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
-                    Start knowing
+                    {t("landing.headlineStart", "Start knowing")}
                   </span>{" "}
-                  when to reorder.
+                  {t("landing.headlineWhen", "when to reorder.")}
                 </h1>
 
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
-                  SmartStock uses AI to predict demand 30 days ahead, flag low stock, and send
-                  reorder alerts directly to your Telegram — so you never run out during Khmer New
-                  Year again.
+                  {t("landing.heroDesc", "SmartStock uses AI to predict demand 30 days ahead, flag low stock, and send reorder alerts directly to your Telegram — so you never run out during Khmer New Year again.")}
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -60,26 +63,26 @@ export default function Home() {
                     href="/onboarding"
                     className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-500/30"
                   >
-                    Start free — 1 month trial
+                    {t("landing.trialCta", "Start free — 1 month trial")}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="#how-it-works"
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   >
-                    See how it works
+                    {t("landing.seeHow", "See how it works")}
                   </Link>
                 </div>
 
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" /> No credit card
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> {t("landing.noCc", "No credit card")}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" /> Setup in 10 min
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> {t("landing.setupTime", "Setup in 10 min")}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" /> Cancel anytime
+                    <CheckCircle2 className="h-4 w-4 text-green-500" /> {t("landing.cancelAnytime", "Cancel anytime")}
                   </span>
                 </div>
               </div>
@@ -94,9 +97,9 @@ export default function Home() {
                     </div>
                     <div className="min-w-0">
                       <p className="truncate text-[11px] font-semibold text-slate-800 dark:text-slate-200">
-                        SmartStock Bot
+                        {t("landing.telegramBot", "SmartStock Bot")}
                       </p>
-                      <p className="text-[9px] text-slate-400">Telegram · just now</p>
+                      <p className="text-[9px] text-slate-400">{t("landing.telegramJustNow", "Telegram · just now")}</p>
                     </div>
                     <span className="relative ml-auto flex h-2 w-2 shrink-0">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
@@ -104,8 +107,7 @@ export default function Home() {
                     </span>
                   </div>
                   <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
-                    📦 <strong>Blue T-Shirt (M)</strong> is running low. Order 25 units by Tuesday to
-                    avoid stockout.
+                    {t("landing.telegramAlertText", "📦 Blue T-Shirt (M) is running low. Order 25 units by Tuesday to avoid stockout.")}
                   </p>
                 </div>
 
@@ -119,7 +121,7 @@ export default function Home() {
                       <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
                     </div>
                     <span className="ml-2 text-[10px] font-medium text-slate-400">
-                      SmartStock · Reorder Queue
+                      {t("landing.reorderQueueMock", "SmartStock · Reorder Queue")}
                     </span>
                   </div>
 
@@ -132,15 +134,15 @@ export default function Home() {
                         </span>
                         <div>
                           <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                            Blue T-Shirt (M)
+                            {t("landing.mockItems.blueShirt", "Blue T-Shirt (M)")}
                           </p>
                           <p className="text-[10px] font-medium text-red-600 dark:text-red-400">
-                            3 left — Order 25 units by Tue
+                            {t("landing.mockItems.blueShirtAlert", "3 left — Order 25 units by Tue")}
                           </p>
                         </div>
                       </div>
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-900/60 dark:text-red-300">
-                        URGENT
+                        {t("landing.mockItems.urgent", "URGENT")}
                       </span>
                     </div>
 
@@ -152,15 +154,15 @@ export default function Home() {
                         </span>
                         <div>
                           <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                            Jasmine Rice (5kg)
+                            {t("landing.mockItems.rice", "Jasmine Rice (5kg)")}
                           </p>
                           <p className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
-                            12 left — Order 40 bags by Fri
+                            {t("landing.mockItems.riceAlert", "12 left — Order 40 bags by Fri")}
                           </p>
                         </div>
                       </div>
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">
-                        LOW
+                        {t("landing.mockItems.low", "LOW")}
                       </span>
                     </div>
 
@@ -172,15 +174,15 @@ export default function Home() {
                         </span>
                         <div>
                           <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                            Coconut Water (24pk)
+                            {t("landing.mockItems.coconut", "Coconut Water (24pk)")}
                           </p>
                           <p className="text-[10px] text-slate-500">
-                            47 in stock · Forecast +18 this week
+                            {t("landing.mockItems.coconutAlert", "47 in stock · Forecast +18 this week")}
                           </p>
                         </div>
                       </div>
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:bg-green-900/60 dark:text-green-300">
-                        OK
+                        {t("landing.mockItems.ok", "OK")}
                       </span>
                     </div>
                   </div>
@@ -189,10 +191,10 @@ export default function Home() {
                   <div className="border-t border-slate-100 px-4 py-3 dark:border-slate-700/60">
                     <div className="mb-2 flex items-center justify-between">
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                        30-Day Demand Forecast
+                        {t("landing.forecastTitle", "30-Day Demand Forecast")}
                       </p>
                       <span className="flex items-center gap-1 text-[10px] font-bold text-green-600">
-                        <CheckCircle2 className="h-3 w-3" /> 87% accuracy
+                        <CheckCircle2 className="h-3 w-3" /> {t("landing.forecastAccuracy", "87% accuracy")}
                       </span>
                     </div>
                     <div className="flex h-10 items-end gap-0.5">
@@ -211,7 +213,7 @@ export default function Home() {
                 <div className="absolute -bottom-3 -left-3 hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-lg dark:border-slate-700 dark:bg-slate-800 sm:flex">
                   <TrendingUp className="h-4 w-4 shrink-0 text-green-600" />
                   <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    70% fewer stockouts
+                    {t("landing.stats.fewerStockouts", "70% fewer stockouts")}
                   </p>
                 </div>
               </div>
@@ -224,16 +226,16 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 gap-8 text-center sm:grid-cols-4">
               {[
-                { value: "70%", label: "Fewer stockouts" },
-                { value: "5 hrs", label: "Saved per week" },
-                { value: "85%+", label: "Forecast accuracy" },
-                { value: "$15/mo", label: "Starting price" },
+                { value: "70%", labelKey: "landing.stats.fewerStockouts", defaultLabel: "Fewer stockouts" },
+                { value: "5 hrs", labelKey: "landing.stats.hoursSaved", defaultLabel: "Saved per week" },
+                { value: "85%+", labelKey: "landing.stats.accuracy", defaultLabel: "Forecast accuracy" },
+                { value: "$15/mo", labelKey: "landing.stats.startingPrice", defaultLabel: "Starting price" },
               ].map((stat) => (
-                <div key={stat.label}>
+                <div key={stat.labelKey}>
                   <p className="bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
                     {stat.value}
                   </p>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t(stat.labelKey, stat.defaultLabel)}</p>
                 </div>
               ))}
             </div>
@@ -245,15 +247,13 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                The problem
+                {t("landing.problemTag", "The problem")}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Running out of stock costs you money.{" "}
-                <span className="text-slate-400">Especially when you can&apos;t afford it.</span>
+                {t("landing.problemTitle", "Running out of stock costs you money. Especially when you can't afford it.")}
               </h2>
               <p className="mt-4 text-base text-slate-500 dark:text-slate-400 sm:text-lg">
-                70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New
-                Year hits, they either run out of best-sellers or lock up cash in overstock.
+                {t("landing.problemDesc", "70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New Year hits, they either run out of best-sellers or lock up cash in overstock.")}
               </p>
             </div>
 
@@ -261,32 +261,38 @@ export default function Home() {
               {[
                 {
                   emoji: "😰",
-                  title: "Guesswork reordering",
-                  desc: '"Should I call my supplier? I think we\'re low…" Then customers start asking and it\'s too late.',
+                  titleKey: "landing.problems.0.title",
+                  defaultTitle: "Guesswork reordering",
+                  descKey: "landing.problems.0.desc",
+                  defaultDesc: '"Should I call my supplier? I think we\'re low…" Then customers start asking and it\'s too late.',
                 },
                 {
                   emoji: "📉",
-                  title: "Peak season disasters",
-                  desc: "Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you'll never get back.",
+                  titleKey: "landing.problems.1.title",
+                  defaultTitle: "Peak season disasters",
+                  descKey: "landing.problems.1.desc",
+                  defaultDesc: "Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you'll never get back.",
                 },
                 {
                   emoji: "💸",
-                  title: "Cash locked in overstock",
-                  desc: "Order too much to avoid stockouts, but now your money sits on shelves instead of working for you.",
+                  titleKey: "landing.problems.2.title",
+                  defaultTitle: "Cash locked in overstock",
+                  descKey: "landing.problems.2.desc",
+                  defaultDesc: "Order too much to avoid stockouts, but now your money sits on shelves instead of working for you.",
                 },
               ].map((item) => (
                 <div
-                  key={item.title}
+                  key={item.titleKey}
                   className="group rounded-2xl border border-red-100 bg-linear-to-b from-red-50 to-white p-6 transition-all hover:border-red-200 hover:shadow-md dark:border-red-900/30 dark:from-red-950/30 dark:to-transparent"
                 >
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-100 text-xl dark:bg-red-900/40">
                     {item.emoji}
                   </div>
                   <h3 className="mt-4 font-semibold text-slate-800 dark:text-slate-200">
-                    {item.title}
+                    {t(item.titleKey, item.defaultTitle)}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                    {item.desc}
+                    {t(item.descKey, item.defaultDesc)}
                   </p>
                 </div>
               ))}
@@ -302,13 +308,13 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                How it works
+                {t("landing.howItWorksTag", "How it works")}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                From manual tracking to intelligent decisions
+                {t("landing.howItWorksTitle", "From manual tracking to intelligent decisions")}
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 dark:text-slate-400">
-                Built for sellers who live on their phones, not desktop dashboards.
+                {t("landing.howItWorksDesc", "Built for sellers who live on their phones, not desktop dashboards.")}
               </p>
             </div>
 
@@ -319,23 +325,32 @@ export default function Home() {
               {[
                 {
                   step: 1,
-                  title: "Upload your sales data",
-                  desc: "Import from CSV, connect your POS, or paste Facebook Messenger orders. Our AI understands Khmer and English mixed messages.",
-                  detail: "Facebook Messenger parsing included",
+                  titleKey: "landing.steps.0.title",
+                  defaultTitle: "Upload your sales data",
+                  descKey: "landing.steps.0.desc",
+                  defaultDesc: "Import from CSV, connect your POS, or paste Facebook Messenger orders. Our AI understands Khmer and English mixed messages.",
+                  detailKey: "landing.steps.0.detail",
+                  defaultDetail: "Facebook Messenger parsing included",
                   icon: <MessageSquare className="h-4 w-4" />,
                 },
                 {
                   step: 2,
-                  title: "AI predicts demand",
-                  desc: "Get 30-day forecasts for every product. Our model knows Cambodia's calendar — Khmer New Year, Pchum Ben, 11.11 shopping events.",
-                  detail: "85%+ accuracy after 60 days",
+                  titleKey: "landing.steps.1.title",
+                  defaultTitle: "AI predicts demand",
+                  descKey: "landing.steps.1.desc",
+                  defaultDesc: "Get 30-day forecasts for every product. Our model knows Cambodia's calendar — Khmer New Year, Pchum Ben, 11.11 shopping events.",
+                  detailKey: "landing.steps.1.detail",
+                  defaultDetail: "85%+ accuracy after 60 days",
                   icon: <TrendingUp className="h-4 w-4" />,
                 },
                 {
                   step: 3,
-                  title: "Get alerts on Telegram",
-                  desc: 'Every morning at 8 AM: "Blue T-Shirt (M) — Order 25 units by Tuesday." No desktop needed. Just tap, call your supplier, done.',
-                  detail: "Alerts in English or Khmer",
+                  titleKey: "landing.steps.2.title",
+                  defaultTitle: "Get alerts on Telegram",
+                  descKey: "landing.steps.2.desc",
+                  defaultDesc: 'Every morning at 8 AM: "Blue T-Shirt (M) — Order 25 units by Tuesday." No desktop needed. Just tap, call your supplier, done.',
+                  detailKey: "landing.steps.2.detail",
+                  defaultDetail: "Alerts in English or Khmer",
                   icon: <Bell className="h-4 w-4" />,
                 },
               ].map((item) => (
@@ -344,14 +359,14 @@ export default function Home() {
                     {item.step}
                   </div>
                   <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
-                    {item.title}
+                    {t(item.titleKey, item.defaultTitle)}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-                    {item.desc}
+                    {t(item.descKey, item.defaultDesc)}
                   </p>
                   <div className="mt-4 flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
                     {item.icon}
-                    {item.detail}
+                    {t(item.detailKey, item.defaultDetail)}
                   </div>
                 </div>
               ))}
@@ -364,10 +379,10 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Features
+                {t("landing.featuresTag", "Features")}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Everything you need to stop stockouts
+                {t("landing.featuresTitle", "Everything you need to stop stockouts")}
               </h2>
             </div>
 
@@ -375,62 +390,78 @@ export default function Home() {
               {[
                 {
                   icon: <BarChart3 className="h-6 w-6" />,
-                  title: "AI Demand Forecasting",
-                  desc: "30-day predictions with seasonal awareness for Cambodia's peak shopping periods.",
+                  titleKey: "landing.features.0.title",
+                  defaultTitle: "AI Demand Forecasting",
+                  descKey: "landing.features.0.desc",
+                  defaultDesc: "30-day predictions with seasonal awareness for Cambodia's peak shopping periods.",
                   color: "text-blue-600 bg-blue-50 dark:bg-blue-950/50 dark:text-blue-400",
                 },
                 {
                   icon: <Bell className="h-6 w-6" />,
-                  title: "Smart Reorder Alerts",
-                  desc: "Automatic notifications with recommended quantities before you run out.",
+                  titleKey: "landing.features.1.title",
+                  defaultTitle: "Smart Reorder Alerts",
+                  descKey: "landing.features.1.desc",
+                  defaultDesc: "Automatic notifications with recommended quantities before you run out.",
                   color: "text-violet-600 bg-violet-50 dark:bg-violet-950/50 dark:text-violet-400",
                 },
                 {
                   icon: <MessageSquare className="h-6 w-6" />,
-                  title: "Messenger Parsing",
-                  desc: "Paste order messages, AI extracts products and quantities. Khmer + English supported.",
+                  titleKey: "landing.features.2.title",
+                  defaultTitle: "Messenger Parsing",
+                  descKey: "landing.features.2.desc",
+                  defaultDesc: "Paste order messages, AI extracts products and quantities. Khmer + English supported.",
                   color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-400",
                 },
                 {
                   icon: <Package className="h-6 w-6" />,
-                  title: "Multi-Channel Sync",
-                  desc: "One view of stock across Facebook, walk-in, and online sales channels.",
+                  titleKey: "landing.features.3.title",
+                  defaultTitle: "Multi-Channel Sync",
+                  descKey: "landing.features.3.desc",
+                  defaultDesc: "One view of stock across Facebook, walk-in, and online sales channels.",
                   color: "text-cyan-600 bg-cyan-50 dark:bg-cyan-950/50 dark:text-cyan-400",
                 },
                 {
                   icon: <Globe className="h-6 w-6" />,
-                  title: "Khmer Language Support",
-                  desc: "Full UI and alerts in Khmer or English. Switch anytime.",
+                  titleKey: "landing.features.4.title",
+                  defaultTitle: "Khmer Language Support",
+                  descKey: "landing.features.4.desc",
+                  defaultDesc: "Full UI and alerts in Khmer or English. Switch anytime.",
                   color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400",
                 },
                 {
                   icon: <TrendingUp className="h-6 w-6" />,
-                  title: "Seasonal Trend Detection",
-                  desc: "Built-in awareness of Khmer New Year, Pchum Ben, and 11.11 shopping events.",
+                  titleKey: "landing.features.5.title",
+                  defaultTitle: "Seasonal Trend Detection",
+                  descKey: "landing.features.5.desc",
+                  defaultDesc: "Built-in awareness of Khmer New Year, Pchum Ben, and 11.11 shopping events.",
                   color: "text-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-400",
                 },
                 {
                   icon: <BarChart3 className="h-6 w-6" />,
-                  title: "Sales Analytics",
-                  desc: "Track trends, top sellers, and forecast accuracy in one dashboard.",
+                  titleKey: "landing.features.6.title",
+                  defaultTitle: "Sales Analytics",
+                  descKey: "landing.features.6.desc",
+                  defaultDesc: "Track trends, top sellers, and forecast accuracy in one dashboard.",
                   color: "text-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-400",
                 },
                 {
                   icon: <Zap className="h-6 w-6" />,
-                  title: "10-Minute Setup",
-                  desc: "Guided onboarding with demo mode. No tech skills required.",
+                  titleKey: "landing.features.7.title",
+                  defaultTitle: "10-Minute Setup",
+                  descKey: "landing.features.7.desc",
+                  defaultDesc: "Guided onboarding with demo mode. No tech skills required.",
                   color: "text-orange-600 bg-orange-50 dark:bg-orange-950/50 dark:text-orange-400",
                 },
               ].map((f) => (
                 <div
-                  key={f.title}
+                  key={f.titleKey}
                   className="group rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
                 >
                   <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${f.color}`}>
                     {f.icon}
                   </div>
-                  <h3 className="mt-4 font-semibold text-slate-800 dark:text-slate-200">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{f.desc}</p>
+                  <h3 className="mt-4 font-semibold text-slate-800 dark:text-slate-200">{t(f.titleKey, f.defaultTitle)}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{t(f.descKey, f.defaultDesc)}</p>
                 </div>
               ))}
             </div>
@@ -442,13 +473,13 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Pricing
+                {t("landing.pricingTag", "Pricing")}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Enterprise AI at SME pricing
+                {t("landing.pricingTitle", "Enterprise AI at SME pricing")}
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base text-slate-500 dark:text-slate-400">
-                Start with 1 month free. No credit card required. Cancel anytime.
+                {t("landing.pricingDesc", "Start with 1 month free. No credit card required. Cancel anytime.")}
               </p>
             </div>
 
@@ -464,7 +495,7 @@ export default function Home() {
                 >
                   {idx === 1 && (
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-900 shadow">
-                      Most Popular
+                      {t("billing.mostPopular", "Most Popular")}
                     </div>
                   )}
 
@@ -472,12 +503,12 @@ export default function Home() {
                     <h3
                       className={`text-lg font-bold ${idx === 1 ? "text-white" : "text-slate-900 dark:text-white"}`}
                     >
-                      {plan.name}
+                      {t(`billing.plans.${plan.id}.name`, plan.name)}
                     </h3>
                     <p
                       className={`mt-1 text-xs ${idx === 1 ? "text-blue-100" : "text-slate-500 dark:text-slate-400"}`}
                     >
-                      {plan.targetCustomer}
+                      {t(`billing.plans.${plan.id}.targetCustomer`, plan.targetCustomer)}
                     </p>
                   </div>
 
@@ -492,20 +523,20 @@ export default function Home() {
                         <span
                           className={`text-sm ${idx === 1 ? "text-blue-100" : "text-slate-400"}`}
                         >
-                          /month
+                          {t("billing.cycleMonth", "/month")}
                         </span>
                       )}
                     </p>
                   </div>
 
                   <ul className="mt-5 flex-1 space-y-2.5 text-sm">
-                    {plan.features.map((feature) => (
+                    {plan.features.map((feature, featureIdx) => (
                       <li key={`${plan.id}-${feature}`} className="flex items-start gap-2.5">
                         <CheckCircle2
                           className={`mt-0.5 h-4 w-4 shrink-0 ${idx === 1 ? "text-blue-200" : "text-blue-500"}`}
                         />
                         <span className={idx === 1 ? "text-blue-50" : "text-slate-500 dark:text-slate-400"}>
-                          {feature}
+                          {t(`billing.plans.${plan.id}.features.${featureIdx}`, feature)}
                         </span>
                       </li>
                     ))}
@@ -519,15 +550,14 @@ export default function Home() {
                         : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                     }`}
                   >
-                    Start free trial
+                    {t("billing.startTrial", "Start free trial")}
                   </Link>
                 </div>
               ))}
             </div>
 
             <p className="mt-8 text-center text-sm text-slate-400">
-              All plans include 1 month free trial · Annual plans save 20% · Custom enterprise
-              pricing available
+              {t("landing.pricingDisclaimer", "All plans include 1 month free trial · Annual plans save 20% · Custom enterprise pricing available")}
             </p>
           </div>
         </section>
@@ -537,39 +567,45 @@ export default function Home() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Testimonials
+                {t("landing.testimonialsTag", "Testimonials")}
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Trusted by retailers across Phnom Penh
+                {t("landing.testimonialsTitle", "Trusted by retailers across Phnom Penh")}
               </h2>
             </div>
 
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  quote:
-                    "I only realize I'm out of stock when customers start asking. By then it's already too late. SmartStock tells me before I run out — saved me during last Khmer New Year.",
-                  name: "Lika",
-                  role: "Clothing seller via Facebook, Phnom Penh",
+                  quoteKey: "landing.testimonials.0.quote",
+                  defaultQuote: "I only realize I'm out of stock when customers start asking. By then it's already too late. SmartStock tells me before I run out — saved me during last Khmer New Year.",
+                  nameKey: "landing.testimonials.0.name",
+                  defaultName: "Lika",
+                  roleKey: "landing.testimonials.0.role",
+                  defaultRole: "Clothing seller via Facebook, Phnom Penh",
                   initial: "L",
                 },
                 {
-                  quote:
-                    "Setting up took less than 15 minutes. Now I get a Telegram message every morning telling me what to order. I don't even look at my Excel file anymore.",
-                  name: "Dara",
-                  role: "Grocery store owner, Toul Kork",
+                  quoteKey: "landing.testimonials.1.quote",
+                  defaultQuote: "Setting up took less than 15 minutes. Now I get a Telegram message every morning telling me what to order. I don't even look at my Excel file anymore.",
+                  nameKey: "landing.testimonials.1.name",
+                  defaultName: "Dara",
+                  roleKey: "landing.testimonials.1.role",
+                  defaultRole: "Grocery store owner, Toul Kork",
                   initial: "D",
                 },
                 {
-                  quote:
-                    "During the 11.11 sale, SmartStock predicted the spike 2 weeks early. I ordered extra stock and sold out completely — best sale day ever.",
-                  name: "Sreymom",
-                  role: "Cosmetics & beauty shop, BKK1",
+                  quoteKey: "landing.testimonials.2.quote",
+                  defaultQuote: "During the 11.11 sale, SmartStock predicted the spike 2 weeks early. I ordered extra stock and sold out completely — best sale day ever.",
+                  nameKey: "landing.testimonials.2.name",
+                  defaultName: "Sreymom",
+                  roleKey: "landing.testimonials.2.role",
+                  defaultRole: "Cosmetics & beauty shop, BKK1",
                   initial: "S",
                 },
-              ].map((t) => (
+              ].map((testi) => (
                 <div
-                  key={t.name}
+                  key={testi.defaultName}
                   className="flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900"
                 >
                   <div className="flex gap-0.5 text-amber-400">
@@ -578,15 +614,15 @@ export default function Home() {
                     ))}
                   </div>
                   <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    &ldquo;{t.quote}&rdquo;
+                    &ldquo;{t(testi.quoteKey, testi.defaultQuote)}&rdquo;
                   </blockquote>
                   <div className="mt-6 flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-                      {t.initial}
+                      {testi.initial}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t.name}</p>
-                      <p className="text-xs text-slate-400">{t.role}</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t(testi.nameKey, testi.defaultName)}</p>
+                      <p className="text-xs text-slate-400">{t(testi.roleKey, testi.defaultRole)}</p>
                     </div>
                   </div>
                 </div>
@@ -606,17 +642,15 @@ export default function Home() {
               <div className="relative">
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
                   <Users className="h-3.5 w-3.5" />
-                  Join retailers across Cambodia
+                  {t("landing.finalCtaTag", "Join retailers across Cambodia")}
                 </div>
 
                 <h2 className="mt-5 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                  Stop running out of stock
-                  <br className="hidden sm:block" /> during peak season
+                  {t("landing.finalCtaTitle", "Stop running out of stock during peak season")}
                 </h2>
 
                 <p className="mx-auto mt-4 max-w-xl text-base text-blue-100 sm:text-lg">
-                  Join Cambodian SMEs using SmartStock to reduce stockouts, free up cash, and make
-                  smarter reorder decisions every day.
+                  {t("landing.finalCtaDesc", "Join Cambodian SMEs using SmartStock to reduce stockouts, free up cash, and make smarter reorder decisions every day.")}
                 </p>
 
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -624,20 +658,19 @@ export default function Home() {
                     href="/onboarding"
                     className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-blue-700 shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
                   >
-                    Start your free trial
+                    {t("landing.finalCtaButton", "Start your free trial")}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
                     href="/billing"
                     className="inline-flex items-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                   >
-                    View pricing
+                    {t("landing.finalCtaPricing", "View pricing")}
                   </Link>
                 </div>
 
                 <p className="mt-6 text-sm text-blue-200">
-                  ✓ No credit card required &nbsp;·&nbsp; ✓ Setup in 10 minutes &nbsp;·&nbsp; ✓
-                  Cancel anytime
+                  {t("landing.finalCtaSubtext", "✓ No credit card required  ·  ✓ Setup in 10 minutes  ·  ✓ Cancel anytime")}
                 </p>
               </div>
             </div>

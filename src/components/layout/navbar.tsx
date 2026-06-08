@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { useToast } from "@/components/ui/toast-provider";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { LanguageToggle } from "@/components/ui/language-toggle";
 import { AUTH_CHANGED_EVENT, getUserInitials, readAuthUser, signOut, type AuthUser } from "@/lib/auth";
 import {
   NOTIFICATION_CENTER_CHANGED_EVENT,
@@ -13,20 +15,21 @@ import {
 } from "@/lib/notification-center";
 
 const navItems = [
-  { href: "/inventory", label: "Inventory" },
-  { href: "/reorder-queue", label: "Reorder" },
-  { href: "/sales", label: "Sales & Reports" },
-  { href: "/suppliers", label: "Suppliers & Delivery", activePaths: ["/suppliers", "/delivery"] },
+  { href: "/inventory", label: "Inventory", key: "inventory" },
+  { href: "/reorder-queue", label: "Reorder", key: "reorder" },
+  { href: "/sales", label: "Sales & Reports", key: "sales" },
+  { href: "/suppliers", label: "Suppliers & Delivery", key: "suppliers", activePaths: ["/suppliers", "/delivery"] },
 ];
 
 const secondaryNavItems = [
-  { href: "/forecast", label: "Forecast" },
-  { href: "/integrations", label: "Integrations & Sync", activePaths: ["/integrations", "/sync"] },
-  { href: "/billing", label: "Billing" },
-  { href: "/onboarding", label: "Tutorial" },
+  { href: "/forecast", label: "Forecast", key: "forecast" },
+  { href: "/integrations", label: "Integrations & Sync", key: "integrations", activePaths: ["/integrations", "/sync"] },
+  { href: "/billing", label: "Billing", key: "billing" },
+  { href: "/onboarding", label: "Tutorial", key: "tutorial" },
 ];
 
 export function Navbar() {
+  const t = useT();
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
@@ -121,11 +124,11 @@ export function Navbar() {
                       href={item.href}
                       className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                         isActive
-                          ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                           ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                       }`}
                     >
-                      {item.label}
+                      {t(`nav.${item.key}`, item.label)}
                     </Link>
                   </li>
                 );
@@ -144,7 +147,7 @@ export function Navbar() {
                   aria-expanded={isMoreMenuOpen}
                   aria-label="Open more navigation"
                 >
-                  More
+                  {t("nav.more", "More")}
                   <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 opacity-60" fill="currentColor" aria-hidden="true">
                     <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -167,7 +170,7 @@ export function Navbar() {
                               : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                           }`}
                         >
-                          {item.label}
+                          {t(`nav.${item.key}`, item.label)}
                         </Link>
                       );
                     })}
@@ -194,6 +197,7 @@ export function Navbar() {
             </svg>
           </button>
 
+          <LanguageToggle />
           <ModeToggle />
 
           <Link
@@ -205,7 +209,7 @@ export function Navbar() {
                 : "border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
-            <span className="sr-only">Notifications</span>
+            <span className="sr-only">{t("nav.notifications", "Notifications")}</span>
             <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M15 17H9m9-4V11a6 6 0 10-12 0v2l-2 2h16l-2-2z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -221,7 +225,7 @@ export function Navbar() {
             href="/dashboard"
             className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 xl:px-4"
           >
-            Dashboard
+            {t("nav.dashboard", "Dashboard")}
           </Link>
 
           {/* Account menu — isMounted guard needed, reads from localStorage */}
@@ -248,14 +252,14 @@ export function Navbar() {
                         onClick={() => setIsAccountMenuOpen(false)}
                         className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
-                        My account
+                        {t("nav.myAccount", "My account")}
                       </Link>
                       <Link
                         href="/setting"
                         onClick={() => setIsAccountMenuOpen(false)}
                         className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
-                        Settings
+                        {t("nav.settings", "Settings")}
                       </Link>
                       <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
                       <button
@@ -263,7 +267,7 @@ export function Navbar() {
                         onClick={handleSignOut}
                         className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
                       >
-                        Sign out
+                        {t("nav.signOut", "Sign out")}
                       </button>
                     </div>
                   )}
@@ -273,7 +277,7 @@ export function Navbar() {
                   href="/auth/login"
                   className="rounded-lg border border-slate-200 px-3.5 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 xl:px-4"
                 >
-                  Sign in
+                  {t("nav.signIn", "Sign in")}
                 </Link>
               )
             ) : (
@@ -299,7 +303,7 @@ export function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
-                    Sign in
+                    {t("nav.signIn", "Sign in")}
                   </Link>
                 </li>
                 <li>
@@ -308,7 +312,7 @@ export function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
-                    Create account
+                    {t("nav.createAccount", "Create account")}
                   </Link>
                 </li>
                 <li className="my-1 border-t border-slate-100 dark:border-slate-800" />
@@ -329,7 +333,7 @@ export function Navbar() {
                         : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     }`}
                   >
-                    <span>{item.label}</span>
+                    <span>{t(`nav.${item.key}`, item.label)}</span>
                   </Link>
                 </li>
               );
@@ -353,7 +357,7 @@ export function Navbar() {
                         : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     }`}
                   >
-                    <span>{item.label}</span>
+                    <span>{t(`nav.${item.key}`, item.label)}</span>
                   </Link>
                 </li>
               );
@@ -361,7 +365,11 @@ export function Navbar() {
 
             <li className="my-1 border-t border-slate-100 dark:border-slate-800" />
             <li className="flex items-center justify-between rounded-lg px-3 py-2">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Theme</span>
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{t("settings.language", "Language")}</span>
+              <LanguageToggle />
+            </li>
+            <li className="flex items-center justify-between rounded-lg px-3 py-2">
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{t("nav.theme", "Theme")}</span>
               <ModeToggle />
             </li>
           </ul>

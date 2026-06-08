@@ -1,0 +1,363 @@
+{
+  "nav": {
+    "logo": "SmartStock",
+    "inventory": "Inventory",
+    "reorder": "Reorder",
+    "sales": "Sales & Reports",
+    "suppliers": "Suppliers & Delivery",
+    "forecast": "Forecast",
+    "integrations": "Integrations & Sync",
+    "billing": "Billing",
+    "tutorial": "Tutorial",
+    "settings": "Settings",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "myAccount": "My account",
+    "more": "More",
+    "theme": "Theme",
+    "dashboard": "Dashboard",
+    "createAccount": "Create account",
+    "notifications": "Notifications",
+    "features": "Features",
+    "about": "About",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "footerBuiltFor": "Built for retail SMEs.",
+    "toggleNav": "Toggle public navigation menu"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Real-time inventory intelligence at a glance.",
+    "realtimeWorkspace": "Real-time workspace",
+    "planLabel": "Plan",
+    "trialDaysLeft": "Trial {{days}} days left",
+    "trialDayLeft": "Trial {{days}} day left",
+    "trialEnded": "Trial ended",
+    "featureLocked": "Feature locked",
+    "requiresPlan": "This page requires the {{plan}} plan or higher.",
+    "viewBilling": "View billing plans",
+    "kpis": {
+      "totalProducts": "Total products",
+      "lowStock": "Low stock",
+      "outOfStock": "Out of stock",
+      "salesThisWeek": "Sales this week",
+      "inventoryValue": "Inventory value",
+      "reorderQueue": "Reorder queue",
+      "reorderValue": "Reorder value"
+    },
+    "status": {
+      "inStock": "in stock",
+      "requiresAttention": "Requires attention",
+      "lostSalesRisk": "Lost sales risk",
+      "unitsSold": "Units sold",
+      "items": "items"
+    },
+    "sections": {
+      "actionRequired": "Action required",
+      "weeklySales": "Weekly sales",
+      "topStock": "Top stock",
+      "quickActions": "Quick actions",
+      "alertSummary": "Alert summary"
+    },
+    "actions": {
+      "showLess": "Show less",
+      "viewAll": "View all {{count}}",
+      "ordered": "Ordered",
+      "reorder": "Reorder",
+      "noAction": "No action",
+      "viewAllProducts": "View all products",
+      "addNewProduct": "Add new product",
+      "adjustStockLevels": "Adjust stock levels",
+      "viewReports": "View reports"
+    },
+    "alertSummaryRows": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "normal": "Normal"
+    },
+    "reorderDialog": {
+      "title": "Reorder product",
+      "quantityStep": "Quantity",
+      "confirmStep": "Confirm",
+      "suggestedQty": "Suggested quantity",
+      "units": "units",
+      "orderQty": "Order quantity",
+      "estCost": "Est. cost",
+      "cancel": "Cancel",
+      "next": "Next",
+      "back": "Back",
+      "confirm": "Confirm",
+      "product": "Product",
+      "reorderConfirmed": "Reorder confirmed",
+      "markedOrdered": "{{name}}: {{qty}} units marked as ordered."
+    },
+    "helpHint": "Prioritize 'Out of Stock' items first, then clear low-stock items with highest reorder value to protect weekly sales.",
+    "allClear": "All clear",
+    "noUrgentIssues": "No urgent stock issues right now.",
+    "dailyUnitSales": "Daily unit sales",
+    "totalSales": "{{count}} total",
+    "units": "units"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile, appearance, security, and team.",
+    "personalInfo": "Personal information",
+    "personalInfoDesc": "This information appears across billing, exports, and team notifications.",
+    "fullName": "Full name",
+    "emailAddress": "Email address",
+    "phoneNumber": "Phone number",
+    "businessName": "Business name",
+    "timezone": "Timezone",
+    "language": "Language",
+    "currency": "Currency",
+    "saveChanges": "Save changes",
+    "reset": "Reset",
+    "preferences": "Preferences",
+    "preferencesDesc": "Notifications and display settings for your workspace.",
+    "emailAlerts": "Email alerts",
+    "emailAlertsDesc": "Receive important updates via email",
+    "telegramAlerts": "Telegram alerts",
+    "telegramAlertsDesc": "Get stock notifications on Telegram",
+    "compactRows": "Compact table rows",
+    "compactRowsDesc": "Show more items per screen in tables",
+    "themeSection": "Theme",
+    "themeSectionDesc": "Choose how SmartStock looks on your device.",
+    "themeQuickToggle": "Quick toggle",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "changePassword": "Change password",
+    "changePasswordDesc": "Use a strong password of at least 8 characters.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "updatePassword": "Update password",
+    "twoFactor": "Two-factor authentication",
+    "twoFactorDesc": "Add an extra layer of security to your account.",
+    "authenticatorApp": "Authenticator app",
+    "activeProtect": "Active and protecting your account",
+    "notConfigured": "Not configured",
+    "disable": "Disable",
+    "enable2fa": "Enable 2FA",
+    "recoveryEmail": "Recovery email",
+    "activeSessions": "Active sessions",
+    "activeSessionCount": "{{count}} active session",
+    "activeSessionsCount": "{{count}} active sessions",
+    "current": "Current",
+    "lastActive": "Last active: {{time}}",
+    "revoke": "Revoke",
+    "signOutOther": "Sign out all other devices",
+    "dangerZone": "Danger zone",
+    "dangerZoneDesc": "Permanently remove this account profile and sign out from the workspace. This action cannot be undone.",
+    "deleteAccount": "Delete account",
+    "inviteTeam": "Invite a team member",
+    "inviteTeamDesc": "New members will receive an invitation email.",
+    "role": "Role",
+    "inviteMember": "Invite member",
+    "teamMembers": "Team members",
+    "membersWorkspace": "members in your workspace",
+    "memberWorkspace": "member in your workspace",
+    "pending": "Pending",
+    "tabs": {
+      "profile": "Profile",
+      "appearance": "Appearance",
+      "security": "Security",
+      "team": "Team"
+    }
+  },
+  "landing": {
+    "tagline": "Built for Cambodia's SME retailers",
+    "headlineStop": "Stop guessing.",
+    "headlineStart": "Start knowing",
+    "headlineWhen": "when to reorder.",
+    "heroDesc": "SmartStock uses AI to predict demand 30 days ahead, flag low stock, and send reorder alerts directly to your Telegram — so you never run out during Khmer New Year again.",
+    "trialCta": "Start free — 1 month trial",
+    "seeHow": "See how it works",
+    "noCc": "No credit card",
+    "setupTime": "Setup in 10 min",
+    "cancelAnytime": "Cancel anytime",
+    "telegramBot": "SmartStock Bot",
+    "telegramJustNow": "Telegram · just now",
+    "telegramAlertText": "Blue T-Shirt (M) is running low. Order 25 units by Tuesday to avoid stockout.",
+    "reorderQueueMock": "SmartStock · Reorder Queue",
+    "mockItems": {
+      "blueShirt": "Blue T-Shirt (M)",
+      "blueShirtAlert": "3 left — Order 25 units by Tue",
+      "rice": "Jasmine Rice (5kg)",
+      "riceAlert": "12 left — Order 40 bags by Fri",
+      "coconut": "Coconut Water (24pk)",
+      "coconutAlert": "47 in stock · Forecast +18 this week",
+      "urgent": "URGENT",
+      "low": "LOW",
+      "ok": "OK"
+    },
+    "forecastTitle": "30-Day Demand Forecast",
+    "forecastAccuracy": "87% accuracy",
+    "stats": {
+      "fewerStockouts": "70% fewer stockouts",
+      "hoursSaved": "5 hrs saved per week",
+      "accuracy": "85%+ accuracy",
+      "startingPrice": "$15/mo"
+    },
+    "problemTag": "The problem",
+    "problemTitle": "Running out of stock costs you money. Especially when you can't afford it.",
+    "problemDesc": "70% of Cambodian SMEs still track inventory with notebooks and Excel. When Khmer New Year hits, they either run out of best-sellers or lock up cash in overstock.",
+    "problems": [
+      {
+        "title": "Guesswork reordering",
+        "desc": "\"Should I call my supplier? I think we're low…\" Then customers start asking and it's too late."
+      },
+      {
+        "title": "Peak season disasters",
+        "desc": "Run out during Pchum Ben or 11.11 when demand spikes. Lost sales you'll never get back."
+      },
+      {
+        "title": "Cash locked in overstock",
+        "desc": "Order too much to avoid stockouts, but now your money sits on shelves instead of working for you."
+      }
+    ],
+    "howItWorksTag": "How it works",
+    "howItWorksTitle": "From manual tracking to intelligent decisions",
+    "howItWorksDesc": "Built for sellers who live on their phones, not desktop dashboards.",
+    "steps": [
+      {
+        "title": "Upload your sales data",
+        "desc": "Import from CSV, connect your POS, or paste Facebook Messenger orders. Our AI understands Khmer and English mixed messages.",
+        "detail": "Facebook Messenger parsing included"
+      },
+      {
+        "title": "AI predicts demand",
+        "desc": "Get 30-day forecasts for every product. Our model knows Cambodia's calendar — Khmer New Year, Pchum Ben, 11.11 shopping events.",
+        "detail": "85%+ accuracy after 60 days"
+      },
+      {
+        "title": "Get alerts on Telegram",
+        "desc": "Every morning at 8 AM: \"Blue T-Shirt (M) — Order 25 units by Tuesday.\" No desktop needed. Just tap, call your supplier, done.",
+        "detail": "Alerts in English or Khmer"
+      }
+    ],
+    "featuresTag": "Features",
+    "featuresTitle": "Everything you need to stop stockouts",
+    "features": [
+      {
+        "title": "AI Demand Forecasting",
+        "desc": "30-day predictions with seasonal awareness for Cambodia's peak shopping periods."
+      },
+      {
+        "title": "Smart Reorder Alerts",
+        "desc": "Automatic notifications with recommended quantities before you run out."
+      },
+      {
+        "title": "Messenger Parsing",
+        "desc": "Paste order messages, AI extracts products and quantities. Khmer + English supported."
+      },
+      {
+        "title": "Multi-Channel Sync",
+        "desc": "One view of stock across Facebook, walk-in, and online sales channels."
+      },
+      {
+        "title": "Khmer Language Support",
+        "desc": "Full UI and alerts in Khmer or English. Switch anytime."
+      },
+      {
+        "title": "Seasonal Trend Detection",
+        "desc": "Built-in awareness of Khmer New Year, Pchum Ben, and 11.11 shopping events."
+      },
+      {
+        "title": "Sales Analytics",
+        "desc": "Track trends, top sellers, and forecast accuracy in one dashboard."
+      },
+      {
+        "title": "10-Minute Setup",
+        "desc": "Guided onboarding with demo mode. No tech skills required."
+      }
+    ],
+    "pricingTag": "Pricing",
+    "pricingTitle": "Enterprise AI at SME pricing",
+    "pricingDesc": "Start with 1 month free. No credit card required. Cancel anytime.",
+    "pricingDisclaimer": "All plans include 1 month free trial · Annual plans save 20% · Custom enterprise pricing available",
+    "testimonialsTag": "Testimonials",
+    "testimonialsTitle": "Trusted by retailers across Phnom Penh",
+    "testimonials": [
+      {
+        "quote": "I only realize I'm out of stock when customers start asking. By then it's already too late. SmartStock tells me before I run out — saved me during last Khmer New Year.",
+        "name": "Lika",
+        "role": "Clothing seller via Facebook, Phnom Penh"
+      },
+      {
+        "quote": "Setting up took less than 15 minutes. Now I get a Telegram message every morning telling me what to order. I don't even look at my Excel file anymore.",
+        "name": "Dara",
+        "role": "Grocery store owner, Toul Kork"
+      },
+      {
+        "quote": "During the 11.11 sale, SmartStock predicted the spike 2 weeks early. I ordered extra stock and sold out completely — best sale day ever.",
+        "name": "Sreymom",
+        "role": "Cosmetics & beauty shop, BKK1"
+      }
+    ],
+    "finalCtaTag": "Join retailers across Cambodia",
+    "finalCtaTitle": "Stop running out of stock during peak season",
+    "finalCtaDesc": "Join Cambodian SMEs using SmartStock to reduce stockouts, free up cash, and make smarter reorder decisions every day.",
+    "finalCtaButton": "Start your free trial",
+    "finalCtaPricing": "View pricing",
+    "finalCtaSubtext": "✓ No credit card required  ·  ✓ Setup in 10 minutes  ·  ✓ Cancel anytime"
+  },
+  "billing": {
+    "mostPopular": "Most Popular",
+    "cycleMonth": "/month",
+    "startTrial": "Start free trial",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "targetCustomer": "Micro SMEs (50–100 SKUs)",
+        "features": [
+          "Basic AI demand forecasting (30-day forecast)",
+          "Stockout alerts",
+          "Email notifications",
+          "1 sales channel integration",
+          "Simple dashboard"
+        ]
+      },
+      "growth": {
+        "name": "Growth",
+        "targetCustomer": "Growing SMEs (100–300 SKUs)",
+        "features": [
+          "Advanced AI forecasting (seasonality-aware)",
+          "Smart reorder recommendations",
+          "Multi-channel sync (up to 3 platforms)",
+          "Real-time alerts (Email + Telegram)",
+          "Sales trend analytics",
+          "Basic supplier tracking"
+        ]
+      },
+      "advanced": {
+        "name": "Advanced",
+        "targetCustomer": "Mini-marts & established SMEs",
+        "features": [
+          "Unlimited SKUs",
+          "AI reorder quantity optimization",
+          "Supplier lead-time modeling",
+          "Promotion demand simulation",
+          "Advanced analytics dashboard",
+          "Priority support",
+          "Multi-location support"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "targetCustomer": "Multi-branch retailers / marts",
+        "features": [
+          "Custom AI models",
+          "API integration for POS providers",
+          "Dedicated onboarding",
+          "SLA support",
+          "Data export & reporting tools",
+          "White-label options"
+        ]
+      }
+    }
+  }
+}

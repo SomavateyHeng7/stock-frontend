@@ -174,3 +174,12 @@
     background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
     background-size: 24px 24px;
 }
+
+/* ─── Kantumruy Pro for Khmer ─────────────────────────────────────── */
+html[lang="km-KH"],
+html[lang="km-KH"] body,
+html[lang="km-KH"] *,
+html[lang="km-KH"] *::before,
+html[lang="km-KH"] *::after {
+    font-family: "Kantumruy Pro", sans-serif !important;
+}
